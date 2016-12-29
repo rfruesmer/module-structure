@@ -1,5 +1,5 @@
 {
-  "name": "module-structure",
+  "name": "module-structure-analyzer",
   "version": "0.0.1",
   "description": "Generates levelized structure data for ECMAScript/TypeScript modules.",
   "main": "index.js",
@@ -8,18 +8,21 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/rfruesmer/module-structure.git"
+    "url": "git+https://github.com/rfruesmer/module-structure-analyzer.git"
   },
   "keywords": [
     "module",
     "structure",
     "dependencies",
-    "dependency"
+    "dependency",
+    "ecmascript",
+    "es6",
+    "typescript"
   ],
   "author": "Reinhold Früsmer",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/rfruesmer/module-structure/issues"
+    "url": "https://github.com/rfruesmer/module-structure-analyzer/issues"
   },
-  "homepage": "https://github.com/rfruesmer/module-structure#readme"
+  "homepage": "https://github.com/rfruesmer/module-structure-analyzer#readme"
 }
