@@ -58,6 +58,16 @@ export class StructureMapBuilder {
         this.resolvePackageDependencies(this.packageTree);
     }
 
+    private resolvePackageDependencies(_package: Package): void {
+        _package.packages.forEach(childPackage => this.resolvePackageDependencies(childPackage));
+        _package.modules.forEach(module =>
+            module.dependencies
+                .filter(dependency => dependency instanceof Module)
+                .forEach(dependentModule => {
+                    _package.addDependency(this.packageIndex[(dependentModule as Module).packageName]);
+                }));
+    }
+
     private resolveModuleDependencies(_package: Package): void {
         _package.packages.forEach(childPackage => this.resolveModuleDependencies(childPackage));
         _package.modules.forEach(module =>
@@ -73,16 +83,6 @@ export class StructureMapBuilder {
         if (importedModule) {
             module.addDependency(importedModule);
         }
-    }
-
-    private resolvePackageDependencies(_package: Package): void {
-        _package.packages.forEach(childPackage => this.resolvePackageDependencies(childPackage));
-        _package.modules.forEach(module =>
-            module.dependencies
-                .filter(dependency => dependency instanceof Module)
-                .forEach(dependentModule => {
-                    _package.addDependency(this.packageIndex[(dependentModule as Module).packageName]);
-                }));
     }
 
     private createStructureMap(): void {

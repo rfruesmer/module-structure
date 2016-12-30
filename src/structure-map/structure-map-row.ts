@@ -1,8 +1,6 @@
-import {Package} from "../package-tree/package";
 import {Module} from "../package-tree/module";
 import {StructureMapEntity} from "./structure-map-entity";
-import {PackageTreeEntity} from "../package-tree/package-tree-entity";
-import {StructureMapEntityFactory} from "./structure-map-entity-factory";
+import {StructureMapPackage} from "./structure-map-package";
 
 
 export class StructureMapRow {
@@ -11,13 +9,13 @@ export class StructureMapRow {
     private _dependencyMap: any = {};
 
 
-    public insert(entity: PackageTreeEntity): void {
+    public insert(entity: StructureMapEntity): void {
         this.indexDependencies(entity);
         this.insertInternal(entity);
     }
 
-    private indexDependencies(entity: PackageTreeEntity): void {
-        if (entity instanceof Package) { // notable: after this instanceof check, TypeScript implicitly casts param entity to Package :)
+    private indexDependencies(entity: StructureMapEntity): void {
+        if (entity instanceof StructureMapPackage) { // notable: after this instanceof check, TypeScript implicitly casts param entity to Package :)
             entity.packages.forEach(childPackage => this.indexDependencies(childPackage));
             entity.modules.forEach(module => this.indexModuleDependencies(module));
         }
@@ -31,7 +29,7 @@ export class StructureMapRow {
         module.dependencies.forEach(dependency => this.indexDependency(module, dependency));
     }
 
-    private indexDependency(from: PackageTreeEntity, to: PackageTreeEntity): void {
+    private indexDependency(from: StructureMapEntity, to: StructureMapEntity): void {
         let dependencyList = this._dependencyMap[to.name];
         if (!dependencyList) {
             dependencyList = [];
@@ -41,18 +39,17 @@ export class StructureMapRow {
         dependencyList.push(from);
     }
 
-    private insertInternal(packageTreeEntity: PackageTreeEntity): void {
-        let structureMapEntity = StructureMapEntityFactory.createFrom(packageTreeEntity);
-        this._items.push(structureMapEntity);
-        this._itemsMap[structureMapEntity.name] = structureMapEntity;
+    private insertInternal(entity: StructureMapEntity): void {
+        this._items.push(entity);
+        this._itemsMap[entity.name] = entity;
     }
 
-    public getDependencyCountTo(entity: PackageTreeEntity): number {
+    public getDependencyCountTo(entity: StructureMapEntity): number {
         let dependencyList = this._dependencyMap[entity.name];
         return dependencyList ? dependencyList.length : 0;
     }
 
-    public getDependencyCountFrom(entity: PackageTreeEntity): number {
+    public getDependencyCountFrom(entity: StructureMapEntity): number {
         let count = 0;
 
         entity.dependencies.forEach(dependency => {

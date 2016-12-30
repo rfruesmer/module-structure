@@ -83,8 +83,8 @@ export class PackageTreeBuilder {
 
     private getModuleFiles(dir: string): string[] {
         return fs.readdirSync(dir)
-            .map(file => path.join(dir, file))
-            .filter(path => fs.statSync(path).isFile() && path.endsWith(".ts"));
+            .map(fileName => path.join(dir, fileName))
+            .filter(filePath => fs.statSync(filePath).isFile() && path.extname(filePath) === ".ts"); // TODO: allow js extensions too
     }
 
     private static getModuleName(filePath: string, packageName: string): string {

@@ -1,6 +1,8 @@
 .idea/sonarlint
 .idea/atlassian-ide-plugin.xml
 .idea/workspace.xml
-src/**/*.js*
 node_modules/
+src/**/*.js*
 test/resources/ts/**/*.js*
+test/result/
+npm-debug.log

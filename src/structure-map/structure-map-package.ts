@@ -2,6 +2,8 @@ import {StructureMapRow} from "./structure-map-row";
 import {Package} from "../package-tree/package";
 import {StructureMapEntity} from "./structure-map-entity";
 import {PackageTreeEntity} from "../package-tree/package-tree-entity";
+import {StructureMapEntityFactory} from "./structure-map-entity-factory";
+import {Module} from "../package-tree/module";
 
 
 export class StructureMapPackage implements StructureMapEntity {
@@ -20,29 +22,30 @@ export class StructureMapPackage implements StructureMapEntity {
     }
 
     private levelize(): void {
-        this._package.packages.forEach(childPackage => this.insertEntity(childPackage));
-        this._package.modules.forEach(module => this.insertEntity(module));
+        this.packages.forEach(childPackage => this.insertEntity(childPackage));
+        this.modules.forEach(module => this.insertEntity(module));
     }
 
-    private insertEntity(entity: PackageTreeEntity): void {
-        let inserted = this.findRowAndInsertEntityThere(entity);
+    private insertEntity(packageTreeEntity: PackageTreeEntity): void {
+        let structureMapEntity = StructureMapEntityFactory.createFrom(packageTreeEntity);
+        let inserted = this.findRowAndInsertEntityThere(structureMapEntity);
         if (!inserted) {
-            this.appendRow(entity);
+            this.appendRow(structureMapEntity);
         }
     }
 
-    private findRowAndInsertEntityThere(entity: PackageTreeEntity): boolean {
+    private findRowAndInsertEntityThere(entity: StructureMapEntity): boolean {
         for (let i = 0; i < this._rows.length; ++i) {
             let row = this._rows[i];
-            let dependenciesToPackage = row.getDependencyCountTo(entity);
+            let dependenciesToEntity = row.getDependencyCountTo(entity);
             let dependenciesToRow = row.getDependencyCountFrom(entity);
-            if (dependenciesToPackage < dependenciesToRow) {
+            if (dependenciesToEntity < dependenciesToRow) {
                 let newRow = new StructureMapRow();
                 newRow.insert(entity);
                 this._rows.splice(i, 0, newRow);
                 return true;
             }
-            else if (dependenciesToRow === dependenciesToPackage) {
+            else if (dependenciesToRow === 0 && dependenciesToEntity === 0) {
                 row.insert(entity);
                 return true;
             }
@@ -51,7 +54,7 @@ export class StructureMapPackage implements StructureMapEntity {
         return false;
     }
 
-    private appendRow(entity: PackageTreeEntity) {
+    private appendRow(entity: StructureMapEntity) {
         let row = new StructureMapRow();
         row.insert(entity);
         this._rows.push(row);
@@ -65,7 +68,19 @@ export class StructureMapPackage implements StructureMapEntity {
         return this._package.simpleName;
     }
 
+    get packages(): Array<Package> {
+        return this._package.packages;
+    }
+
+    get modules(): Array<Module> {
+        return this._package.modules;
+    }
+
     get rows(): Array<StructureMapRow> {
         return this._rows.slice();
+    }
+
+    get dependencies(): Array<PackageTreeEntity> {
+        return this._package.dependencies;
     }
 }

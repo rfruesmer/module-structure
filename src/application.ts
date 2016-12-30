@@ -1,31 +1,34 @@
 import {StructureMapBuilder} from "./structure-map/structure-map-builder";
 import {StructureMapPackage} from "./structure-map/structure-map-package";
+import {StructureMapSerializer} from "./structure-map/structure-map-serializer";
 
 import fs = require("fs");
 import path = require("path");
 import process = require("process");
-import {StructureMapViewModel} from "./structure-map/structure-map-view-model";
-import {StructureMapViewModelBuilder} from "./structure-map/structure-map-view-model-builder";
 
 const commandLineArgs = require("command-line-args");
 const commandLineUsage = require("command-line-usage");
 const preconditions = require("preconditions").instance();
-const checkArgument = preconditions.checkArgument;
 
 
 export class Application {
     private static readonly EXIT_SUCCESS = 0;
+    private static readonly EXIT_FAILURE = -1;
 
-    private config: any = {excludes: []};
+    private config: any = {
+        src: "",
+        dest: "",
+        excludes: []
+    };
     private structureMap: StructureMapPackage;
-    private viewModel: StructureMapViewModel;
 
 
     public run(): void {
         this.parseArguments();
         this.createStructureMap();
-        this.createViewModel();
-        this.exportViewModel();
+        this.exportStructureMap();
+
+        Application.exitWithSuccess();
     }
 
     private parseArguments() {
@@ -36,13 +39,21 @@ export class Application {
         ];
 
         let options = commandLineArgs(optionDefinitions);
-        if (!options.src || typeof options.help !== "undefined") {
+        if (!options.src
+                || !options.dest
+                || typeof options.help !== "undefined") {
             this.printUsage();
             Application.exitWithSuccess();
         }
 
-        checkArgument(fs.existsSync(options.src) && fs.statSync(options.src).isDirectory());
+        if (!fs.existsSync(options.src)
+                || !fs.statSync(options.src).isDirectory()) {
+            console.error("Invalid --src argument");
+            Application.exitWithFailure();
+        }
+
         this.config.src = options.src;
+        this.config.dest = options.dest;
     }
 
     private printUsage() {
@@ -87,17 +98,28 @@ export class Application {
         process.exit(Application.EXIT_SUCCESS);
     };
 
+    private static exitWithFailure() {
+        process.exit(Application.EXIT_FAILURE);
+    }
+
     private createStructureMap(): void {
         let builder = new StructureMapBuilder();
         this.structureMap = builder.build(this.config.src, this.config.excludes);
     }
 
-    private createViewModel(): void {
-        let builder = new StructureMapViewModelBuilder();
-        this.viewModel = builder.buildFrom(this.structureMap);
-    }
+    private exportStructureMap(): void {
+        let destDir = path.dirname(this.config.dest);
+        if (!fs.existsSync(destDir)) {
+            fs.mkdir(destDir);
+        }
 
-    private exportViewModel(): void {
-        // TODO
+        if (fs.existsSync(this.config.dest)) {
+            fs.unlinkSync(this.config.dest);
+        }
+
+        let builder = new StructureMapSerializer();
+        let output = builder.serialize(this.structureMap);
+
+        fs.writeFileSync(this.config.dest, output);
     }
 }

@@ -1,16 +1,17 @@
 import {Module} from "./module";
 import {ModuleImport} from "./module-import";
-import {CompilerOptions, transpile, ScriptTarget, ModuleKind} from "typescript/lib/typescript";
 import {parse} from "babylon";
 import {File, ImportDeclaration} from "babel-types";
 
 import fs = require("fs");
 import path = require("path");
+import {TypeScriptImportParser} from "./typescript-import-parser";
 
 const preconditions = require("preconditions").instance();
 
 
 export class ModuleBuilder {
+    private typeScriptParser = new TypeScriptImportParser();
 
     public build(filePath: string, name: string, packageName: string): Module {
         let simpleName = ModuleBuilder.getSimpleName(filePath);
@@ -24,6 +25,11 @@ export class ModuleBuilder {
     }
 
     private parseImports(filePath: string): Array<ModuleImport> {
+        if (path.extname(filePath) === ".ts") {
+            // since tsc removes imports, it's necessary to parse ts files on our own:
+            return this.typeScriptParser.parseImports(filePath);
+        }
+
         let ast = ModuleBuilder.parseModule(filePath);
         let importDeclarations = ModuleBuilder.getImportDeclarations(ast);
 
@@ -33,14 +39,7 @@ export class ModuleBuilder {
     private static parseModule(filePath: string): File {
         let input = fs.readFileSync(filePath, "utf-8");
 
-        let compilerOptions: CompilerOptions = {
-            target: ScriptTarget.Latest,
-            module: ModuleKind.ES2015
-        };
-
-        let output = transpile(input, compilerOptions, filePath);
-
-        return parse(output, {sourceType: "module"}) as File;
+        return parse(input, {sourceType: "module"}) as File;
     }
 
     private static getImportDeclarations(ast: File): Array<ImportDeclaration> {
