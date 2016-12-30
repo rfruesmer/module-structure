@@ -50,13 +50,13 @@ export class ModuleBuilder {
     private parseImportDeclarations(importDeclarations: Array<ImportDeclaration>): Array<ModuleImport> {
         let imports: Array<ModuleImport> = [];
         importDeclarations.forEach(declaration => {
-            imports.push(ModuleBuilder.parseImportDeclation(declaration));
+            imports.push(ModuleBuilder.parseImportDeclaration(declaration));
         });
 
         return imports;
     }
 
-    private static parseImportDeclation(declaration: ImportDeclaration): ModuleImport {
+    private static parseImportDeclaration(declaration: ImportDeclaration): ModuleImport {
         let types = ModuleBuilder.getImportedTypes(declaration);
         let modulePath = ModuleBuilder.getModulePath(declaration) + ".ts";
 
