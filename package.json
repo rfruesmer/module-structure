@@ -4,7 +4,7 @@
   "description": "Generates levelized structure data for ECMAScript/TypeScript modules.",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node src/index.js"
   },
   "repository": {
     "type": "git",
@@ -24,5 +24,18 @@
   "bugs": {
     "url": "https://github.com/rfruesmer/module-structure-analyzer/issues"
   },
-  "homepage": "https://github.com/rfruesmer/module-structure-analyzer#readme"
+  "homepage": "https://github.com/rfruesmer/module-structure-analyzer#readme",
+  "devDependencies": {
+    "@types/babylon": "^6.7.15",
+    "@types/chai": "^3.4.34",
+    "@types/node": "^6.0.54",
+    "chai": "^3.5.0"
+  },
+  "dependencies": {
+    "babylon": "^6.14.1",
+    "command-line-args": "^3.0.5",
+    "command-line-usage": "^3.0.8",
+    "preconditions": "^2.2.0",
+    "typescript": "^2.1.4"
+  }
 }

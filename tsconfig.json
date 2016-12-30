@@ -1,0 +1,27 @@
+{
+    "compilerOptions": {
+        "target": "es6",
+        "module": "commonjs",
+        "moduleResolution": "node",
+        "sourceMap": true,
+        "removeComments": true,
+        "noImplicitAny": true,
+        "noImplicitReturns": true,
+        "typeRoots": [
+            "node_modules/@types"
+        ],
+        "types": [
+            "babylon",
+            "babel-types",
+            "chai",
+            "node",
+            "typescript"
+        ]
+    },
+    "include": [
+        "./src/**/*"
+    ],
+    "exclude": [
+        "node_modules/*"
+    ]
+}
