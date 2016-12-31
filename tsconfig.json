@@ -5,6 +5,7 @@
         "moduleResolution": "node",
         "sourceMap": true,
         "removeComments": true,
+        "experimentalDecorators": true,
         "noImplicitAny": true,
         "noImplicitReturns": true,
         "typeRoots": [
@@ -19,7 +20,8 @@
         ]
     },
     "include": [
-        "./src/**/*"
+        "./src/**/*",
+        "./test/**/*"
     ],
     "exclude": [
         "node_modules/*"

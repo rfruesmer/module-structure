@@ -1,27 +1,27 @@
-import {StructureMapPackage} from "./structure-map-package";
-import {StructureViewModel} from "../structure-view-model/structure-view-model";
-import {StructureViewModelNode} from "../structure-view-model/structure-view-model-node";
-import {StructureMapRow} from "./structure-map-row";
-import {StructureMapEntity} from "./structure-map-entity";
-import {StructureMapModule} from "./structure-map-module";
-import {StructureViewModelDependency} from "../structure-view-model/structure-view-model-dependency";
+import {StructureMapPackage} from "../structure-map/structure-map-package";
+import {StructureViewModel} from "./structure-view-model";
+import {StructureViewModelNode} from "./structure-view-model-node";
+import {StructureMapRow} from "../structure-map/structure-map-row";
+import {StructureMapEntity} from "../structure-map/structure-map-entity";
+import {StructureMapModule} from "../structure-map/structure-map-module";
+import {StructureViewModelDependency} from "./structure-view-model-dependency";
 
 const preconditions = require("preconditions").instance();
 const checkState = preconditions.checkState;
 
 
-export class StructureMapSerializer {
+export class StructureViewModelBuilder {
     private viewModel: StructureViewModel;
 
 
-    public serialize(structureMap: StructureMapPackage): String {
+    public build(structureMap: StructureMapPackage): StructureViewModel {
         this.viewModel = new StructureViewModel();
-        this.viewModel.root = this.serializeInternal(structureMap);
+        this.viewModel.root = this.buildInternal(structureMap);
 
-        return JSON.stringify(this.viewModel);
+        return this.viewModel;
     }
 
-    private serializeInternal(structureMapEntity: StructureMapEntity): StructureViewModelNode {
+    private buildInternal(structureMapEntity: StructureMapEntity): StructureViewModelNode {
         if (structureMapEntity instanceof StructureMapPackage) {
             return this.serializePackage(structureMapEntity);
         }
@@ -58,7 +58,7 @@ export class StructureMapSerializer {
         let viewModelRow: Array<StructureViewModelNode> = [];
 
         structureMapRow.items.forEach(entity => {
-            viewModelRow.push(this.serializeInternal(entity));
+            viewModelRow.push(this.buildInternal(entity));
         });
 
         return viewModelRow;

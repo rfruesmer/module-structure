@@ -20,7 +20,9 @@ export class StructureMapBuilder {
     private structureMap: StructureMapPackage;
 
 
-    public build(dir: string, excludes: string[]): StructureMapPackage {
+    public build(dir: string, excludes: string[] = []): StructureMapPackage {
+        checkArgument(fs.statSync(dir).isDirectory());
+
         this.dir = dir;
         this.excludes = excludes;
 

@@ -1,5 +1,5 @@
-import {B} from "../pb/b";
-import {C} from "../pc/c";
+import {B} from "../package-b/b";
+import {C} from "../package-c/c";
 
 export class A {
 

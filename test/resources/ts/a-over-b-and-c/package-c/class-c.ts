@@ -1,4 +1,4 @@
-export class B {
+export class ClassC {
 
     doSomething() {
         console.log("done");

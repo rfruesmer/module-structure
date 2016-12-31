@@ -1,4 +1,4 @@
-import {B} from "../pb/b";
+import {B} from "../package-b/b";
 
 export class D {
 

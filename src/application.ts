@@ -1,6 +1,6 @@
 import {StructureMapBuilder} from "./structure-map/structure-map-builder";
 import {StructureMapPackage} from "./structure-map/structure-map-package";
-import {StructureMapSerializer} from "./structure-map/structure-map-serializer";
+import {StructureViewModelBuilder} from "./structure-view-model/structure-view-model-builder";
 
 import fs = require("fs");
 import path = require("path");
@@ -26,7 +26,7 @@ export class Application {
     public run(): void {
         this.parseArguments();
         this.createStructureMap();
-        this.exportStructureMap();
+        this.exportViewModel();
 
         Application.exitWithSuccess();
     }
@@ -107,7 +107,7 @@ export class Application {
         this.structureMap = builder.build(this.config.src, this.config.excludes);
     }
 
-    private exportStructureMap(): void {
+    private exportViewModel(): void {
         let destDir = path.dirname(this.config.dest);
         if (!fs.existsSync(destDir)) {
             fs.mkdir(destDir);
@@ -117,9 +117,9 @@ export class Application {
             fs.unlinkSync(this.config.dest);
         }
 
-        let builder = new StructureMapSerializer();
-        let output = builder.serialize(this.structureMap);
+        let viewModelBuilder = new StructureViewModelBuilder();
+        let viewModel = viewModelBuilder.build(this.structureMap);
 
-        fs.writeFileSync(this.config.dest, output);
+        fs.writeFileSync(this.config.dest, JSON.stringify(viewModel));
     }
 }

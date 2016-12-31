@@ -4,5 +4,6 @@
 node_modules/
 src/**/*.js*
 test/resources/ts/**/*.js*
+test/*.js*
 test/result/
 npm-debug.log
