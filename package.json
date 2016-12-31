@@ -4,7 +4,6 @@
   "description": "Generates levelized structure data for ECMAScript/TypeScript modules.",
   "main": "index.js",
   "scripts": {
-    "postinstall": "rimraf ./src/structure-view-model && git clone https://github.com/rfruesmer/module-structure-view-model.git ./src/structure-view-model",
     "start": "node src/index.js",
     "build": "tsc",
     "pretest": "tsc -p .",
