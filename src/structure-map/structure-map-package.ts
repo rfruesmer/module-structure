@@ -55,18 +55,12 @@ export class StructureMapPackage implements StructureMapEntity {
             if (dependenciesToEntity > dependenciesToRow) {
                 // insert entity into row below
                 let newRow = new StructureMapRow();
-                this._rows.splice(i + 1, 0, newRow)
+                this._rows.splice(i + 1, 0, newRow);
                 this.insertEntityIntoRow(structureMapEntity, i + 1);
                 return;
             }
-            // else if entity depends on row more than row on entity
-            else if (dependenciesToRow > dependenciesToEntity) {
-                // continue to row above
-            }
-            else {
-                // TODO: break up row
-                checkState(false, "not implemented");
-            }
+
+            // continue to row above
         }
 
         this.insertEntityIntoRow(structureMapEntity, -1);
