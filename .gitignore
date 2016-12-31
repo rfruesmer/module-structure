@@ -1,6 +1,8 @@
 .idea/sonarlint
 .idea/atlassian-ide-plugin.xml
 .idea/workspace.xml
+.nyc_output/
+coverage/
 node_modules/
 src/**/*.js*
 test/resources/ts/**/*.js*
