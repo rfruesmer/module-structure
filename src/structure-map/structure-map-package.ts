@@ -5,9 +5,6 @@ import {PackageTreeEntity} from "../package-tree/package-tree-entity";
 import {StructureMapEntityFactory} from "./structure-map-entity-factory";
 import {Module} from "../package-tree/module";
 
-const preconditions = require("preconditions").instance();
-const checkState = preconditions.checkState;
-
 
 export class StructureMapPackage implements StructureMapEntity {
     private _package: Package;
@@ -32,31 +29,21 @@ export class StructureMapPackage implements StructureMapEntity {
             let dependenciesToEntity = row.getDependencyCountTo(structureMapEntity);
             let dependenciesToRow = row.getDependencyCountFrom(structureMapEntity);
 
-            // if row doesn't depend on entity
             if (dependenciesToEntity === 0) {
-                // if entity depends on row
                 if (dependenciesToRow > 0) {
                     continue;
                 }
 
-                // if row is first row
                 if (i === 0) {
-                    // insert entity into first row
                     this.insertEntityIntoRow(structureMapEntity, 0);
                     return;
                 }
-                else {
-                    // continue to row above
-                    continue;
-                }
+
+                continue;
             }
 
-            // if row depends on entity more than entity on row
             if (dependenciesToEntity > dependenciesToRow) {
-                // insert entity into row below
-                let newRow = new StructureMapRow();
-                this._rows.splice(i + 1, 0, newRow);
-                this.insertEntityIntoRow(structureMapEntity, i + 1);
+                this.insertEntityIntoNewRowBelow(structureMapEntity, i);
                 return;
             }
 
@@ -77,6 +64,13 @@ export class StructureMapPackage implements StructureMapEntity {
 
         let row = this._rows[rowIndex];
         row.insert(entity);
+    }
+
+    private insertEntityIntoNewRowBelow(entity: StructureMapEntity, rowIndex: number) {
+        let newRow = new StructureMapRow();
+        this._rows.splice(rowIndex + 1, 0, newRow);
+        this.insertEntityIntoRow(entity, rowIndex + 1);
+        return newRow;
     }
 
     get name(): string {
