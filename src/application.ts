@@ -1,6 +1,6 @@
 import {StructureMapBuilder} from "./structure-map/structure-map-builder";
 import {StructureMapPackage} from "./structure-map/structure-map-package";
-import {StructureViewModelBuilder} from "./structure-view-model/structure-view-model-builder";
+import {StructureViewModelBuilder} from "./structure-map/structure-view-model-builder";
 
 import fs = require("fs");
 import path = require("path");

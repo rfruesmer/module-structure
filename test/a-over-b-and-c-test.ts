@@ -1,10 +1,8 @@
 import {suite, test} from "mocha-typescript";
-import {StructureMapBuilder} from "../src/structure-map/structure-map-builder";
-import {StructureViewModelBuilder} from "../src/structure-view-model/structure-view-model-builder";
-import {StructureViewModel} from "../src/structure-view-model/structure-view-model";
 import {expect} from "chai";
 import {StructureViewModelNode} from "../src/structure-view-model/structure-view-model-node";
 import {ModuleStructureAnalyerTest} from "./module-structure-analyzer-test";
+
 
 @suite class AOverBAndCTest extends ModuleStructureAnalyerTest {
 

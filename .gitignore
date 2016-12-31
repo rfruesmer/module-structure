@@ -5,6 +5,7 @@
 coverage/
 node_modules/
 src/**/*.js*
+src/structure-view-model/
 test/resources/ts/**/*.js*
 test/*.js*
 test/result/

@@ -4,6 +4,7 @@
   "description": "Generates levelized structure data for ECMAScript/TypeScript modules.",
   "main": "index.js",
   "scripts": {
+    "postinstall": "git clone https://github.com/rfruesmer/module-structure-view-model.git src/structure-view-model",
     "start": "node src/index.js",
     "build": "tsc",
     "pretest": "tsc -p .",

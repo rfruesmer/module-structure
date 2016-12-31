@@ -2,8 +2,8 @@ import {StructureViewModelNode} from "../src/structure-view-model/structure-view
 import {expect} from "chai";
 import {StructureViewModel} from "../src/structure-view-model/structure-view-model";
 import {StructureMapBuilder} from "../src/structure-map/structure-map-builder";
-import {StructureViewModelBuilder} from "../src/structure-view-model/structure-view-model-builder";
-import {test} from "mocha-typescript";
+import {StructureViewModelBuilder} from "../src/structure-map/structure-view-model-builder";
+
 
 export abstract class ModuleStructureAnalyerTest {
 
