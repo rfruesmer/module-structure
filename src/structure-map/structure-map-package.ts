@@ -5,20 +5,18 @@ import {PackageTreeEntity} from "../package-tree/package-tree-entity";
 import {StructureMapEntityFactory} from "./structure-map-entity-factory";
 import {Module} from "../package-tree/module";
 
+const preconditions = require("preconditions").instance();
+const checkState = preconditions.checkState;
+
 
 export class StructureMapPackage implements StructureMapEntity {
     private _package: Package;
     private _rows: Array<StructureMapRow> = [];
 
-
     constructor(_package: Package) {
         this._package = _package;
-        this.insertFirstRow();
-        this.levelize();
-    }
-
-    private insertFirstRow(): void {
         this._rows.push(new StructureMapRow());
+        this.levelize();
     }
 
     private levelize(): void {
@@ -28,36 +26,63 @@ export class StructureMapPackage implements StructureMapEntity {
 
     private insertEntity(packageTreeEntity: PackageTreeEntity): void {
         let structureMapEntity = StructureMapEntityFactory.createFrom(packageTreeEntity);
-        let inserted = this.findRowAndInsertEntityThere(structureMapEntity);
-        if (!inserted) {
-            this.appendRow(structureMapEntity);
-        }
-    }
 
-    private findRowAndInsertEntityThere(entity: StructureMapEntity): boolean {
-        for (let i = 0; i < this._rows.length; ++i) {
+        for (let i = this._rows.length - 1; i >= 0; --i) {
             let row = this._rows[i];
-            let dependenciesToEntity = row.getDependencyCountTo(entity);
-            let dependenciesToRow = row.getDependencyCountFrom(entity);
-            if (dependenciesToEntity < dependenciesToRow) {
-                let newRow = new StructureMapRow();
-                newRow.insert(entity);
-                this._rows.splice(i, 0, newRow);
-                return true;
+            let dependenciesToEntity = row.getDependencyCountTo(structureMapEntity);
+            let dependenciesToRow = row.getDependencyCountFrom(structureMapEntity);
+
+            // if row doesn't depend on entity
+            if (dependenciesToEntity === 0) {
+                // if entity depends on row
+                if (dependenciesToRow > 0) {
+                    continue;
+                }
+
+                // if row is first row
+                if (i === 0) {
+                    // insert entity into first row
+                    this.insertEntityIntoRow(structureMapEntity, 0);
+                    return;
+                }
+                else {
+                    // continue to row above
+                    continue;
+                }
             }
-            else if (dependenciesToRow === 0 && dependenciesToEntity === 0) {
-                row.insert(entity);
-                return true;
+
+            // if row depends on entity more than entity on row
+            if (dependenciesToEntity > dependenciesToRow) {
+                // insert entity into row below
+                let newRow = new StructureMapRow();
+                this._rows.splice(i + 1, 0, newRow)
+                this.insertEntityIntoRow(structureMapEntity, i + 1);
+                return;
+            }
+            // else if entity depends on row more than row on entity
+            else if (dependenciesToRow > dependenciesToEntity) {
+                // continue to row above
+            }
+            else {
+                // TODO: break up row
+                checkState(false, "not implemented");
             }
         }
 
-        return false;
+        this.insertEntityIntoRow(structureMapEntity, -1);
     }
 
-    private appendRow(entity: StructureMapEntity) {
-        let row = new StructureMapRow();
+    private insertEntityIntoRow(entity: StructureMapEntity, rowIndex: number) {
+        if (rowIndex < 0) {
+            this._rows.splice(0, 0, new StructureMapRow());
+            rowIndex = 0;
+        }
+        else if (rowIndex >= this._rows.length) {
+            this._rows.push(new StructureMapRow());
+        }
+
+        let row = this._rows[rowIndex];
         row.insert(entity);
-        this._rows.push(row);
     }
 
     get name(): string {
