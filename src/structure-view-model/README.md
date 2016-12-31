@@ -1,1 +1,0 @@
-# module-structure-view-model
