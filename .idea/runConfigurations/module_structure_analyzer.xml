@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="module-structure-analyzer" type="NodeJSConfigurationType" factoryName="Node.js" path-to-node="project" path-to-js-file="src/index.js" application-parameters="--src V:\dev\sources\module-structure-analyzer\test\resources\ts\depencency-equality-04 --dest V:\dev\sources\module-structure-viewer\test\resources\test-model.json" working-dir="$PROJECT_DIR$">
+  <configuration default="false" name="module-structure-analyzer" type="NodeJSConfigurationType" factoryName="Node.js" path-to-node="project" path-to-js-file="src/index.js" application-parameters="--src V:\dev\sources\module-structure-analyzer\test\resources\ts\a-and-d-over-b-and-c --dest V:\dev\sources\module-structure-viewer\test\resources\test-model.json" working-dir="$PROJECT_DIR$">
     <profiling v8-profiler-path="" />
     <EXTENSION ID="com.jetbrains.nodejs.run.NodeJSProfilingRunConfigurationExtension">
       <profiling v8-profiler-path="" />

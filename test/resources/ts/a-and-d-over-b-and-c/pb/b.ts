@@ -1,4 +1,4 @@
-export class LowerLeft {
+export class B {
 
     doSomething() {
         console.log("done");

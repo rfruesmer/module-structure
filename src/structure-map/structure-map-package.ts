@@ -13,16 +13,14 @@ export class StructureMapPackage implements StructureMapEntity {
     constructor(_package: Package) {
         this._package = _package;
         this._rows.push(new StructureMapRow());
-        this.levelize();
-    }
-
-    private levelize(): void {
         this.packages.forEach(childPackage => this.insertEntity(childPackage));
         this.modules.forEach(module => this.insertEntity(module));
     }
 
     private insertEntity(packageTreeEntity: PackageTreeEntity): void {
         let structureMapEntity = StructureMapEntityFactory.createFrom(packageTreeEntity);
+
+        // console.log(packageTreeEntity.name);
 
         for (let i = this._rows.length - 1; i >= 0; --i) {
             let row = this._rows[i];
@@ -43,6 +41,15 @@ export class StructureMapPackage implements StructureMapEntity {
             }
 
             if (dependenciesToEntity > dependenciesToRow) {
+                if (i < this._rows.length - 1) {
+                    dependenciesToEntity = this._rows[i + 1].getDependencyCountTo(structureMapEntity);
+                    dependenciesToRow = this._rows[i + 1].getDependencyCountFrom(structureMapEntity);
+                    if (dependenciesToEntity === 0 && dependenciesToRow === 0) {
+                        this.insertEntityIntoRow(structureMapEntity, i + 1);
+                        return;
+                    }
+                }
+
                 this.insertEntityIntoNewRowBelow(structureMapEntity, i);
                 return;
             }
