@@ -1,10 +1,10 @@
 import {suite, test} from "mocha-typescript";
 import {expect} from "chai";
 import {StructureViewModelNode} from "../src/structure-view-model/structure-view-model-node";
-import {ModuleStructureAnalyerTest} from "./module-structure-analyzer-test";
+import {ModuleStructureTest} from "./module-structure-test";
 
 
-@suite class AOverBAndCTest extends ModuleStructureAnalyerTest {
+@suite class AOverBAndCTest extends ModuleStructureTest {
 
     @test "contains root"() {
         expect(this.viewModel).to.have.property("root");

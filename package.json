@@ -23,7 +23,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/rfruesmer/module-structure-analyzer.git"
+    "url": "git+https://github.com/rfruesmer/module-structure.git"
   },
   "keywords": [
     "module",
@@ -37,9 +37,9 @@
   "author": "Reinhold Früsmer",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/rfruesmer/module-structure-analyzer/issues"
+    "url": "https://github.com/rfruesmer/module-structure/issues"
   },
-  "homepage": "https://github.com/rfruesmer/module-structure-analyzer#readme",
+  "homepage": "https://github.com/rfruesmer/module-structure#readme",
   "devDependencies": {
     "@types/babylon": "^6.7.15",
     "@types/chai": "^3.4.34",
