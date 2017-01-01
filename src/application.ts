@@ -5,121 +5,247 @@ import {StructureViewModelBuilder} from "./structure-map/structure-view-model-bu
 import fs = require("fs");
 import path = require("path");
 import process = require("process");
+import Stopwatch = require("agstopwatch");
 
+const project = require("../package.json");
 const commandLineArgs = require("command-line-args");
 const commandLineUsage = require("command-line-usage");
+const colors = require("colors/safe");
 const preconditions = require("preconditions").instance();
+const getInstalledPathSync = require("get-installed-path").sync;
+const httpServerModule = require("http-server");
+const opener = require("opener");
 
 
 export class Application {
     private static readonly EXIT_SUCCESS = 0;
     private static readonly EXIT_FAILURE = -1;
 
+    private options: any;
+    private optionDefinitions = [
+        {
+            name: "help",
+            alias: "h",
+            type: String,
+            description: "Show this help."
+        },
+        {
+            name: "version",
+            alias: "v",
+            type: Boolean,
+            description: "Print the version number."
+        },
+        {
+            name: "rootDir",
+            type: String,
+            typeLabel: "[underline]{directory}",
+            description: "Specifies the root directory of input files."
+        },
+        {
+            name: "outFile",
+            type: String,
+            typeLabel: "[underline]{file}",
+            description: "Optional: the output path for the generated module structure file. If omitted, the file will be created in a temporary directory and the module structure will be displayed in your default browser."
+        },
+        {
+            name: "port",
+            alias: "p",
+            defaultValue: 3000,
+            typeLabel: "[underline]{port}",
+            description: "Port for serving the included viewer web-app that renders the generated module structure in your browser (defaults to 3000). Omitted if --outFile is specified."
+        }
+    ];
     private config: any = {
-        src: "",
-        dest: "",
+        rootDir: "",
+        outFile: "",
+        port: 3000,
         excludes: []
     };
     private structureMap: StructureMapPackage;
+    private stopWatch: Stopwatch = new Stopwatch();
 
 
     public run(): void {
         this.parseArguments();
+        this.processArguments();
         this.createStructureMap();
         this.exportViewModel();
-
-        Application.exitWithSuccess();
+        if (this.isShowExport()) {
+            this.showViewModel();
+        }
+        else {
+            Application.exitWithSuccess();
+        }
     }
 
     private parseArguments() {
-        let optionDefinitions = [
-            {name: "help", alias: "h", type: String},
-            {name: "src", type: String},
-            {name: "dest", type: String}
-        ];
-
-        let options = commandLineArgs(optionDefinitions);
-        if (!options.src
-                || !options.dest
-                || typeof options.help !== "undefined") {
-            this.printUsage();
-            Application.exitWithSuccess();
+        try {
+            this.options = commandLineArgs(this.optionDefinitions);
         }
-
-        if (!fs.existsSync(options.src)
-                || !fs.statSync(options.src).isDirectory()) {
-            console.error("Invalid --src argument");
+        catch (e) {
+            console.error(e.message);
+            this.printUsage();
             Application.exitWithFailure();
         }
+    }
 
-        this.config.src = options.src;
-        this.config.dest = options.dest;
+    private processArguments() {
+        this.processHelpArgument();
+        this.processVersionArgument();
+        this.processRootDirArgument();
+        this.processPortArgument();
+        if (this.isOutFileSpecified()) {
+            this.processOutFileArgument();
+        }
+        else {
+            this.buildTemporaryOutputPath();
+        }
+    }
+
+    private static exitWithFailure() {
+        process.exit(Application.EXIT_FAILURE);
     }
 
     private printUsage() {
         let sections = [
             {
-                header: "typescript-dependencies",
-                content: "Generates a TypeScript dependency diagram for a given directory."
+                header: project.name,
+                content: "Generates and displays a levelized structure map for ECMAScript/TypeScript modules."
             },
             {
-                header: "Synopsis",
+                header: "Usage",
                 content: [
-                    "$ node index.js [bold]{--src} [underline]{directory} [bold]{--dest} [underline]{file}",
-                    "$ node index.js [bold]{--help}"
+                    "$ " + project.name + " [bold]{--rootDir} [underline]{directory}",
+                    "$ " + project.name + " [bold]{--rootDir} [underline]{directory} [bold]{--outFile} [underline]{file}"
                 ]
             },
             {
                 header: "Options",
-                optionList: [
-                    {
-                        name: "src",
-                        typeLabel: "[underline]{directory}",
-                        description: "The input directory to process."
-                    },
-                    {
-                        name: "dest",
-                        typeLabel: "[underline]{file}",
-                        description: "The path for the output HTML file."
-                    },
-                    {
-                        name: "help",
-                        alias: "h",
-                        description: "Print this usage guide."
-                    }
-                ]
+                optionList: this.optionDefinitions
             }
         ];
 
         console.log(commandLineUsage(sections));
     }
 
+    private processHelpArgument() {
+        if (this.options.help !== undefined) {
+            this.printUsage();
+            Application.exitWithSuccess();
+        }
+    }
+
     private static exitWithSuccess(): void {
         process.exit(Application.EXIT_SUCCESS);
     };
 
-    private static exitWithFailure() {
-        process.exit(Application.EXIT_FAILURE);
+    private processVersionArgument() {
+        if (this.options.version) {
+            console.log(project.name + " version " + project.version);
+            Application.exitWithSuccess();
+        }
+    }
+
+    private processRootDirArgument() {
+        if (!this.options.rootDir) {
+            console.error("Missing --rootDir argument");
+            this.printUsage();
+            Application.exitWithFailure();
+        }
+
+        if (!fs.existsSync(this.options.rootDir)
+                || !fs.statSync(this.options.rootDir).isDirectory()) {
+            console.error("Invalid --rootDir argument");
+            Application.exitWithFailure();
+        }
+
+        this.config.rootDir = this.options.rootDir;
+    }
+
+    private processPortArgument() {
+        this.config.port = this.options.port;
+    }
+
+    private isOutFileSpecified() {
+        return this.options.outFile !== undefined;
+    }
+
+    private processOutFileArgument() {
+        let outDir = path.dirname(this.options.outFile);
+        if (!fs.existsSync(outDir)
+               || !fs.statSync(outDir).isDirectory()) {
+            console.error("Invalid --outFile argument");
+            Application.exitWithFailure();
+        }
+
+        this.config.outFile = this.options.outFile;
+    }
+
+    private buildTemporaryOutputPath(): void {
+        try {
+            let installedPath = getInstalledPathSync(project.name);
+            this.config.outFile = path.join(installedPath, "dist/web-app/module-structure.json");
+        }
+        catch (e) {
+            this.config.outFile = path.join(process.cwd(), "src/structure-view/data/module-structure.json");
+        }
     }
 
     private createStructureMap(): void {
+        this.startProcessing("Building structure map");
+
         let builder = new StructureMapBuilder();
-        this.structureMap = builder.build(this.config.src, this.config.excludes);
+        this.structureMap = builder.build(this.config.rootDir, this.config.excludes);
+
+        this.stopProcessing();
+    }
+
+    private startProcessing(message: string) {
+        process.stdout.write(colors.yellow(message + " ... "));
+        this.stopWatch.reset();
+        this.stopWatch.start();
+    }
+
+    private stopProcessing() {
+        this.stopWatch.stop();
+        console.log(colors.yellow("finished in " + this.stopWatch.elapsed + "ms"));
     }
 
     private exportViewModel(): void {
-        let destDir = path.dirname(this.config.dest);
+        this.startProcessing("Exporting view model");
+
+        let destDir = path.dirname(this.config.outFile);
         if (!fs.existsSync(destDir)) {
             fs.mkdir(destDir);
         }
 
-        if (fs.existsSync(this.config.dest)) {
-            fs.unlinkSync(this.config.dest);
+        if (fs.existsSync(this.config.outFile)) {
+            fs.unlinkSync(this.config.outFile);
         }
 
         let viewModelBuilder = new StructureViewModelBuilder();
         let viewModel = viewModelBuilder.build(this.structureMap);
 
-        fs.writeFileSync(this.config.dest, JSON.stringify(viewModel));
+        fs.writeFileSync(this.config.outFile, JSON.stringify(viewModel));
+
+        this.stopProcessing();
+    }
+
+    private isShowExport() {
+        return (this.options.outFile === undefined);
+    }
+
+    private showViewModel() {
+        let serverRoot = path.join(process.cwd(), "dist/web-app");
+        console.log(colors.yellow("Starting http-server, serving " + serverRoot));
+
+        let server = httpServerModule.createServer({root: serverRoot});
+        server.listen(this.config.port, "127.0.0.1", () => {
+            let url = "http://localhost:" + this.config.port + "/index.html?input=module-structure.json";
+            console.log(colors.green("Module structure is now available at " + url));
+            console.info("Hit CTRL-C to stop the server");
+
+            opener(url);
+        });
     }
 }

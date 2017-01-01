@@ -1,0 +1,261 @@
+///<reference path="../../../node_modules/@types/snapsvg/index.d.ts"/>
+
+import {StructureViewObject} from "./structure-view-object";
+import {StructureViewObjectListener} from "./structure-view-object-listener";
+import {StructureViewNodeRow} from "./structure-view-row";
+import {SelectionService} from "./selection-service";
+import {Point} from "./point";
+import {StructureViewModelNode} from "../../structure-view-model/structure-view-model-node";
+
+
+export class StructureViewNode extends StructureViewObject implements StructureViewObjectListener {
+    public static readonly OFFSET_X = 10;
+    private static readonly DEFAULT_HEIGHT = 30;
+    private static readonly PADDING_TOP = 40;
+    private static readonly PADDING_BOTTOM = 30;
+    private static readonly ICON_SIZE = 24;
+    private static readonly ICON_PADDING = 5;
+    private static readonly TEXT_PADDING = 10;
+
+    paper: Snap.Paper;
+    rect: Snap.Element;
+    icon: Snap.Element;
+    text: Snap.Element;
+    model: StructureViewModelNode;
+    parent: StructureViewNode;
+    rows: Array<StructureViewNodeRow> = [];
+    x: number = 0;
+    y: number = 0;
+    width: number = 0;
+    height: number = 0;
+    expanded: boolean = false;
+    visible: boolean;
+    selected: boolean;
+
+    constructor(parent: StructureViewNode, model: StructureViewModelNode, paper: Snap.Paper) {
+        super();
+
+        this.parent = parent;
+        this.model = model;
+        this.paper = paper;
+
+        this.createRect();
+        this.createIcon();
+        this.createText();
+        this.updateSize();
+    }
+
+    private createRect() {
+        this.rect = this.paper.rect(0, 0, 0, 0);
+        this.rect.attr({
+            fill: "#5d5d5d",
+            "stroke-width": 1.0
+        });
+        this.updateRectColors();
+        this.rect.click(() => this.onClick());
+        this.rect.dblclick(() => this.onDoubleClick());
+    }
+
+    private createIcon() {
+        let iconFile = this.model.isGroup
+            ? "assets/ic_folder_black_24px.svg"
+            : "assets/ic_insert_drive_file_black_24px.svg";
+        this.icon = this.paper.image(iconFile, 0, 0, StructureViewNode.ICON_SIZE, StructureViewNode.ICON_SIZE);
+        this.icon.click(() => this.onClick());
+        this.icon.dblclick(() => this.onDoubleClick());
+    }
+
+    private createText() {
+        this.text = this.paper.text(0, 0, this.model.name);
+        this.text.attr({
+            "cursor": "default",
+            "fill": "#bcbcbc",
+            "font-family": "Arial",
+            "font-size": "12"
+        });
+        this.text.click(() => this.onClick());
+        this.text.dblclick(() => this.onDoubleClick());
+    }
+
+    private onClick() {
+        this.setSelected(true);
+    }
+
+    public setSelected(selected: boolean): void {
+        this.selected = selected;
+        this.updateRectColors();
+        if (selected) {
+            SelectionService.setSelection(this);
+        }
+    }
+
+    private updateRectColors(): void {
+        this.rect.attr({
+            "fill-opacity": this.expanded ? 1.0 : 0.0,
+            stroke: this.selected ? "#ddcb00" : "#7cbe00",
+            "stroke-opacity": this.expanded || this.selected ? 1.0 : 0.0
+        });
+    }
+
+    private onDoubleClick(): void {
+        this.setSelected(true);
+        this.toggle();
+    }
+
+    private toggle(): void {
+        if (!this.model.isGroup
+            || this.model.rows.length === 0) {
+            return;
+        }
+
+        if (!this.expanded) {
+            this.expand();
+        }
+        else {
+            this.collapse();
+        }
+    }
+
+    private expand(): void {
+        this.expanded = true;
+
+        this.lazyCreateRows();
+        this.displayRows(true);
+        this.updateSize();
+        this.updateRectColors();
+        this.notifyExpanded(this);
+    }
+
+    private lazyCreateRows() {
+        if (this.rows.length > 0) {
+            return;
+        }
+
+        for (let row of this.model.rows) {
+            let viewRow = new StructureViewNodeRow(this, row, this.paper);
+            viewRow.addListener(this);
+            this.rows.push(viewRow);
+        }
+    }
+
+    private displayRows(display: boolean): void {
+        for (let row of this.rows) {
+            row.setVisible(display);
+        }
+    }
+
+    private updateSize(): void {
+        this.setSize(this.calculateSize());
+        this.notifySizeChanged();
+    }
+
+    private calculateSize(): Point {
+        const minimumWidth = 2 * StructureViewNode.ICON_PADDING + StructureViewNode.ICON_SIZE
+            + this.text.getBBox().width + StructureViewNode.TEXT_PADDING;
+        if (!this.expanded || this.rows.length === 0) {
+            return new Point(minimumWidth, StructureViewNode.DEFAULT_HEIGHT);
+        }
+
+        let width = 0;
+        let height = StructureViewNode.PADDING_TOP;
+
+        for (let i = 0; i < this.rows.length; ++i) {
+            let row = this.rows[i];
+            width = row.width > width ? row.width : width;
+            height += row.height;
+            if (i < this.rows.length - 1) {
+                height += StructureViewNode.PADDING_BOTTOM;
+            }
+        }
+
+        width += 2 * StructureViewNode.OFFSET_X;
+        width =  width < minimumWidth ? minimumWidth : width;
+        height += 10;
+
+        return new Point(width, height);
+    }
+
+    private setSize(point: Point) {
+        this.width = point.x;
+        this.height = point.y;
+
+        this.rect.attr({
+            width: this.width,
+            height: this.height
+        });
+    }
+
+    private layoutRows(): void {
+        let centerX = this.x + this.width / 2;
+        let offsetY = this.y + StructureViewNode.PADDING_TOP;
+        for (let row of this.rows) {
+            let offsetX = centerX - row.width / 2;
+            row.setPosition(offsetX, offsetY);
+            offsetY += row.height + StructureViewNode.PADDING_BOTTOM;
+        }
+    }
+
+    private collapse(): void {
+        this.expanded = false;
+
+        this.displayRows(false);
+        this.updateSize();
+        this.updateRectColors();
+        this.notifyCollapsed(this);
+    }
+
+    public setPosition(x: number, y: number): void {
+        this.x = x;
+        this.y = y;
+
+        this.rect.attr({
+            x: x,
+            y: y
+        });
+
+        this.icon.attr({
+            x: x + StructureViewNode.ICON_PADDING,
+            y: y + 3,
+        });
+
+        this.text.attr({
+            x: x + (2 * StructureViewNode.ICON_PADDING) + StructureViewNode.ICON_SIZE,
+            y: y + 19
+        });
+
+        this.layoutRows();
+    }
+
+    public setVisible(visible: boolean): void {
+        if (visible === this.visible) {
+            return;
+        }
+
+        for (let row of this.rows) {
+            row.setVisible(this.expanded && visible);
+        }
+
+        let display = visible ? "block" : "none";
+        this.rect.attr({display: display});
+        this.icon.attr({display: display});
+        this.text.attr({display: display});
+
+        this.visible = visible;
+    }
+
+    public onSizeChanged(): void {
+        this.updateSize();
+    }
+
+    layout() {
+        this.layoutRows();
+    }
+
+    onCollapsed(target: StructureViewObject): void {
+        this.notifyCollapsed(target);
+    }
+
+    onExpanded(target: StructureViewObject): void {
+        this.notifyExpanded(target);
+    }
+}

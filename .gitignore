@@ -4,9 +4,11 @@
 .idea/workspace.xml
 .nyc_output/
 coverage/
+dist/
 node_modules/
 src/**/*.js*
+src/structure-view/data/
 test/resources/ts/**/*.js*
 test/*.js*
-test/result/
+output/
 npm-debug.log

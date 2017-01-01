@@ -1,0 +1,9 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="module-structure" type="NodeJSConfigurationType" factoryName="Node.js" path-to-node="project" path-to-js-file="src/main.js" application-parameters="--rootDir V:\dev\sources\module-structure\test\resources\ts\ecommerce-sample --outFile V:\dev\sources\module-structure\src\structure-view\data\module-structure.json" working-dir="$PROJECT_DIR$">
+    <profiling v8-profiler-path="" />
+    <EXTENSION ID="com.jetbrains.nodejs.run.NodeJSProfilingRunConfigurationExtension">
+      <profiling v8-profiler-path="" />
+    </EXTENSION>
+    <method />
+  </configuration>
+</component>

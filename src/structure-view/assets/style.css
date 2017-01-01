@@ -1,0 +1,19 @@
+body {
+    background: #333333;
+    margin: 0;
+    padding: 0;
+
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+#canvas {
+    position:absolute;
+    left: 50%;
+    top: 50%;
+    padding-right: 10px;
+    padding-bottom: 10px;
+    transform: translate(-50%, -50%);
+}

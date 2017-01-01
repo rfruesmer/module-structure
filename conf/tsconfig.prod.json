@@ -3,12 +3,12 @@
         "target": "es5",
         "module": "commonjs",
         "moduleResolution": "node",
-        "sourceMap": true,
+        "sourceMap": false,
         "removeComments": true,
         "experimentalDecorators": true,
         "noImplicitReturns": true,
         "typeRoots": [
-            "node_modules/@types"
+            "../node_modules/@types"
         ],
         "types": [
             "jquery",
@@ -17,10 +17,9 @@
         ]
     },
     "include": [
-        "./src/**/*",
-        "./test/**/*"
+        "../src/**/*"
     ],
     "exclude": [
-        "node_modules/*"
+        "../node_modules/*"
     ]
 }
