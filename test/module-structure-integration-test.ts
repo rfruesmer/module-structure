@@ -5,14 +5,10 @@ import {StructureMapBuilder} from "../src/structure-map/structure-map-builder";
 import {StructureViewModelBuilder} from "../src/structure-map/structure-view-model-builder";
 
 
-export abstract class ModuleStructureTest {
+export abstract class ModuleStructureIntegrationTest {
 
     protected viewModel: StructureViewModel;
 
-    before() {
-        let structureMap = new StructureMapBuilder().build("test/resources/ts/a-over-b-and-c");
-        this.viewModel = new StructureViewModelBuilder().build(structureMap);
-    }
 
     protected expectModuleNodeToEqual(moduleNode: StructureViewModelNode, id: string, name: string) {
         expect(moduleNode).to.be.an.instanceOf(StructureViewModelNode);

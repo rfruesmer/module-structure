@@ -1,9 +1,9 @@
-import {D} from "../package-d/d";
+import {ClassD} from "../package-d/class-d";
 
-export class C {
+export class ClassC {
 
     foo(): void {
-        let d = new D();
+        let d = new ClassD();
         d.doSomething();
     }
 

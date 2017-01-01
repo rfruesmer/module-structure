@@ -1,10 +1,17 @@
 import {suite, test} from "mocha-typescript";
 import {expect} from "chai";
 import {StructureViewModelNode} from "../src/structure-view-model/structure-view-model-node";
-import {ModuleStructureTest} from "./module-structure-test";
+import {ModuleStructureIntegrationTest} from "./module-structure-integration-test";
+import {StructureMapBuilder} from "../src/structure-map/structure-map-builder";
+import {StructureViewModelBuilder} from "../src/structure-map/structure-view-model-builder";
 
 
-@suite class AOverBAndCTest extends ModuleStructureTest {
+@suite class AOverBAndCTest extends ModuleStructureIntegrationTest {
+
+    before() {
+        let structureMap = new StructureMapBuilder().build("test/resources/ts/a-over-b-and-c");
+        this.viewModel = new StructureViewModelBuilder().build(structureMap);
+    }
 
     @test "contains root"() {
         expect(this.viewModel).to.have.property("root");

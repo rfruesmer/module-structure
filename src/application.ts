@@ -45,20 +45,26 @@ export class Application {
             name: "outFile",
             type: String,
             typeLabel: "[underline]{file}",
-            description: "Optional: the output path for the generated module structure file. If omitted, the file will be created in a temporary directory and the module structure will be displayed in your default browser."
+            description: "Optional: the output path for the structure map JSON-file. If omitted, the file will be created in a temporary directory and rendered as a diagram in your default browser."
+        },
+        {
+            name: "pretty",
+            type: Boolean,
+            description: "Pretty-print the generated structure map JSON-file."
         },
         {
             name: "port",
             alias: "p",
             defaultValue: 3000,
             typeLabel: "[underline]{port}",
-            description: "Port for serving the included viewer web-app that renders the generated module structure in your browser (defaults to 3000). Omitted if --outFile is specified."
+            description: "Port for serving the included viewer webapp (defaults to 3000). Omitted if --outFile is specified."
         }
     ];
     private config: any = {
         rootDir: "",
         outFile: "",
-        port: 3000,
+        prettyPrint: false,
+        serverPort: 3000,
         excludes: []
     };
     private structureMap: StructureMapPackage;
@@ -89,23 +95,6 @@ export class Application {
         }
     }
 
-    private processArguments() {
-        this.processHelpArgument();
-        this.processVersionArgument();
-        this.processRootDirArgument();
-        this.processPortArgument();
-        if (this.isOutFileSpecified()) {
-            this.processOutFileArgument();
-        }
-        else {
-            this.buildTemporaryOutputPath();
-        }
-    }
-
-    private static exitWithFailure() {
-        process.exit(Application.EXIT_FAILURE);
-    }
-
     private printUsage() {
         let sections = [
             {
@@ -126,6 +115,24 @@ export class Application {
         ];
 
         console.log(commandLineUsage(sections));
+    }
+
+    private static exitWithFailure() {
+        process.exit(Application.EXIT_FAILURE);
+    }
+
+    private processArguments() {
+        this.processHelpArgument();
+        this.processVersionArgument();
+        this.processRootDirArgument();
+        if (this.isOutFileSpecified()) {
+            this.processOutFileArgument();
+        }
+        else {
+            this.buildTemporaryOutputPath();
+        }
+        this.processPrettyArgument();
+        this.processPortArgument();
     }
 
     private processHelpArgument() {
@@ -162,10 +169,6 @@ export class Application {
         this.config.rootDir = this.options.rootDir;
     }
 
-    private processPortArgument() {
-        this.config.port = this.options.port;
-    }
-
     private isOutFileSpecified() {
         return this.options.outFile !== undefined;
     }
@@ -173,7 +176,7 @@ export class Application {
     private processOutFileArgument() {
         let outDir = path.dirname(this.options.outFile);
         if (!fs.existsSync(outDir)
-               || !fs.statSync(outDir).isDirectory()) {
+            || !fs.statSync(outDir).isDirectory()) {
             console.error("Invalid --outFile argument");
             Application.exitWithFailure();
         }
@@ -189,6 +192,14 @@ export class Application {
         catch (e) {
             this.config.outFile = path.join(process.cwd(), "src/structure-view/data/module-structure.json");
         }
+    }
+
+    private processPrettyArgument() {
+        this.config.prettyPrint = this.options.pretty !== undefined;
+    }
+
+    private processPortArgument() {
+        this.config.serverPort = this.options.serverPort;
     }
 
     private createStructureMap(): void {
@@ -226,7 +237,8 @@ export class Application {
         let viewModelBuilder = new StructureViewModelBuilder();
         let viewModel = viewModelBuilder.build(this.structureMap);
 
-        fs.writeFileSync(this.config.outFile, JSON.stringify(viewModel));
+        let spacing = this.config.prettyPrint ? 2 : 0;
+        fs.writeFileSync(this.config.outFile, JSON.stringify(viewModel, null, spacing));
 
         this.stopProcessing();
     }
@@ -240,8 +252,8 @@ export class Application {
         console.log(colors.yellow("Starting http-server, serving from " + serverRoot));
 
         let server = httpServerModule.createServer({root: serverRoot});
-        server.listen(this.config.port, "127.0.0.1", () => {
-            let url = "http://localhost:" + this.config.port + "/index.html?input=module-structure.json";
+        server.listen(this.config.serverPort, "127.0.0.1", () => {
+            let url = "http://localhost:" + this.config.serverPort + "/index.html?input=module-structure.json";
             console.log(colors.green("Module structure is now available at " + url));
             console.info("Hit CTRL-C to stop the server");
 
