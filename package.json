@@ -45,7 +45,6 @@
     "@types/chai": "^3.4.34",
     "@types/jquery": "^2.0.34",
     "@types/node": "^6.0.54",
-    "@types/snapsvg": "^0.4.27",
     "awesome-typescript-loader": "^3.0.0-beta.17",
     "chai": "^3.5.0",
     "codecov": "^1.0.1",
@@ -83,7 +82,6 @@
     "opener": "^1.4.2",
     "preconditions": "^2.2.0",
     "read-each-line-sync": "^1.0.4",
-    "snapsvg": "^0.4.0",
     "typescript": "^2.1.4"
   }
 }

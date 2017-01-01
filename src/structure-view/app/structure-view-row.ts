@@ -13,16 +13,16 @@ export class StructureViewNodeRow extends StructureViewObject implements Structu
     visible: boolean = false;
 
 
-    constructor(parent: StructureViewNode, nodes: Array<StructureViewModelNode>, paper: Snap.Paper) {
+    constructor(parent: StructureViewNode, nodes: Array<StructureViewModelNode>, canvas: JQuery) {
         super();
 
-        this.createNodes(parent, nodes, paper);
+        this.createNodes(parent, nodes, canvas);
         this.calculateSize();
     }
 
-    private createNodes(parent: StructureViewNode, nodes: Array<StructureViewModelNode>, paper: Snap.Paper) {
+    private createNodes(parent: StructureViewNode, nodes: Array<StructureViewModelNode>, canvas: JQuery) {
         for (let node of nodes) {
-            let viewNode = new StructureViewNode(parent, node, paper);
+            let viewNode = new StructureViewNode(parent, node, canvas);
             viewNode.addListener(this);
             this.nodes.push(viewNode);
         }

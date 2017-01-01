@@ -5,11 +5,11 @@ import {StructureViewObject} from "./structure-view-object";
 import {SelectionListener} from "./selection-listener";
 import {StructureViewModel} from "../../structure-view-model/structure-view-model";
 import {Point} from "./point";
+import {StructureViewUtil} from "./structure-view-util";
 
 
 export class StructureView implements StructureViewObjectListener, SelectionListener {
     private canvas: JQuery;
-    private paper: Snap.Paper;
     private rootNode: StructureViewNode;
     private selection: StructureViewNode;
     private dependenciesMap: any = {};
@@ -28,15 +28,20 @@ export class StructureView implements StructureViewObjectListener, SelectionList
 
     private initCanvas(): void {
         this.canvas = $("#canvas");
-        this.paper = Snap(<SVGElement><any>this.canvas.get(0));
 
+        this.createDefs();
         this.createMarker("arrow", "#ffffff");
         this.createMarker("arrow-hover", "#7fb8ff");
         this.createMarker("arrow-feedback", "#F75F00");
     }
 
+    private createDefs() {
+        let defs = StructureViewUtil.createSVGElement("defs");
+        this.canvas.append(defs);
+    }
+
     private createMarker(id: string, color: string) {
-        let marker = $(document.createElementNS("http://www.w3.org/2000/svg", "marker"));
+        let marker = StructureViewUtil.createSVGElement("marker");
         marker.attr({
             "id": id,
             "markerWidth": 6,
@@ -47,12 +52,12 @@ export class StructureView implements StructureViewObjectListener, SelectionList
             "markerUnits": "strokeWidth",
         });
 
-        let path = $(document.createElementNS("http://www.w3.org/2000/svg", "path"));
+        let path = StructureViewUtil.createSVGElement("path");
         path.attr({
-            d: "M0,1 L6,3 L0,5",
-            stroke: color,
+            "d": "M0,1 L6,3 L0,5",
+            "stroke": color,
             "stroke-width": "0.1",
-            fill: color
+            "fill": color
         });
 
         marker.append(path);
@@ -61,7 +66,7 @@ export class StructureView implements StructureViewObjectListener, SelectionList
     }
 
     private createRootNode(model: StructureViewModel): void {
-        this.rootNode = new StructureViewNode(null, model.root, this.paper);
+        this.rootNode = new StructureViewNode(null, model.root, this.canvas);
     }
 
     private resize(): void {
@@ -359,26 +364,26 @@ export class StructureView implements StructureViewObjectListener, SelectionList
         return {from, to, qx, qy, strokeColor, markerEnd};
     }
 
-    private createArrowPath(pathDesc: any, sourceNode: StructureViewNode, targetNode: StructureViewNode): Snap.Element {
+    private createArrowPath(pathDesc: any, sourceNode: StructureViewNode, targetNode: StructureViewNode): JQuery {
         let pathString = "M" + pathDesc.from.x + " " + pathDesc.from.y
             + "Q" + pathDesc.qx + " " + pathDesc.qy
             + " " + pathDesc.to.x + " " + pathDesc.to.y;
 
-        let path = this.paper.path(pathString);
+        let path = StructureViewUtil.createSVGElement("path");
         path.attr({
-            stroke: pathDesc.strokeColor,
-            "stroke-width": 1,
-            fill: "none"
+            "d": pathString,
+            "fill": "none",
+            "marker-end": pathDesc.markerEnd,
+            "stroke": pathDesc.strokeColor,
+            "stroke-width": 1
         });
 
-        let pathNode = $(path.node);
-        pathNode.attr("marker-end", pathDesc.markerEnd);
-        pathNode.hover(e => {
+        path.hover(e => {
 
             console.log(sourceNode.model.name + " -> " + targetNode.model.name);
 
             path.attr({
-                stroke: "#7fb8ff",
+                "stroke": "#7fb8ff",
                 "stroke-width": 2,
                 "stroke-dasharray": "2,1"
             });
@@ -387,7 +392,7 @@ export class StructureView implements StructureViewObjectListener, SelectionList
             target.attr("marker-end", "url(#arrow-hover)");
         }, e => {
             path.attr({
-                stroke: pathDesc.strokeColor,
+                "stroke": pathDesc.strokeColor,
                 "stroke-width": 1,
                 "stroke-dasharray": ""
             });
@@ -396,10 +401,12 @@ export class StructureView implements StructureViewObjectListener, SelectionList
             target.attr("marker-end", pathDesc.markerEnd);
         });
 
+        this.canvas.append(path);
+
         return path;
     }
 
-    private mapArrow(source: StructureViewNode, target: StructureViewNode, path: Snap.Element) {
+    private mapArrow(source: StructureViewNode, target: StructureViewNode, path: JQuery) {
         let key = source.model.id;
         let entries = this.arrowsMap[key];
         if (!entries) {

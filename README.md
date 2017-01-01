@@ -24,14 +24,6 @@ Generates and displays a levelized structure map for ECMAScript/TypeScript modul
             <a href="https://github.com/jquery/jquery/blob/master/LICENSE.txt">show license</a>
         </td>
     </tr>
-    <tr>
-        <td>Snap.svg</td>
-        <td align="right">
-            <a href="http://snapsvg.io/">homepage</a>
-            &nbsp;-&nbsp;  
-            <a href="https://github.com/adobe-webplatform/Snap.svg/blob/master/LICENSE">show license</a>
-        </td>
-    </tr>
 </table>
 
 ## License

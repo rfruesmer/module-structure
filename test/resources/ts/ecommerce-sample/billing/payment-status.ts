@@ -1,4 +1,3 @@
-
 export class PaymentStatus {
     private _succeeded: boolean;
 
