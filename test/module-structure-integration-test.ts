@@ -49,14 +49,16 @@ export abstract class ModuleStructureIntegrationTest {
 
     protected expectPackageContainsSingleModule(packageId: string, packageRow: number, moduleName: string): void {
         let row = this.viewModel.root.rows[packageRow];
-        let packageNode = this.findNode(packageId, row);
+        let node = this.findNode(packageId, row);
 
-        expect(packageNode.rows).to.have.length(1);
+        expect(node.rows).to.have.length(1);
 
-        row = packageNode.rows[0];
+        row = node.rows[0];
         expect(row).to.have.length(1);
 
-        this.expectModuleNodeToEqual(row[0], packageId + "." + moduleName, moduleName);
+        node = row[0];
+
+        this.expectModuleNodeToEqual(node, packageId + "." + moduleName, moduleName);
     }
 
     protected expectModuleNodeToEqual(moduleNode: StructureViewModelNode, moduleId: string, moduleName: string): void {

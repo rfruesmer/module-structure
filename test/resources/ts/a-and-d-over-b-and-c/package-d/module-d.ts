@@ -1,4 +1,4 @@
-import {ClassB} from "../package-b/class-b";
+import {ClassB} from "../package-b/module-b";
 
 export class ClassD {
 
