@@ -79,13 +79,13 @@ export class StructureViewNode extends StructureViewObject implements StructureV
             : "assets/ic_insert_drive_file_black_24px.svg";
         this.icon = StructureViewUtil.createSVGElement("image");
         this.icon.attr({
-            "href": iconFile,
             "preserveAspectRatio": "none",
             "x": 0,
             "y": 0,
             "width": StructureViewNode.ICON_SIZE,
             "height": StructureViewNode.ICON_SIZE
         });
+        this.icon.get(0).setAttributeNS("http://www.w3.org/1999/xlink", "href", iconFile);
         this.icon.click(() => this.onClick());
         this.icon.dblclick(() => this.onDoubleClick());
         this.canvas.append(this.icon);
