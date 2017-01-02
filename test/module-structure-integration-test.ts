@@ -40,6 +40,14 @@ export abstract class ModuleStructureIntegrationTest {
         return searchResult[0];
     }
 
+    protected expectRowContainsModule(row: Array<StructureViewModelNode>, moduleId: string, moduleName: string) {
+        let node = this.findNode(moduleId, row);
+        expect(node).to.be.an.instanceOf(StructureViewModelNode);
+        expect(node.id).to.equal(moduleId);
+        expect(node.name).to.equal(moduleName);
+        expect(node.isGroup).to.equal(false);
+    }
+
     protected expectPackageNodeToEqual(packageNode: StructureViewModelNode, packageId: string, packageName: string): void {
         expect(packageNode).to.be.an.instanceOf(StructureViewModelNode);
         expect(packageNode.id).to.equal(packageId);
