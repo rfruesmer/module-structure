@@ -1,6 +1,5 @@
 import {suite, test} from "mocha-typescript";
 import {expect} from "chai";
-import {StructureViewModelNode} from "../src/structure-view-model/structure-view-model-node";
 import {ModuleStructureIntegrationTest} from "./module-structure-integration-test";
 
 
