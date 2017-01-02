@@ -13,7 +13,7 @@ export function buildViewModelFor(rootDir: string, moduleType: string): Structur
     return viewModel;
 }
 
-export function expectRootIsPresent(viewModel) {
+export function expectRootIsPresent(viewModel: StructureViewModel) {
     expect(viewModel).to.have.property("root");
 }
 
@@ -26,8 +26,8 @@ export function expectRowNodesCountToEqual(row: Array<StructureViewModelNode>, e
 }
 
 export function expectRowContainsPackage(row: Array<StructureViewModelNode>, packageId: string, packageName: string): void {
-    let packageNode = this.findNode(packageId, row);
-    this.expectPackageNodeToEqual(packageNode, packageId, packageName);
+    let packageNode = findNode(packageId, row);
+    expectPackageNodeToEqual(packageNode, packageId, packageName);
 }
 
 export function findNode(id: string, row: Array<StructureViewModelNode>): StructureViewModelNode {
@@ -38,7 +38,7 @@ export function findNode(id: string, row: Array<StructureViewModelNode>): Struct
 }
 
 export function expectRowContainsModule(row: Array<StructureViewModelNode>, moduleId: string, moduleName: string) {
-    let node = this.findNode(moduleId, row);
+    let node = findNode(moduleId, row);
     expect(node).to.be.an.instanceOf(StructureViewModelNode);
     expect(node.id).to.equal(moduleId);
     expect(node.name).to.equal(moduleName);
@@ -54,7 +54,7 @@ export function expectPackageNodeToEqual(packageNode: StructureViewModelNode, pa
 
 export function expectPackageContainsSingleModule(viewModel: StructureViewModel, packageId: string, packageRow: number, moduleName: string): void {
     let row = viewModel.root.rows[packageRow];
-    let node = this.findNode(packageId, row);
+    let node = findNode(packageId, row);
 
     expect(node.rows).to.have.length(1);
 
@@ -63,7 +63,7 @@ export function expectPackageContainsSingleModule(viewModel: StructureViewModel,
 
     node = row[0];
 
-    this.expectModuleNodeToEqual(node, packageId + "." + moduleName, moduleName);
+    expectModuleNodeToEqual(node, packageId + "." + moduleName, moduleName);
 }
 
 export function expectModuleNodeToEqual(moduleNode: StructureViewModelNode, moduleId: string, moduleName: string): void {
