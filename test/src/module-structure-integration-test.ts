@@ -1,8 +1,9 @@
+import {StructureViewModelNode} from "../../src/structure-view-model/structure-view-model-node";
+import {StructureViewModel} from "../../src/structure-view-model/structure-view-model";
 import {StructureMapBuilder} from "../../src/structure-map/structure-map-builder";
 import {StructureViewModelBuilder} from "../../src/structure-map/structure-view-model-builder";
-import {StructureViewModel} from "../../src/structure-view-model/structure-view-model";
+
 import {expect} from "chai";
-import {StructureViewModelNode} from "../../src/structure-view-model/structure-view-model-node";
 
 
 export function buildViewModelFor(rootDir: string, moduleType: string): StructureViewModel {
