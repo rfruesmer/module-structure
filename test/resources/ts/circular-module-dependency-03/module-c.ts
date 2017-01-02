@@ -1,5 +1,5 @@
-import {ClassE} from "./class-e";
-import {ClassD} from "./class-d";
+import {ClassE} from "./module-e";
+import {ClassD} from "./module-d";
 
 export class ClassC {
     private d: ClassD;

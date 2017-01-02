@@ -1,9 +1,6 @@
 import {suite, test} from "mocha-typescript";
 import {expect} from "chai";
-import {StructureViewModelNode} from "../src/structure-view-model/structure-view-model-node";
 import {ModuleStructureIntegrationTest} from "./module-structure-integration-test";
-import {StructureMapBuilder} from "../src/structure-map/structure-map-builder";
-import {StructureViewModelBuilder} from "../src/structure-map/structure-view-model-builder";
 
 
 @suite class CircularModuleDependency02Test extends ModuleStructureIntegrationTest {
