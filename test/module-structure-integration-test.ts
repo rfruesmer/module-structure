@@ -77,6 +77,10 @@ export abstract class ModuleStructureIntegrationTest {
         expect(moduleNode.rows).to.have.length(0);
     }
 
+    protected expectNodeRowsCountToEqual(node: StructureViewModelNode, expectedRowsCount: number) {
+        expect(node.rows).to.have.length(expectedRowsCount);
+    }
+
     protected expectDependencyCountToEqual(expectedCount: number) {
         expect(this.viewModel).to.have.property("dependencies");
         expect(this.viewModel.dependencies).to.have.length(expectedCount);
