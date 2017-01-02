@@ -219,7 +219,7 @@ export class Application {
     }
 
     private processPortArgument() {
-        this.config.serverPort = this.options.serverPort;
+        this.config.serverPort = this.options.port;
     }
 
     private createStructureMap(): void {
