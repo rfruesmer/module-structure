@@ -13,6 +13,7 @@ const checkArgument = preconditions.checkArgument;
 
 export class StructureMapBuilder {
     private dir: string;
+    private moduleType: string;
     private excludes: string[] = [];
     private packageTree: Package;
     private packageIndex: any = {};
@@ -20,10 +21,9 @@ export class StructureMapBuilder {
     private structureMap: StructureMapPackage;
 
 
-    public build(dir: string, excludes: string[] = []): StructureMapPackage {
-        checkArgument(fs.statSync(dir).isDirectory());
-
+    public build(dir: string, moduleType: string, excludes: string[] = []): StructureMapPackage {
         this.dir = dir;
+        this.moduleType = moduleType;
         this.excludes = excludes;
 
         this.buildPackageTree();
@@ -36,7 +36,7 @@ export class StructureMapBuilder {
 
     private buildPackageTree(): void {
         let packageTreeBuilder = new PackageTreeBuilder();
-        this.packageTree = packageTreeBuilder.build(this.dir, this.excludes);
+        this.packageTree = packageTreeBuilder.build(this.dir, this.moduleType, this.excludes);
     }
 
     private indexPackageTree(): void {

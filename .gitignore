@@ -9,6 +9,6 @@ node_modules/
 src/**/*.js*
 src/structure-view/data/
 test/resources/ts/**/*.js*
-test/*.js*
+test/src/module-structure-integration-test.js*
 output/
 npm-debug.log

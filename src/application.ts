@@ -42,6 +42,14 @@ export class Application {
             description: "Specifies the root directory of input files."
         },
         {
+            name: "module",
+            alias: "m",
+            type: String,
+            defaultValue: "es6",
+            typeLabel: "es6|ts",
+            description: "Specify module type of input files (defaults to es6): \r\n [bold]{es6} for ECMAScript modules \r\n [bold]{ts} for TypeScript modules"
+        },
+        {
             name: "outFile",
             type: String,
             typeLabel: "[underline]{file}",
@@ -62,6 +70,7 @@ export class Application {
     ];
     private config: any = {
         rootDir: "",
+        module: "js",
         outFile: "",
         prettyPrint: false,
         serverPort: 3000,
@@ -125,6 +134,7 @@ export class Application {
         this.processHelpArgument();
         this.processVersionArgument();
         this.processRootDirArgument();
+        this.processModuleArgument();
         if (this.isOutFileSpecified()) {
             this.processOutFileArgument();
         }
@@ -169,6 +179,16 @@ export class Application {
         this.config.rootDir = this.options.rootDir;
     }
 
+    private processModuleArgument() {
+        if (["es6", "ts"].indexOf(this.options.module) === -1) {
+            console.error("Invalid --module argument");
+            this.printUsage();
+            Application.exitWithFailure();
+        }
+
+        this.config.module = this.options.module;
+    }
+
     private isOutFileSpecified() {
         return this.options.outFile !== undefined;
     }
@@ -206,7 +226,7 @@ export class Application {
         this.startProcessing("Building structure map");
 
         let builder = new StructureMapBuilder();
-        this.structureMap = builder.build(this.config.rootDir, this.config.excludes);
+        this.structureMap = builder.build(this.config.rootDir, this.config.module, this.config.excludes);
 
         this.stopProcessing();
     }

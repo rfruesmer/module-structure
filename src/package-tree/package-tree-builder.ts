@@ -8,17 +8,21 @@ import path = require("path");
 const preconditions = require("preconditions").instance();
 const checkArgument = preconditions.checkArgument;
 
+
 export class PackageTreeBuilder {
     private rootDir: string;
+    private moduleType: string;
     private excludes: string[] = [];
-    private moduleBuilder = new ModuleBuilder();
+    private moduleBuilder;
 
 
-    public build(dir: string, excludes: string[]): Package {
+    public build(dir: string, module: string, excludes: string[]): Package {
         checkArgument(fs.statSync(dir).isDirectory());
 
         this.rootDir =  path.normalize(path.join(dir, ".."));
+        this.moduleType = module;
         this.excludes = excludes;
+        this.moduleBuilder = new ModuleBuilder(this.moduleType);
 
         return this.buildInternal(dir);
     }
@@ -73,7 +77,7 @@ export class PackageTreeBuilder {
 
         this.getModuleFiles(dir).forEach(modulePath => {
             let moduleName = PackageTreeBuilder.getModuleName(modulePath, packageName);
-            if (this.excludes.indexOf(moduleName) === -1) {
+            if (this.isIncluded(modulePath, moduleName)) {
                 modules.push(this.moduleBuilder.build(modulePath, moduleName, packageName));
             }
         });
@@ -84,10 +88,27 @@ export class PackageTreeBuilder {
     private getModuleFiles(dir: string): string[] {
         return fs.readdirSync(dir)
             .map(fileName => path.join(dir, fileName))
-            .filter(filePath => fs.statSync(filePath).isFile() && path.extname(filePath) === ".ts"); // TODO: allow js extensions too
+            .filter(filePath => fs.statSync(filePath).isFile() && [".js", ".ts"].indexOf(path.extname(filePath)) > -1);
     }
 
     private static getModuleName(filePath: string, packageName: string): string {
         return packageName + "." + path.basename(filePath);
+    }
+
+    private isIncluded(modulePath: string, moduleName: string) {
+        return this.excludes.indexOf(moduleName) === -1
+                && this.isResponsibleFor(modulePath);
+    }
+
+    public isResponsibleFor(filePath: string): boolean {
+        let extension = path.extname(filePath).toLowerCase();
+        if (this.moduleType === "es6") {
+            return extension === ".js";
+        }
+        else if (this.moduleType === "ts") {
+            return extension === ".ts";
+        }
+
+        return false;
     }
 }

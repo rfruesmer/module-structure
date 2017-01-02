@@ -2,13 +2,19 @@
 import fs = require("fs");
 import path = require("path");
 import {ModuleImport} from "./module-import";
+import {ModuleImportParser} from "./module-import-parser";
 
 const preconditions = require("preconditions").instance();
 const checkState = preconditions.checkState;
 const readEachLineSync  = require("read-each-line-sync");
 
+/**
+ *  Since the TypeScript compiler aggressively removes imports if no members of the imported
+ *  types are used, the TypeScript compiler can't be used to compile to es6 and then let Babel
+ *  do the work as it is done for es6 modules.
+ */
+export class TypeScriptImportParser implements ModuleImportParser {
 
-export class TypeScriptImportParser {
 
     public parseImports(filePath: string): Array<ModuleImport> {
         let imports: Array<ModuleImport> = [];
