@@ -10,21 +10,27 @@ export abstract class ModuleStructureIntegrationTest {
     protected viewModel: StructureViewModel;
 
 
-    protected expectModuleNodeToEqual(moduleNode: StructureViewModelNode, id: string, name: string) {
-        expect(moduleNode).to.be.an.instanceOf(StructureViewModelNode);
-        expect(moduleNode.id).to.equal(id);
-        expect(moduleNode.name).to.equal(name);
-        expect(moduleNode.isGroup).to.equal(false);
-        expect(moduleNode.rows).to.have.length(0);
+    protected buildViewModelFor(rootDir: string) {
+        let structureMap = new StructureMapBuilder().build(rootDir);
+        this.viewModel = new StructureViewModelBuilder().build(structureMap);
+        expect(this.viewModel).to.exist;
     }
 
-    protected expectRowContainsPackage(row: Array<StructureViewModelNode>, id: string, name: string) {
-        let packageNode = this.findNode(id, row);
+    protected expectRootIsPresent() {
+        expect(this.viewModel).to.have.property("root");
+    }
 
-        expect(packageNode).to.be.an.instanceOf(StructureViewModelNode);
-        expect(packageNode.id).to.equal(id);
-        expect(packageNode.name).to.equal(name);
-        expect(packageNode.isGroup).to.equal(true);
+    protected expectRootRowCountToEqual(expectedRowCount: number) {
+        expect(this.viewModel.root).to.have.property("rows").with.length(expectedRowCount);
+    }
+
+    protected expectRowNodesCountToEqual(row: Array<StructureViewModelNode>, expectedNodesCount: number) {
+        expect(row).to.have.length(expectedNodesCount);
+    }
+
+    protected expectRowContainsPackage(row: Array<StructureViewModelNode>, packageId: string, packageName: string): void {
+        let packageNode = this.findNode(packageId, row);
+        this.expectPackageNodeToEqual(packageNode, packageId, packageName);
     }
 
     protected findNode(id: string, row: Array<StructureViewModelNode>): StructureViewModelNode {
@@ -34,7 +40,39 @@ export abstract class ModuleStructureIntegrationTest {
         return searchResult[0];
     }
 
-    protected expectContainsDependency(from: string, to: string) {
+    protected expectPackageNodeToEqual(packageNode: StructureViewModelNode, packageId: string, packageName: string): void {
+        expect(packageNode).to.be.an.instanceOf(StructureViewModelNode);
+        expect(packageNode.id).to.equal(packageId);
+        expect(packageNode.name).to.equal(packageName);
+        expect(packageNode.isGroup).to.equal(true);
+    }
+
+    protected expectPackageContainsSingleModule(packageId: string, packageRow: number, moduleName: string): void {
+        let row = this.viewModel.root.rows[packageRow];
+        let packageNode = this.findNode(packageId, row);
+
+        expect(packageNode.rows).to.have.length(1);
+
+        row = packageNode.rows[0];
+        expect(row).to.have.length(1);
+
+        this.expectModuleNodeToEqual(row[0], packageId + "." + moduleName, moduleName);
+    }
+
+    protected expectModuleNodeToEqual(moduleNode: StructureViewModelNode, moduleId: string, moduleName: string): void {
+        expect(moduleNode).to.be.an.instanceOf(StructureViewModelNode);
+        expect(moduleNode.id).to.equal(moduleId);
+        expect(moduleNode.name).to.equal(moduleName);
+        expect(moduleNode.isGroup).to.equal(false);
+        expect(moduleNode.rows).to.have.length(0);
+    }
+
+    protected expectDependencyCountToEqual(expectedCount: number) {
+        expect(this.viewModel).to.have.property("dependencies");
+        expect(this.viewModel.dependencies).to.have.length(expectedCount);
+    }
+
+    protected expectContainsDependency(from: string, to: string): void {
         let searchResult = this.viewModel.dependencies.filter(dependency => dependency.from === from && dependency.to === to);
         expect(searchResult).to.have.length(1);
     }
