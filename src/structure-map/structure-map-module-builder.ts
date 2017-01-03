@@ -10,9 +10,10 @@ const dependencyTree = require("dependency-tree");
 export class StructureMapModuleBuilder {
     private typeScriptHelper: TypeScriptImportParser = new TypeScriptImportParser();
 
-    public build(modulePath: string, name: string): StructureMapModule {
+
+    public build(modulePath: string, name: string, rootDir: string): StructureMapModule {
         let simpleName = StructureMapModuleBuilder.getSimpleName(modulePath);
-        let dependencies = this.getImports(modulePath);
+        let dependencies = this.getImports(modulePath, rootDir);
 
         return new StructureMapModule(modulePath, name, simpleName, dependencies);
     }
@@ -21,16 +22,18 @@ export class StructureMapModuleBuilder {
         return path.basename(filePath);
     }
 
-    private getImports(modulePath: string): Array<string> {
+    private getImports(modulePath: string, rootDir: string): Array<string> {
         if (path.extname(modulePath) === ".ts") {
             return this.typeScriptHelper.getImports(modulePath);
         }
 
-        let moduleDirectory = path.join(process.cwd(), path.dirname(modulePath));
-        let tree = dependencyTree({directory: moduleDirectory, filename: modulePath});
+        let tree = dependencyTree({directory: rootDir, filename: modulePath});
         let key = Object.keys(tree)[0];
         let imports = Object.keys(tree[key]);
+        let moduleDirectory = path.dirname(modulePath);
 
-        return imports.map(dependencyPath => path.relative(moduleDirectory, dependencyPath));
+        return imports.map(dependencyPath => {
+            return path.relative(moduleDirectory, dependencyPath);
+        });
     }
 }

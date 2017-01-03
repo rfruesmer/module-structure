@@ -17,6 +17,16 @@ const httpServerModule = require("http-server");
 const opener = require("opener");
 
 
+class ApplicationConfiguration {
+    rootDir = "";
+    module =  "js";
+    outFile =  "";
+    prettyPrint = false;
+    serverPort = 3000;
+    excludes = [];
+    showExport = false;
+}
+
 export class Application {
     private static readonly EXIT_SUCCESS = 0;
     private static readonly EXIT_FAILURE = -1;
@@ -47,7 +57,7 @@ export class Application {
             type: String,
             defaultValue: "es6",
             typeLabel: "es6|ts",
-            description: "Specify module type of input files (defaults to es6): \r\n [bold]{es6} for ECMAScript modules \r\n [bold]{ts} for TypeScript modules (experimental)"
+            description: "Specify module type of input files (defaults to es6): \r\n [bold]{es6} for ECMAScript modules \r\n [bold]{ts} for TypeScript modules (experimental) \r\n [bold]{es6} for ECMAScript modules \r\n [bold]{es6} for ECMAScript modules \r\n [bold]{es6} for ECMAScript modules \r\n [bold]{es6} for ECMAScript modules \r\n [bold]{es6} for ECMAScript modules \r\n [bold]{es6} for ECMAScript modules \r\n [bold]{es6} for ECMAScript modules \r\n [bold]{es6} for ECMAScript modules \r\n [bold]{es6} for ECMAScript modules \r\n [bold]{es6} for ECMAScript modules \r\n [bold]{es6} for ECMAScript modules \r\n [bold]{es6} for ECMAScript modules \r\n [bold]{es6} for ECMAScript modules \r\n [bold]{es6} for ECMAScript modules \r\n [bold]{es6} for ECMAScript modules \r\n [bold]{es6} for ECMAScript modules \r\n [bold]{es6} for ECMAScript modules \r\n [bold]{es6} for ECMAScript modules \r\n [bold]{es6} for ECMAScript modules \r\n [bold]{es6} for ECMAScript modules \r\n [bold]{es6} for ECMAScript modules \r\n [bold]{es6} for ECMAScript modules \r\n [bold]{es6} for ECMAScript modules \r\n [bold]{es6} for ECMAScript modules \r\n [bold]{es6} for ECMAScript modules \r\n [bold]{es6} for ECMAScript modules \r\n [bold]{es6} for ECMAScript modules \r\n [bold]{es6} for ECMAScript modules \r\n [bold]{es6} for ECMAScript modules \r\n [bold]{es6} for ECMAScript modules \r\n [bold]{es6} for ECMAScript modules \r\n [bold]{es6} for ECMAScript modules \r\n [bold]{es6} for ECMAScript modules \r\n [bold]{es6} for ECMAScript modules \r\n [bold]{es6} for ECMAScript modules \r\n [bold]{es6} for ECMAScript modules \r\n [bold]{es6} for ECMAScript modules \r\n [bold]{es6} for ECMAScript modules \r\n [bold]{es6} for ECMAScript modules \r\n [bold]{es6} for ECMAScript modules \r\n [bold]{es6} for ECMAScript modules \r\n [bold]{es6} for ECMAScript modules \r\n [bold]{es6} for ECMAScript modules \r\n [bold]{es6} for ECMAScript modules \r\n [bold]{es6} for ECMAScript modules \r\n [bold]{es6} for ECMAScript modules \r\n [bold]{es6} for ECMAScript modules \r\n [bold]{es6} for ECMAScript modules \r\n [bold]{es6} for ECMAScript modules "
         },
         {
             name: "outFile",
@@ -75,15 +85,7 @@ export class Application {
             description: "Port for serving the included viewer webapp (defaults to 3000). Omitted if --outFile is specified."
         }
     ];
-    private config: any = {
-        rootDir: "",
-        module: "js",
-        outFile: "",
-        prettyPrint: false,
-        serverPort: 3000,
-        excludes: [],
-        showExport: false
-    };
+    private config = new ApplicationConfiguration();
     private structureMap: StructureMapPackage;
     private stopWatch: Stopwatch = new Stopwatch();
 
@@ -237,7 +239,7 @@ export class Application {
     }
 
     private createStructureMap(): void {
-        this.startProcessing("Building structure map");
+        this.startProcessing("Building structure map (this may take several minutes for AMD modules)");
 
         let builder = new StructureMapBuilder();
         this.structureMap = builder.build(this.config.rootDir, this.config.module, this.config.excludes);

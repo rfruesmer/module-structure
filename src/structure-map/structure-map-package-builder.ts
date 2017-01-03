@@ -11,20 +11,23 @@ const checkArgument = preconditions.checkArgument;
 
 export class StructureMapPackageBuilder {
     private rootDir: string;
+    private rootDirParent: string;
     private moduleType: string;
     private excludes: Array<string> = [];
-    private moduleBuilder;
+    private requireConfigPath: string;
+    private moduleBuilder = new StructureMapModuleBuilder();
 
 
-    public build(dir: string, module: string, excludes: string[]): StructureMapPackage {
-        checkArgument(fs.statSync(dir).isDirectory());
+    public build(rootDir: string, module: string, excludes: string[], requireConfigPath = ""): StructureMapPackage {
+        checkArgument(fs.statSync(rootDir).isDirectory());
 
-        this.rootDir =  path.normalize(path.join(dir, ".."));
+        this.rootDir =  rootDir;
+        this.rootDirParent = path.normalize(path.join(rootDir, ".."));
         this.moduleType = module;
         this.excludes = excludes;
-        this.moduleBuilder = new StructureMapModuleBuilder();
+        this.requireConfigPath = requireConfigPath;
 
-        return this.buildInternal(dir);
+        return this.buildInternal(this.rootDir);
     }
 
     private buildInternal(dir: string): StructureMapPackage {
@@ -44,7 +47,7 @@ export class StructureMapPackageBuilder {
         let replace = path.sep.replace("\\", "\\\\");
         let regEx = new RegExp(replace, "g");
 
-        return path.relative(this.rootDir, dir)
+        return path.relative(this.rootDirParent, dir)
             .replace(regEx, ".")
             .toLowerCase();
     }
@@ -89,7 +92,7 @@ export class StructureMapPackageBuilder {
             let moduleName = StructureMapPackageBuilder.getModuleName(modulePath, packageName);
             if (!this.isExcluded(moduleName)
                     && this.isResponsibleFor(modulePath)) {
-                modules.push(this.moduleBuilder.build(modulePath, moduleName, packageName, this.rootDir));
+                modules.push(this.moduleBuilder.build(modulePath, moduleName, this.rootDir));
             }
         });
 
