@@ -93,7 +93,7 @@ export class Application {
         this.processArguments();
         this.createStructureMap();
         this.exportViewModel();
-        if (this.config.isShowExport) {
+        if (this.config.showExport) {
             this.showViewModel();
         }
         else {
@@ -217,7 +217,7 @@ export class Application {
         try {
             let installedPath = getInstalledPathSync(project.name);
             this.config.outFile = path.join(installedPath, "dist/web-app/module-structure.json");
-            this.options.showExport = true;
+            this.config.showExport = true;
         }
         catch (e) {
             this.config.outFile = path.join(process.cwd(), "src/structure-view/data/module-structure.json");
