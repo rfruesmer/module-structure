@@ -12,7 +12,7 @@ const checkArgument = preconditions.checkArgument;
 export class StructureMapPackageBuilder {
     private rootDir: string;
     private moduleType: string;
-    private excludes: string[] = [];
+    private excludes: Array<string> = [];
     private moduleBuilder;
 
 
@@ -29,7 +29,7 @@ export class StructureMapPackageBuilder {
 
     private buildInternal(dir: string): StructureMapPackage {
         let packageName = this.getPackageName(dir);
-        if (this.excludes.indexOf(packageName) > -1) {
+        if (this.isExcluded(packageName)) {
             return null;
         }
 
@@ -47,6 +47,16 @@ export class StructureMapPackageBuilder {
         return path.relative(this.rootDir, dir)
             .replace(regEx, ".")
             .toLowerCase();
+    }
+
+    private isExcluded(name: string): boolean {
+        for (let exclude of this.excludes) {
+            if (name.match(exclude)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private static getSimpleName(dir: string): string {
@@ -77,7 +87,8 @@ export class StructureMapPackageBuilder {
 
         this.getModuleFiles(dir).forEach(modulePath => {
             let moduleName = StructureMapPackageBuilder.getModuleName(modulePath, packageName);
-            if (this.isIncluded(modulePath, moduleName)) {
+            if (!this.isExcluded(moduleName)
+                    && this.isResponsibleFor(modulePath)) {
                 modules.push(this.moduleBuilder.build(modulePath, moduleName, packageName, this.rootDir));
             }
         });
@@ -93,11 +104,6 @@ export class StructureMapPackageBuilder {
 
     private static getModuleName(filePath: string, packageName: string): string {
         return packageName + "." + path.basename(filePath);
-    }
-
-    private isIncluded(modulePath: string, moduleName: string) {
-        return this.excludes.indexOf(moduleName) === -1
-                && this.isResponsibleFor(modulePath);
     }
 
     public isResponsibleFor(filePath: string): boolean {

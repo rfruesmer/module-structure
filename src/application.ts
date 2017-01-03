@@ -56,6 +56,13 @@ export class Application {
             description: "Optional: the output path for the structure map JSON-file. If omitted, the file will be created in a temporary directory and rendered as a diagram in your default browser."
         },
         {
+            name: "exclude",
+            alias: "e",
+            type: String,
+            multiple: true,
+            description: "One or more expressions to filter packages and/or modules."
+        },
+        {
             name: "pretty",
             type: Boolean,
             description: "Pretty-print the generated structure map JSON-file."
@@ -94,7 +101,7 @@ export class Application {
         }
     }
 
-    private parseArguments() {
+    private parseArguments(): void {
         try {
             this.options = commandLineArgs(this.optionDefinitions);
         }
@@ -105,7 +112,7 @@ export class Application {
         }
     }
 
-    private printUsage() {
+    private printUsage(): void {
         let sections = [
             {
                 header: project.name,
@@ -127,11 +134,11 @@ export class Application {
         console.log(commandLineUsage(sections));
     }
 
-    private static exitWithFailure() {
+    private static exitWithFailure(): void {
         process.exit(Application.EXIT_FAILURE);
     }
 
-    private processArguments() {
+    private processArguments(): void {
         this.processHelpArgument();
         this.processVersionArgument();
         this.processRootDirArgument();
@@ -142,11 +149,12 @@ export class Application {
         else {
             this.buildTemporaryOutputPath();
         }
+        this.processExcludes();
         this.processPrettyArgument();
         this.processPortArgument();
     }
 
-    private processHelpArgument() {
+    private processHelpArgument(): void {
         if (this.options.help !== undefined) {
             this.printUsage();
             Application.exitWithSuccess();
@@ -157,14 +165,14 @@ export class Application {
         process.exit(Application.EXIT_SUCCESS);
     };
 
-    private processVersionArgument() {
+    private processVersionArgument(): void {
         if (this.options.version) {
             console.log(project.name + " version " + project.version);
             Application.exitWithSuccess();
         }
     }
 
-    private processRootDirArgument() {
+    private processRootDirArgument(): void {
         if (!this.options.rootDir) {
             console.error("Missing --rootDir argument");
             this.printUsage();
@@ -180,7 +188,7 @@ export class Application {
         this.config.rootDir = this.options.rootDir;
     }
 
-    private processModuleArgument() {
+    private processModuleArgument(): void {
         if (["es6", "ts"].indexOf(this.options.module) === -1) {
             console.error("Invalid --module argument");
             this.printUsage();
@@ -190,11 +198,11 @@ export class Application {
         this.config.module = this.options.module;
     }
 
-    private isOutFileSpecified() {
+    private isOutFileSpecified(): boolean {
         return this.options.outFile !== undefined;
     }
 
-    private processOutFileArgument() {
+    private processOutFileArgument(): void {
         let outDir = path.dirname(this.options.outFile);
         if (!fs.existsSync(outDir)
             || !fs.statSync(outDir).isDirectory()) {
@@ -216,11 +224,15 @@ export class Application {
         }
     }
 
-    private processPrettyArgument() {
+    private processExcludes(): void {
+        this.config.excludes = this.options.exclude ? this.options.exclude : [];
+    }
+
+    private processPrettyArgument(): void {
         this.config.prettyPrint = this.options.pretty !== undefined;
     }
 
-    private processPortArgument() {
+    private processPortArgument(): void {
         this.config.serverPort = this.options.port;
     }
 
