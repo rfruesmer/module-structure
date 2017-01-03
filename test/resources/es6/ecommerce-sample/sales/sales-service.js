@@ -6,8 +6,9 @@ export class SalesService {
         this.billingService = new BillingService();
     }
     placeOrder(request) {
-        const order = new Order("4711", new Date(), request.customer);
+        let order = new Order("4711", new Date(), request.customer);
         request.products.forEach(product => order.addProduct(product));
-        return this.billingService.processPaymentFor(order);
+        this.billingService.processPaymentFor(order);
+        return true;
     }
 }

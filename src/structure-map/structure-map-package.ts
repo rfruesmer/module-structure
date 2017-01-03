@@ -1,31 +1,44 @@
 import {StructureMapRow} from "./structure-map-row";
-import {Package} from "../package-tree/package";
 import {StructureMapEntity} from "./structure-map-entity";
-import {PackageTreeEntity} from "../package-tree/package-tree-entity";
-import {StructureMapEntityFactory} from "./structure-map-entity-factory";
-import {Module} from "../package-tree/module";
+import {StructureMapModule} from "./structure-map-module";
 
 
-export class StructureMapPackage implements StructureMapEntity {
-    private _package: Package;
+export class StructureMapPackage extends StructureMapEntity {
+    private _packages: Array<StructureMapPackage>;
+    private _modules: Array<StructureMapModule>;
     private _rows: Array<StructureMapRow> = [];
 
-    constructor(_package: Package) {
-        this._package = _package;
-        this._rows.push(new StructureMapRow());
-        this.packages.forEach(childPackage => this.insertEntity(childPackage));
-        this.modules.forEach(module => this.insertEntity(module));
+    constructor(path: string,
+                name: string,
+                simpleName: string,
+                childPackages: Array<StructureMapPackage>,
+                modules: Array<StructureMapModule>) {
+        super(path, name, simpleName);
+
+        this._packages = childPackages.slice();
+        this._packages.forEach(_package => _package.parent = this);
+
+        this._modules = modules.slice();
+        this._modules.forEach(_package => _package.parent = this);
+
+        this._rows.push(new StructureMapRow(this));
     }
 
-    private insertEntity(packageTreeEntity: PackageTreeEntity): void {
-        let structureMapEntity = StructureMapEntityFactory.createFrom(packageTreeEntity);
+    public levelize(): void {
+        this.packages.forEach(childPackage => {
+            childPackage.levelize();
+            this.levelizeEntity(childPackage);
+        });
+        this.modules.forEach(module => this.levelizeEntity(module));
+    }
 
-        // console.log(packageTreeEntity.name);
+    private levelizeEntity(entity: StructureMapEntity): void {
+        // console.log(">>> " + entity.name + " => " + this.name);
 
         for (let i = this._rows.length - 1; i >= 0; --i) {
             let row = this._rows[i];
-            let dependenciesToEntity = row.getDependencyCountTo(structureMapEntity);
-            let dependenciesToRow = row.getDependencyCountFrom(structureMapEntity);
+            let dependenciesToEntity = row.getDependencyCountTo(entity);
+            let dependenciesToRow = row.getDependencyCountFrom(entity);
 
             if (dependenciesToEntity === 0) {
                 if (dependenciesToRow > 0) {
@@ -33,7 +46,7 @@ export class StructureMapPackage implements StructureMapEntity {
                 }
 
                 if (i === 0) {
-                    this.insertEntityIntoRow(structureMapEntity, 0);
+                    this.insertEntityIntoRow(entity, 0);
                     return;
                 }
 
@@ -42,31 +55,31 @@ export class StructureMapPackage implements StructureMapEntity {
 
             if (dependenciesToEntity > dependenciesToRow) {
                 if (i < this._rows.length - 1) {
-                    dependenciesToEntity = this._rows[i + 1].getDependencyCountTo(structureMapEntity);
-                    dependenciesToRow = this._rows[i + 1].getDependencyCountFrom(structureMapEntity);
+                    dependenciesToEntity = this._rows[i + 1].getDependencyCountTo(entity);
+                    dependenciesToRow = this._rows[i + 1].getDependencyCountFrom(entity);
                     if (dependenciesToEntity === 0 && dependenciesToRow === 0) {
-                        this.insertEntityIntoRow(structureMapEntity, i + 1);
+                        this.insertEntityIntoRow(entity, i + 1);
                         return;
                     }
                 }
 
-                this.insertEntityIntoNewRowBelow(structureMapEntity, i);
+                this.insertEntityIntoNewRowBelow(entity, i);
                 return;
             }
 
             // continue to row above
         }
 
-        this.insertEntityIntoRow(structureMapEntity, -1);
+        this.insertEntityIntoRow(entity, -1);
     }
 
     private insertEntityIntoRow(entity: StructureMapEntity, rowIndex: number) {
         if (rowIndex < 0) {
-            this._rows.splice(0, 0, new StructureMapRow());
+            this._rows.splice(0, 0, new StructureMapRow(this));
             rowIndex = 0;
         }
         else if (rowIndex >= this._rows.length) {
-            this._rows.push(new StructureMapRow());
+            this._rows.push(new StructureMapRow(this));
         }
 
         let row = this._rows[rowIndex];
@@ -74,33 +87,21 @@ export class StructureMapPackage implements StructureMapEntity {
     }
 
     private insertEntityIntoNewRowBelow(entity: StructureMapEntity, rowIndex: number) {
-        let newRow = new StructureMapRow();
+        let newRow = new StructureMapRow(this);
         this._rows.splice(rowIndex + 1, 0, newRow);
         this.insertEntityIntoRow(entity, rowIndex + 1);
         return newRow;
     }
 
-    get name(): string {
-        return this._package.name;
+    get packages(): Array<StructureMapPackage> {
+        return this._packages.slice();
     }
 
-    get simpleName(): string {
-        return this._package.simpleName;
-    }
-
-    get packages(): Array<Package> {
-        return this._package.packages;
-    }
-
-    get modules(): Array<Module> {
-        return this._package.modules;
+    get modules(): Array<StructureMapModule> {
+        return this._modules.slice();
     }
 
     get rows(): Array<StructureMapRow> {
         return this._rows.slice();
-    }
-
-    get dependencies(): Array<PackageTreeEntity> {
-        return this._package.dependencies;
     }
 }

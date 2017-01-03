@@ -1,21 +1,19 @@
-import {Package} from "../package-tree/package";
-import {PackageTreeBuilder} from "../package-tree/package-tree-builder";
-import {Module} from "../package-tree/module";
-import {ModuleImport} from "../package-tree/module-import";
+import {StructureMapPackageBuilder} from "./structure-map-package-builder";
 import {StructureMapPackage} from "./structure-map-package";
 
 import fs = require("fs");
 import path = require("path");
+import {StructureMapModule} from "./structure-map-module";
 
 const preconditions = require("preconditions").instance();
 const checkArgument = preconditions.checkArgument;
+const checkState = preconditions.checkState;
 
 
 export class StructureMapBuilder {
     private dir: string;
     private moduleType: string;
     private excludes: string[] = [];
-    private packageTree: Package;
     private packageIndex: any = {};
     private moduleIndex: any = {};
     private structureMap: StructureMapPackage;
@@ -26,59 +24,44 @@ export class StructureMapBuilder {
         this.moduleType = moduleType;
         this.excludes = excludes;
 
-        this.buildPackageTree();
-        this.indexPackageTree();
-        this.resolveDependencies();
-        this.createStructureMap();
+        this.buildStructureMap();
+        this.indexStructureMap();
+        this.setupDependencies(this.structureMap);
+        this.levelizeStructureMap();
 
         return this.structureMap;
     }
 
-    private buildPackageTree(): void {
-        let packageTreeBuilder = new PackageTreeBuilder();
-        this.packageTree = packageTreeBuilder.build(this.dir, this.moduleType, this.excludes);
+    private buildStructureMap(): void {
+        let packageBuilder = new StructureMapPackageBuilder();
+        this.structureMap = packageBuilder.build(this.dir, this.moduleType, this.excludes);
     }
 
-    private indexPackageTree(): void {
-        this.indexPackage(this.packageTree);
+    private indexStructureMap(): void {
+        this.indexPackage(this.structureMap);
     }
 
-    private indexPackage(_package: Package): void {
+    private indexPackage(_package: StructureMapPackage): void {
         _package.packages.forEach(childPackage => this.indexPackage(childPackage));
         _package.modules.forEach(module => this.indexModule(module));
 
         this.packageIndex[_package.name] = _package;
     }
 
-    private indexModule(module: Module): void {
+    private indexModule(module: StructureMapModule): void {
         checkArgument(fs.existsSync(module.path));
         this.moduleIndex[module.path] = module;
     }
 
-    private resolveDependencies(): void {
-        this.resolveModuleDependencies(this.packageTree);
-        this.resolvePackageDependencies(this.packageTree);
-    }
-
-    private resolvePackageDependencies(_package: Package): void {
-        _package.packages.forEach(childPackage => this.resolvePackageDependencies(childPackage));
+    private setupDependencies(_package: StructureMapPackage) {
+        _package.packages.forEach(childPackage => this.setupDependencies(childPackage));
         _package.modules.forEach(module =>
-            module.dependencies
-                .filter(dependency => dependency instanceof Module)
-                .forEach(dependentModule => {
-                    _package.addDependency(this.packageIndex[(dependentModule as Module).packageName]);
-                }));
+                module.imports.forEach(_import => this.setupModuleDependency(module, _import)));
     }
 
-    private resolveModuleDependencies(_package: Package): void {
-        _package.packages.forEach(childPackage => this.resolveModuleDependencies(childPackage));
-        _package.modules.forEach(module =>
-            module.imports.forEach(_import => this.resolveModuleDependency(module, _import)));
-    }
-
-    private resolveModuleDependency(module: Module, _import: ModuleImport): void {
+    private setupModuleDependency(module: StructureMapModule, _import: string): void {
         let moduleDirectory = path.dirname(module.path);
-        let importedModulePath = path.join(moduleDirectory, _import.from);
+        let importedModulePath = path.join(moduleDirectory, _import);
         importedModulePath = path.normalize(importedModulePath);
 
         let importedModule = this.moduleIndex[importedModulePath];
@@ -87,7 +70,7 @@ export class StructureMapBuilder {
         }
     }
 
-    private createStructureMap(): void {
-        this.structureMap = new StructureMapPackage(this.packageTree);
+    private levelizeStructureMap(): void {
+        this.structureMap.levelize();
     }
 }

@@ -1,0 +1,22 @@
+{
+    "compilerOptions": {
+        "target": "es6",
+        "sourceMap": false,
+        "removeComments": true,
+        "experimentalDecorators": true,
+        "noImplicitReturns": true,
+        "typeRoots": [
+            "node_modules/@types"
+        ],
+        "types": [
+            "jquery",
+            "node"
+        ]
+    },
+    "include": [
+        "./**/*"
+    ],
+    "exclude": [
+        "node_modules/*"
+    ]
+}

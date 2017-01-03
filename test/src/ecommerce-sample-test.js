@@ -74,12 +74,14 @@ describe("ecommerce-sample", function() {
             it("billing contains bill-, billing-sevice- and payment-status modules", function() {
                 let row = test.viewModel.root.rows[0];
                 const billingPackage = findNode("ecommerce-sample.billing", row);
-                expectNodeRowsCountToEqual(billingPackage, 1);
+                expectNodeRowsCountToEqual(billingPackage, 2);
 
                 row = billingPackage.rows[0];
-                expectRowContainsModule(row, "ecommerce-sample.billing.bill" + test.extension, "bill" + test.extension);
                 expectRowContainsModule(row, "ecommerce-sample.billing.billing-service" + test.extension, "billing-service" + test.extension);
                 expectRowContainsModule(row, "ecommerce-sample.billing.payment-status" + test.extension, "payment-status" + test.extension);
+
+                row = billingPackage.rows[1];
+                expectRowContainsModule(row, "ecommerce-sample.billing.bill" + test.extension, "bill" + test.extension);
             });
 
             it("shopping contains basket module", function() {
@@ -111,19 +113,23 @@ describe("ecommerce-sample", function() {
                 expectRowContainsModule(row, "ecommerce-sample.sales.order" + test.extension, "order" + test.extension);
             });
 
-            it("shared contains customer and product modules", function() {
+            it("shared contains customer-repository, customer and product modules", function() {
                 let row = test.viewModel.root.rows[3];
                 const sharedPackage = findNode("ecommerce-sample.shared", row);
-                expectNodeRowsCountToEqual(sharedPackage, 1);
+                expectNodeRowsCountToEqual(sharedPackage, 2);
 
                 row = sharedPackage.rows[0];
                 expectRowNodesCountToEqual(row, 2);
-                expectRowContainsModule(row, "ecommerce-sample.shared.customer" + test.extension, "customer" + test.extension);
+                expectRowContainsModule(row, "ecommerce-sample.shared.customer-repository" + test.extension, "customer-repository" + test.extension);
                 expectRowContainsModule(row, "ecommerce-sample.shared.product" + test.extension, "product" + test.extension);
+
+                row = sharedPackage.rows[1];
+                expectRowNodesCountToEqual(row, 1);
+                expectRowContainsModule(row, "ecommerce-sample.shared.customer" + test.extension, "customer" + test.extension);
             });
 
-            it("contains 15 dependencies", function() {
-                expectDependencyCountToEqual(test.viewModel, 15);
+            it("contains 19 dependencies", function() {
+                expectDependencyCountToEqual(test.viewModel, 19);
             });
 
             it("contains dependency from application-service to sales-service", function() {
@@ -136,9 +142,14 @@ describe("ecommerce-sample", function() {
                     "ecommerce-sample.sales.order-request" + test.extension);
             });
 
-            it("contains dependency from bill to order", function() {
-                expectContainsDependency(test.viewModel, "ecommerce-sample.billing.bill" + test.extension,
-                    "ecommerce-sample.sales.order" + test.extension);
+            it("contains dependency from application-service to customer-repository", function() {
+                expectContainsDependency(test.viewModel, "ecommerce-sample.app.application-service" + test.extension,
+                    "ecommerce-sample.shared.customer-repository" + test.extension);
+            });
+
+            it("contains dependency from application-service to product", function() {
+                expectContainsDependency(test.viewModel, "ecommerce-sample.app.application-service" + test.extension,
+                    "ecommerce-sample.shared.product" + test.extension);
             });
 
             it("contains dependency from billing-service to shipping-service", function() {
@@ -148,6 +159,16 @@ describe("ecommerce-sample", function() {
 
             it("contains dependency from billing-service to order", function() {
                 expectContainsDependency(test.viewModel, "ecommerce-sample.billing.billing-service" + test.extension,
+                    "ecommerce-sample.sales.order" + test.extension);
+            });
+
+            it("contains dependency from billing-service to bill", function() {
+                expectContainsDependency(test.viewModel, "ecommerce-sample.billing.billing-service" + test.extension,
+                    "ecommerce-sample.billing.bill" + test.extension);
+            });
+
+            it("contains dependency from bill to order", function() {
+                expectContainsDependency(test.viewModel, "ecommerce-sample.billing.bill" + test.extension,
                     "ecommerce-sample.sales.order" + test.extension);
             });
 
@@ -199,6 +220,11 @@ describe("ecommerce-sample", function() {
             it("contains dependency from order to product", function() {
                 expectContainsDependency(test.viewModel, "ecommerce-sample.sales.order" + test.extension,
                     "ecommerce-sample.shared.product" + test.extension);
+            });
+
+            it("contains dependency from customer-repository to customer", function() {
+                expectContainsDependency(test.viewModel, "ecommerce-sample.shared.customer-repository" + test.extension,
+                    "ecommerce-sample.shared.customer" + test.extension);
             });
         });
     });

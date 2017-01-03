@@ -1,43 +1,43 @@
-import {Package} from "./package";
-import {Module} from "./module";
-import {ModuleBuilder} from "./module-builder";
+import {StructureMapModuleBuilder} from "./structure-map-module-builder";
 
 import fs = require("fs");
 import path = require("path");
+import {StructureMapPackage} from "./structure-map-package";
+import {StructureMapModule} from "./structure-map-module";
 
 const preconditions = require("preconditions").instance();
 const checkArgument = preconditions.checkArgument;
 
 
-export class PackageTreeBuilder {
+export class StructureMapPackageBuilder {
     private rootDir: string;
     private moduleType: string;
     private excludes: string[] = [];
     private moduleBuilder;
 
 
-    public build(dir: string, module: string, excludes: string[]): Package {
+    public build(dir: string, module: string, excludes: string[]): StructureMapPackage {
         checkArgument(fs.statSync(dir).isDirectory());
 
         this.rootDir =  path.normalize(path.join(dir, ".."));
         this.moduleType = module;
         this.excludes = excludes;
-        this.moduleBuilder = new ModuleBuilder(this.moduleType);
+        this.moduleBuilder = new StructureMapModuleBuilder();
 
         return this.buildInternal(dir);
     }
 
-    private buildInternal(dir: string): Package {
+    private buildInternal(dir: string): StructureMapPackage {
         let packageName = this.getPackageName(dir);
         if (this.excludes.indexOf(packageName) > -1) {
             return null;
         }
 
-        let simplePackageName = PackageTreeBuilder.getSimpleName(dir);
+        let simplePackageName = StructureMapPackageBuilder.getSimpleName(dir);
         let packages = this.buildPackages(dir);
         let modules = this.buildModules(dir, packageName);
 
-        return new Package(dir, packageName, simplePackageName, packages, modules);
+        return new StructureMapPackage(dir, packageName, simplePackageName, packages, modules);
     }
 
     private getPackageName(dir: string): string {
@@ -53,8 +53,8 @@ export class PackageTreeBuilder {
         return path.basename(dir);
     }
 
-    private buildPackages(dir: string): Array<Package> {
-        let childPackages: Array<Package> = [];
+    private buildPackages(dir: string): Array<StructureMapPackage> {
+        let childPackages: Array<StructureMapPackage> = [];
 
         this.getSubDirectories(dir).forEach(subDir => {
             let childPackage = this.buildInternal(subDir);
@@ -72,13 +72,13 @@ export class PackageTreeBuilder {
             .filter(path => fs.statSync(path).isDirectory());
     }
 
-    private buildModules(dir: string, packageName: string): Array<Module> {
-        let modules: Array<Module> = [];
+    private buildModules(dir: string, packageName: string): Array<StructureMapModule> {
+        let modules: Array<StructureMapModule> = [];
 
         this.getModuleFiles(dir).forEach(modulePath => {
-            let moduleName = PackageTreeBuilder.getModuleName(modulePath, packageName);
+            let moduleName = StructureMapPackageBuilder.getModuleName(modulePath, packageName);
             if (this.isIncluded(modulePath, moduleName)) {
-                modules.push(this.moduleBuilder.build(modulePath, moduleName, packageName));
+                modules.push(this.moduleBuilder.build(modulePath, moduleName, packageName, this.rootDir));
             }
         });
 

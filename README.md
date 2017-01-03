@@ -3,7 +3,7 @@
 
 # module-structure
 
-Generates and displays levelized structure maps for ECMAScript/TypeScript modules (inspired by <a href="http://structure101.com/">Structure101</a>).
+Create levelized structure maps from ECMAScript/TypeScript dependencies (inspired by <a href="http://structure101.com/">Structure101</a>).
 
 ## Credits
 

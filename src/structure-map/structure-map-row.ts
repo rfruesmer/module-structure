@@ -1,13 +1,17 @@
-import {Module} from "../package-tree/module";
 import {StructureMapEntity} from "./structure-map-entity";
 import {StructureMapPackage} from "./structure-map-package";
+import {StructureMapModule} from "./structure-map-module";
 
 
 export class StructureMapRow {
     private _items: Array<StructureMapEntity> = [];
     private _itemsMap: any = {};
     private _dependencyMap: any = {};
+    private _parent: StructureMapPackage;
 
+    constructor(parent: StructureMapPackage) {
+        this._parent = parent;
+    }
 
     public insert(entity: StructureMapEntity): void {
         this.indexDependencies(entity);
@@ -17,7 +21,7 @@ export class StructureMapRow {
     private indexDependencies(entity: StructureMapEntity): void {
         if (entity instanceof StructureMapPackage) { // notable: after this instanceof check, TypeScript implicitly casts param entity to Package :)
             entity.packages.forEach(childPackage => this.indexDependencies(childPackage));
-            entity.modules.forEach(module => this.indexModuleDependencies(module));
+            entity.modules.forEach(module => this.indexDependencies(module));
         }
 
         entity.dependencies.forEach(dependency => {
@@ -25,15 +29,31 @@ export class StructureMapRow {
         });
     }
 
-    private indexModuleDependencies(module: Module): void {
-        module.dependencies.forEach(dependency => this.indexDependency(module, dependency));
+    private indexDependency(from: StructureMapEntity, to: StructureMapEntity): void {
+        this.indexDependencyInternal(to.name, from.name);
+
+        let parent = to.parent;
+        for (let i = 0; i < 100; ++i) {
+            if (this._parent.name.indexOf(parent.name) === 0) {
+                break;
+            }
+
+            let list = this._dependencyMap[parent.name];
+            if (!list) {
+                list = [];
+                this._dependencyMap[parent.name] = list;
+            }
+            list.push(from.name);
+
+            parent = parent.parent;
+        }
     }
 
-    private indexDependency(from: StructureMapEntity, to: StructureMapEntity): void {
-        let dependencyList = this._dependencyMap[to.name];
+    private indexDependencyInternal(to: string, from: string) {
+        let dependencyList = this._dependencyMap[to];
         if (!dependencyList) {
             dependencyList = [];
-            this._dependencyMap[to.name] = dependencyList;
+            this._dependencyMap[to] = dependencyList;
         }
 
         dependencyList.push(from);
@@ -46,19 +66,44 @@ export class StructureMapRow {
 
     public getDependencyCountTo(entity: StructureMapEntity): number {
         let dependencyList = this._dependencyMap[entity.name];
-        return dependencyList ? dependencyList.length : 0;
+        if (!dependencyList) {
+            return 0;
+        }
+
+        dependencyList = dependencyList.filter(firstItem => {
+            for (let secondItem of dependencyList) {
+                return secondItem === firstItem || secondItem.indexOf(firstItem) !== 0;
+            }
+
+            return false;
+        });
+
+        return dependencyList.length;
     }
 
     public getDependencyCountFrom(entity: StructureMapEntity): number {
         let count = 0;
 
         entity.dependencies.forEach(dependency => {
-            if (this._itemsMap[dependency.name]) {
+            if (this.containsDependency(dependency)) {
                 count++;
             }
         });
 
         return count;
+    }
+
+    private containsDependency(dependency: StructureMapEntity): boolean {
+        if (this._itemsMap[dependency.name]) {
+            return true;
+        }
+
+        let parent = dependency.parent;
+        if (this._parent.name.indexOf(parent.name) === 0) {
+            return false;
+        }
+
+        return this.containsDependency(parent);
     }
 
     get items(): Array<StructureMapEntity> {

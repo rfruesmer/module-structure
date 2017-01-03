@@ -47,7 +47,7 @@ export class Application {
             type: String,
             defaultValue: "es6",
             typeLabel: "es6|ts",
-            description: "Specify module type of input files (defaults to es6): \r\n [bold]{es6} for ECMAScript modules \r\n [bold]{ts} for TypeScript modules"
+            description: "Specify module type of input files (defaults to es6): \r\n [bold]{es6} for ECMAScript modules \r\n [bold]{ts} for TypeScript modules (experimental)"
         },
         {
             name: "outFile",
@@ -74,7 +74,8 @@ export class Application {
         outFile: "",
         prettyPrint: false,
         serverPort: 3000,
-        excludes: []
+        excludes: [],
+        showExport: false
     };
     private structureMap: StructureMapPackage;
     private stopWatch: Stopwatch = new Stopwatch();
@@ -85,7 +86,7 @@ export class Application {
         this.processArguments();
         this.createStructureMap();
         this.exportViewModel();
-        if (this.isShowExport()) {
+        if (this.config.isShowExport) {
             this.showViewModel();
         }
         else {
@@ -208,6 +209,7 @@ export class Application {
         try {
             let installedPath = getInstalledPathSync(project.name);
             this.config.outFile = path.join(installedPath, "dist/web-app/module-structure.json");
+            this.options.showExport = true;
         }
         catch (e) {
             this.config.outFile = path.join(process.cwd(), "src/structure-view/data/module-structure.json");
@@ -261,10 +263,6 @@ export class Application {
         fs.writeFileSync(this.config.outFile, JSON.stringify(viewModel, null, spacing));
 
         this.stopProcessing();
-    }
-
-    private isShowExport() {
-        return (this.options.outFile === undefined);
     }
 
     private showViewModel() {

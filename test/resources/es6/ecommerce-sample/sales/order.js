@@ -16,10 +16,11 @@ export class Order {
     get date() {
         return this._date;
     }
-    get products() {
-        return this._products;
+    calcSum() {
+        return 42;
     }
     addProduct(product) {
         this._products.push(product);
     }
 }
+//# sourceMappingURL=order.js.map

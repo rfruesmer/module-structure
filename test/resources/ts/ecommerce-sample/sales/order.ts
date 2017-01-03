@@ -25,8 +25,8 @@ export class Order {
         return this._date;
     }
 
-    get products(): Array<Product> {
-        return this._products;
+    public calcSum(): number {
+        return 42;
     }
 
     public addProduct(product: Product) {

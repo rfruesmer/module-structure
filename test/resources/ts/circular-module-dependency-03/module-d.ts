@@ -1,2 +1,6 @@
 export class ClassD {
+
+    doSomething() {
+        // ...
+    }
 }

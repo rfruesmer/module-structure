@@ -7,7 +7,7 @@
     "module-structure": "bin/module-structure.js"
   },
   "scripts": {
-    "build-dev": "tsc -p .",
+    "build-dev": "tsc -p . && npm run tslint",
     "build-prod": "npm run clean-js && npm run test && npm run clean-dist && npm run build-prod-lib && npm run build-prod-webapp",
     "build-prod-lib": "npm run tsc-prod-lib && cpx package.json dist",
     "build-prod-webapp": "webpack --config conf/webpack.prod.js --progress --profile --bail",
@@ -19,6 +19,7 @@
     "start-prod-server": "http-server dist/web-app -o http://localhost:8080?data=module-structure.json",
     "test": "nyc mocha test/src",
     "tsc-prod-lib": "tsc -p conf/tsconfig.prod.json --outDir dist/lib",
+    "tsc-test-resources": "tsc -p test/resources/ts",
     "tslint": "tslint -c conf/tslint.json --project ."
   },
   "repository": {
@@ -75,6 +76,7 @@
     "colors": "^1.1.2",
     "command-line-args": "^3.0.5",
     "command-line-usage": "^3.0.8",
+    "dependency-tree": "^5.7.4",
     "get-installed-path": "^2.0.3",
     "http-server": "^0.9.0",
     "install": "^0.8.4",
