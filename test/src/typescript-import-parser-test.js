@@ -22,7 +22,7 @@ describe("typescript-import-parser", function() {
     }
 
     function whenGettingImportSources() {
-        let typeScriptHelper = new TypeScriptImportParser();
+        const typeScriptHelper = new TypeScriptImportParser();
         actualImportSources = typeScriptHelper.getImportSourcesFromString(source);
     }
 
