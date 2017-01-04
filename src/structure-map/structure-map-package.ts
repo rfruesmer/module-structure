@@ -2,6 +2,9 @@ import {StructureMapRow} from "./structure-map-row";
 import {StructureMapEntity} from "./structure-map-entity";
 import {StructureMapModule} from "./structure-map-module";
 
+const preconditions = require("preconditions").instance();
+const checkState = preconditions.checkState;
+
 
 export class StructureMapPackage extends StructureMapEntity {
     private _packages: Array<StructureMapPackage>;
@@ -30,6 +33,10 @@ export class StructureMapPackage extends StructureMapEntity {
             this.levelizeEntity(childPackage);
         });
         this.modules.forEach(module => this.levelizeEntity(module));
+
+        for (let i = this._rows.length - 1; i > 0; --i) {
+            this.finalizeRow(i);
+        }
     }
 
     private levelizeEntity(entity: StructureMapEntity): void {
@@ -71,7 +78,9 @@ export class StructureMapPackage extends StructureMapEntity {
         }
 
         this.insertEntityIntoRow(entity, -1);
-        this.relevelizeSecondRow();
+        for (let i = 1; i < this._rows.length - 1; ++i) {
+            this.relevelizeRow(i);
+        }
     }
 
     private insertEntityIntoRow(entity: StructureMapEntity, rowIndex: number) {
@@ -94,12 +103,26 @@ export class StructureMapPackage extends StructureMapEntity {
         return newRow;
     }
 
-    private relevelizeSecondRow(): void {
-        let secondRow = this._rows[1];
-        let secondRowEntities = secondRow.entities;
-        secondRowEntities.forEach(entity => secondRow.remove(entity));
-        this._rows.splice(1, 1);
-        secondRowEntities.forEach(entity => this.levelizeEntity(entity));
+    private relevelizeRow(rowIndex: number): void {
+        let row = this._rows[rowIndex];
+        let rowEntities = row.entities;
+        rowEntities.forEach(entity => row.remove(entity));
+        this._rows.splice(rowIndex, 1);
+        rowEntities.forEach(entity => this.levelizeEntity(entity));
+    }
+
+    private finalizeRow(rowIndex: number): void {
+        let row = this._rows[rowIndex];
+        let rowAbove = this._rows[rowIndex - 1];
+
+        row.entities.forEach(entity => {
+            if (rowAbove.getDependencyCountTo(entity) === 0) {
+                row.remove(entity);
+                rowAbove.insert(entity);
+            }
+        });
+
+        checkState(row.entities.length > 0);
     }
 
     get packages(): Array<StructureMapPackage> {
@@ -113,4 +136,4 @@ export class StructureMapPackage extends StructureMapEntity {
     get rows(): Array<StructureMapRow> {
         return this._rows.slice();
     }
- }
+}

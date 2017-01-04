@@ -375,7 +375,7 @@ export class StructureView implements StructureViewObjectListener, SelectionList
             "fill": "none",
             "marker-end": pathDesc.markerEnd,
             "stroke": pathDesc.strokeColor,
-            "stroke-width": 1
+            "stroke-width": 0.5
         });
 
         path.hover(e => {
@@ -393,7 +393,7 @@ export class StructureView implements StructureViewObjectListener, SelectionList
         }, e => {
             path.attr({
                 "stroke": pathDesc.strokeColor,
-                "stroke-width": 1,
+                "stroke-width": 0.5,
                 "stroke-dasharray": ""
             });
 

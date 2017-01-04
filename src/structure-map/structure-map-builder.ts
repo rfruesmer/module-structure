@@ -7,7 +7,6 @@ import {StructureMapModule} from "./structure-map-module";
 
 const preconditions = require("preconditions").instance();
 const checkArgument = preconditions.checkArgument;
-const checkState = preconditions.checkState;
 
 
 export class StructureMapBuilder {
