@@ -8,7 +8,7 @@
 Creates levelized structure maps from ECMAScript, TypeScript and AMD dependencies - 
 inspired by <a href="https://structure101.com/blog/2011/03/introducing-levelized-structure-maps-lsm/">structure101's Levelized Structure Maps</a>.
 
-Generated structure maps may be directly displayed in default browser or saved as JSON files. 
+Generated maps can be directly displayed inside your default browser or saved as JSON files. 
 
 ## Installation
 
