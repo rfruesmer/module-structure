@@ -1,3 +1,4 @@
+<a href="https://www.npmjs.com/package/module-structure"><img alt="npm Version" src="http://img.shields.io/npm/v/module-structure.svg"></a>
 <a href="https://travis-ci.org/rfruesmer/module-structure"><img alt="Build Status" src="https://travis-ci.org/rfruesmer/module-structure.svg?branch=master"></a>
 <a href="https://codecov.io/gh/rfruesmer/module-structure"><img alt="Coverage Status" src="https://codecov.io/gh/rfruesmer/module-structure/master.svg"></a>
 
