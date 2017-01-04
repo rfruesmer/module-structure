@@ -1,12 +1,14 @@
-<a href="https://www.npmjs.com/package/module-structure"><img alt="npm Version" src="http://img.shields.io/npm/v/module-structure.svg"></a>
+# Module Structure
+
+<a href="https://www.npmjs.com/package/module-structure"><img alt="npm Version" src="https://img.shields.io/npm/v/module-structure.svg"></a>
 <a href="https://travis-ci.org/rfruesmer/module-structure"><img alt="Build Status" src="https://travis-ci.org/rfruesmer/module-structure.svg?branch=master"></a>
 <a href="https://codecov.io/gh/rfruesmer/module-structure"><img alt="Coverage Status" src="https://codecov.io/gh/rfruesmer/module-structure/master.svg"></a>
 
-# Module Structure
 
-Creates levelized structure maps from ECMAScript, TypeScript and AMD dependencies - inspired by Structure101's Levelized Structure Maps.
+Creates levelized structure maps from ECMAScript, TypeScript and AMD dependencies - 
+inspired by <a href="https://structure101.com/blog/2011/03/introducing-levelized-structure-maps-lsm/">structure101's Levelized Structure Maps</a>.
 
-Generated structure maps can be directly displayed in default browser or saved as JSON files. 
+Generated structure maps may be directly displayed in default browser or saved as JSON files. 
 
 ## Installation
 
