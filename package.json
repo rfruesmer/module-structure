@@ -1,6 +1,6 @@
 {
   "name": "module-structure",
-  "version": "1.0.0-alpha.1",
+  "version": "1.0.0-alpha.2",
   "description": "Generates and displays levelized structure maps for ECMAScript/TypeScript modules.",
   "main": "index.js",
   "bin": {
@@ -27,14 +27,14 @@
     "url": "git+https://github.com/rfruesmer/module-structure.git"
   },
   "keywords": [
-      "amd",
-      "typescript",
-      "ecmascript",
-      "es6",
-      "dependency",
-      "dependencies",
-      "structure",
-      "module"
+    "amd",
+    "typescript",
+    "ecmascript",
+    "es6",
+    "dependency",
+    "dependencies",
+    "structure",
+    "module"
   ],
   "author": "Reinhold Früsmer",
   "license": "MIT",
