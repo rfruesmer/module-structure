@@ -51,9 +51,8 @@ export class Application {
             description: "Specifies the root directory of input files."
         },
         {
-            name: "typescript",
-            alias: "ts",
-            type: String,
+            name: "ts",
+            type: Boolean,
             description: "Only necessary for analyzing TypeScript modules."
         },
         {
@@ -188,7 +187,7 @@ export class Application {
     }
 
     private processModuleArgument(): void {
-        this.config.module = this.options.typescript ? "ts" : "es6";
+        this.config.module = this.options.ts ? "ts" : "es6";
     }
 
     private isOutFileSpecified(): boolean {

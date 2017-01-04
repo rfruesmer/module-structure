@@ -9,7 +9,7 @@ Generated structure maps may be directly displayed in default browser or saved a
 
 ## Installation
 
-`npm install --save dependency-tree`
+`npm install module-structure -g`
 
 ## CLI 
 
@@ -29,7 +29,7 @@ Create structure map for ECMAScript and/or AMD modules and save as JSON file:
 
 Create structure map for TypeScript modules and save as JSON file:
 
-`module-structure --rootDir directory  --ts --outFile file `           
+`module-structure --rootDir directory  --ts --outFile file`           
 
 ### Flags 
 
@@ -58,8 +58,8 @@ Create structure map for TypeScript modules and save as JSON file:
       <td>Specifies the root directory of input files.</td>
     </tr>
     <tr>
-      <td>--typescript</td>
-      <td>-ts</td>
+      <td>--ts</td>
+      <td></td>
       <td>Must be set for analyzing TypeScript modules instead of ECMAScript or AMD modules.</td>
     </tr>
     <tr>
