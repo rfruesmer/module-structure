@@ -1,6 +1,6 @@
 {
   "name": "module-structure",
-  "version": "1.0.0-alpha.12",
+  "version": "1.0.0-alpha.13",
   "description": "Creates levelized structure maps for ECMAScript, TypeScript and AMD modules.",
   "main": "index.js",
   "bin": {
