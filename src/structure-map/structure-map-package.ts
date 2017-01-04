@@ -33,7 +33,7 @@ export class StructureMapPackage extends StructureMapEntity {
     }
 
     private levelizeEntity(entity: StructureMapEntity): void {
-        // console.log(">>> " + entity.name + " => " + this.name);
+        // console.log("\n>>> " + entity.name + " => " + this.name);
 
         for (let i = this._rows.length - 1; i >= 0; --i) {
             let row = this._rows[i];
@@ -71,6 +71,7 @@ export class StructureMapPackage extends StructureMapEntity {
         }
 
         this.insertEntityIntoRow(entity, -1);
+        this.relevelizeSecondRow();
     }
 
     private insertEntityIntoRow(entity: StructureMapEntity, rowIndex: number) {
@@ -93,6 +94,14 @@ export class StructureMapPackage extends StructureMapEntity {
         return newRow;
     }
 
+    private relevelizeSecondRow(): void {
+        let secondRow = this._rows[1];
+        let secondRowEntities = secondRow.entities;
+        secondRowEntities.forEach(entity => secondRow.remove(entity));
+        this._rows.splice(1, 1);
+        secondRowEntities.forEach(entity => this.levelizeEntity(entity));
+    }
+
     get packages(): Array<StructureMapPackage> {
         return this._packages.slice();
     }
@@ -104,4 +113,4 @@ export class StructureMapPackage extends StructureMapEntity {
     get rows(): Array<StructureMapRow> {
         return this._rows.slice();
     }
-}
+ }

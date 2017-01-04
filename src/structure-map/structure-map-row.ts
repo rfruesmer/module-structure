@@ -1,11 +1,10 @@
 import {StructureMapEntity} from "./structure-map-entity";
 import {StructureMapPackage} from "./structure-map-package";
-import {StructureMapModule} from "./structure-map-module";
 
 
 export class StructureMapRow {
-    private _items: Array<StructureMapEntity> = [];
-    private _itemsMap: any = {};
+    private _entities: Array<StructureMapEntity> = [];
+    private _entityMap: any = {};
     private _dependencyMap: any = {};
     private _parent: StructureMapPackage;
 
@@ -60,8 +59,8 @@ export class StructureMapRow {
     }
 
     private insertInternal(entity: StructureMapEntity): void {
-        this._items.push(entity);
-        this._itemsMap[entity.name] = entity;
+        this._entities.push(entity);
+        this._entityMap[entity.name] = entity;
     }
 
     public getDependencyCountTo(entity: StructureMapEntity): number {
@@ -71,11 +70,8 @@ export class StructureMapRow {
         }
 
         dependencyList = dependencyList.filter(firstItem => {
-            for (let secondItem of dependencyList) {
-                return secondItem === firstItem || secondItem.indexOf(firstItem) !== 0;
-            }
-
-            return false;
+            let secondItem = dependencyList[0];
+            return secondItem === firstItem || secondItem.indexOf(firstItem) !== 0;
         });
 
         return dependencyList.length;
@@ -94,7 +90,7 @@ export class StructureMapRow {
     }
 
     private containsDependency(dependency: StructureMapEntity): boolean {
-        if (this._itemsMap[dependency.name]) {
+        if (this._entityMap[dependency.name]) {
             return true;
         }
 
@@ -106,7 +102,34 @@ export class StructureMapRow {
         return this.containsDependency(parent);
     }
 
-    get items(): Array<StructureMapEntity> {
-        return this._items.slice();
+    get entities(): Array<StructureMapEntity> {
+        return this._entities.slice();
+    }
+
+    public remove(entity: StructureMapEntity): void {
+        for (let to in this._dependencyMap) {
+            if (this._dependencyMap.hasOwnProperty(to)) {
+                this.removeDependenciesOf(entity, to);
+            }
+        }
+
+        let index = this.entities.indexOf(entity);
+        this._entities.splice(index, 1);
+        delete this._entityMap[entity.name];
+    }
+
+    private removeDependenciesOf(entity: StructureMapEntity, to: string) {
+        let froms = this._dependencyMap[to];
+        for (let i = 0; i < froms.length; ++i) {
+            if (froms[i].indexOf(entity.name) !== 0) {
+                continue;
+            }
+
+            this._dependencyMap[to].splice(i, 1);
+            if (this._dependencyMap[to].length === 0) {
+                delete this._dependencyMap[to];
+            }
+            i--;
+        }
     }
 }

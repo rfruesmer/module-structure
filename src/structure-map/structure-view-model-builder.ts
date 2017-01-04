@@ -57,7 +57,7 @@ export class StructureViewModelBuilder {
     private serializeRow(structureMapRow: StructureMapRow): Array<StructureViewModelNode> {
         let viewModelRow: Array<StructureViewModelNode> = [];
 
-        structureMapRow.items.forEach(entity => {
+        structureMapRow.entities.forEach(entity => {
             viewModelRow.push(this.buildInternal(entity));
         });
 
