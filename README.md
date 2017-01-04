@@ -39,8 +39,8 @@ Create structure map for TypeScript modules and save as JSON file:
 <table>
   <thead>
     <tr>
-      <th width="25%">Flag</th>
-      <th width="15%">Short Flag</th>
+      <th width="100">Flag</th>
+      <th>Short Flag</th>
       <th>Description</th>
     </tr>
   </thead>
