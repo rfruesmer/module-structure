@@ -270,7 +270,7 @@ export class Application {
     }
 
     private showViewModel() {
-        let serverRoot = path.join(process.cwd(), "dist/web-app");
+        let serverRoot = path.dirname(this.config.outFile);
         console.log(colors.yellow("Starting http-server, serving from " + serverRoot));
 
         let server = httpServerModule.createServer({root: serverRoot});
