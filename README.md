@@ -9,6 +9,46 @@ Create levelized structure maps from ECMAScript/TypeScript dependencies (inspire
 
 <table align="center">
     <tr>
+        <td>color.js</td>
+        <td align="right">
+            <a href="https://www.npmjs.com/package/colors/">homepage</a>
+            &nbsp;-&nbsp;  
+            <a href="https://github.com/Marak/colors.js/blob/master/LICENSE">show license</a>
+        </td>
+    </tr>
+    <tr>
+        <td>command-line-args</td>
+        <td align="right">
+            <a href="https://www.npmjs.com/package/command-line-args/">homepage</a>
+            &nbsp;-&nbsp;  
+            <a href="https://github.com/75lb/command-line-args/blob/master/LICENSE">show license</a>
+        </td>
+    </tr>
+    <tr>
+        <td>command-line-usage</td>
+        <td align="right">
+            <a href="https://www.npmjs.com/package/command-line-usage/">homepage</a>
+            &nbsp;-&nbsp;  
+            <a href="https://github.com/75lb/command-line-usage/blob/master/LICENSE">show license</a>
+        </td>
+    </tr>
+    <tr>
+        <td>dependency-tree</td>
+        <td align="right">
+            <a href="https://www.npmjs.com/package/dependency-tree/">homepage</a>
+            &nbsp;-&nbsp;  
+            <a href="http://spdx.org/licenses/MIT">show license</a>
+        </td>
+    </tr>
+    <tr>
+        <td>get-installed-path</td>
+        <td align="right">
+            <a href="https://www.npmjs.com/package/get-installed-path/">homepage</a>
+            &nbsp;-&nbsp;  
+            <a href="https://github.com/tunnckoCore/get-installed-path/blob/master/LICENSE">show license</a>
+        </td>
+    </tr>
+    <tr>
         <td>Google Material Design Icons</td>
         <td align="right">
             <a href="https://material.io/icons/">homepage</a>
@@ -17,11 +57,35 @@ Create levelized structure maps from ECMAScript/TypeScript dependencies (inspire
         </td>
     </tr>
     <tr>
+        <td>http-server</td>
+        <td align="right">
+            <a href="https://www.npmjs.com/package/http-server/">homepage</a>
+            &nbsp;-&nbsp;  
+            <a href="https://github.com/indexzero/http-server/blob/master/LICENSE">show license</a>
+        </td>
+    </tr>
+    <tr>
         <td>JQuery</td>
         <td align="right">
             <a href="https://jquery.com/">homepage</a>
             &nbsp;-&nbsp;  
             <a href="https://github.com/jquery/jquery/blob/master/LICENSE.txt">show license</a>
+        </td>
+    </tr>
+    <tr>
+        <td>opener</td>
+        <td align="right">
+            <a href="https://www.npmjs.com/package/opener/">homepage</a>
+            &nbsp;-&nbsp;  
+            <a href="https://github.com/domenic/opener/blob/master/LICENSE.txt">show license</a>
+        </td>
+    </tr>
+    <tr>
+        <td>preconditions</td>
+        <td align="right">
+            <a href="https://www.npmjs.com/package/preconditions/">homepage</a>
+            &nbsp;-&nbsp;  
+            <a href="https://spdx.org/licenses/MIT">show license</a>
         </td>
     </tr>
 </table>

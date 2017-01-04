@@ -5,7 +5,6 @@ import {StructureViewModelBuilder} from "./structure-map/structure-view-model-bu
 import fs = require("fs");
 import path = require("path");
 import process = require("process");
-import Stopwatch = require("agstopwatch");
 
 const project = require("../package.json");
 const commandLineArgs = require("command-line-args");
@@ -87,7 +86,7 @@ export class Application {
     ];
     private config = new ApplicationConfiguration();
     private structureMap: StructureMapPackage;
-    private stopWatch: Stopwatch = new Stopwatch();
+    private startTime: number;
 
 
     public run(): void {
@@ -249,13 +248,13 @@ export class Application {
 
     private startProcessing(message: string) {
         process.stdout.write(colors.yellow(message + " ... "));
-        this.stopWatch.reset();
-        this.stopWatch.start();
+        this.startTime = Date.now();
     }
 
     private stopProcessing() {
-        this.stopWatch.stop();
-        console.log(colors.yellow("finished in " + this.stopWatch.elapsed + "ms"));
+        let stopTime = Date.now();
+        let elapsed = stopTime - this.startTime;
+        console.log(colors.yellow("finished in " + elapsed + "ms"));
     }
 
     private exportViewModel(): void {
