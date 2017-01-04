@@ -51,12 +51,10 @@ export class Application {
             description: "Specifies the root directory of input files."
         },
         {
-            name: "module",
-            alias: "m",
+            name: "typescript",
+            alias: "ts",
             type: String,
-            defaultValue: "es6",
-            typeLabel: "es6|ts",
-            description: "Specify module type of input files (defaults to es6): \r\n [bold]{es6} for ECMAScript modules \r\n [bold]{ts} for TypeScript modules (experimental) \r\n [bold]{es6} for ECMAScript modules \r\n [bold]{es6} for ECMAScript modules \r\n [bold]{es6} for ECMAScript modules \r\n [bold]{es6} for ECMAScript modules \r\n [bold]{es6} for ECMAScript modules \r\n [bold]{es6} for ECMAScript modules \r\n [bold]{es6} for ECMAScript modules \r\n [bold]{es6} for ECMAScript modules \r\n [bold]{es6} for ECMAScript modules \r\n [bold]{es6} for ECMAScript modules \r\n [bold]{es6} for ECMAScript modules \r\n [bold]{es6} for ECMAScript modules \r\n [bold]{es6} for ECMAScript modules \r\n [bold]{es6} for ECMAScript modules \r\n [bold]{es6} for ECMAScript modules \r\n [bold]{es6} for ECMAScript modules \r\n [bold]{es6} for ECMAScript modules \r\n [bold]{es6} for ECMAScript modules \r\n [bold]{es6} for ECMAScript modules \r\n [bold]{es6} for ECMAScript modules \r\n [bold]{es6} for ECMAScript modules \r\n [bold]{es6} for ECMAScript modules \r\n [bold]{es6} for ECMAScript modules \r\n [bold]{es6} for ECMAScript modules \r\n [bold]{es6} for ECMAScript modules \r\n [bold]{es6} for ECMAScript modules \r\n [bold]{es6} for ECMAScript modules \r\n [bold]{es6} for ECMAScript modules \r\n [bold]{es6} for ECMAScript modules \r\n [bold]{es6} for ECMAScript modules \r\n [bold]{es6} for ECMAScript modules \r\n [bold]{es6} for ECMAScript modules \r\n [bold]{es6} for ECMAScript modules \r\n [bold]{es6} for ECMAScript modules \r\n [bold]{es6} for ECMAScript modules \r\n [bold]{es6} for ECMAScript modules \r\n [bold]{es6} for ECMAScript modules \r\n [bold]{es6} for ECMAScript modules \r\n [bold]{es6} for ECMAScript modules \r\n [bold]{es6} for ECMAScript modules \r\n [bold]{es6} for ECMAScript modules \r\n [bold]{es6} for ECMAScript modules \r\n [bold]{es6} for ECMAScript modules \r\n [bold]{es6} for ECMAScript modules \r\n [bold]{es6} for ECMAScript modules \r\n [bold]{es6} for ECMAScript modules \r\n [bold]{es6} for ECMAScript modules \r\n [bold]{es6} for ECMAScript modules \r\n [bold]{es6} for ECMAScript modules "
+            description: "Only necessary for analyzing TypeScript modules."
         },
         {
             name: "outFile",
@@ -117,7 +115,7 @@ export class Application {
         let sections = [
             {
                 header: project.name,
-                content: "Generates and displays a levelized structure map for ECMAScript/TypeScript modules."
+                content: "Creates levelized structure maps from ECMAScript, TypeScript and AMD dependencies."
             },
             {
                 header: "Usage",
@@ -190,13 +188,7 @@ export class Application {
     }
 
     private processModuleArgument(): void {
-        if (["es6", "ts"].indexOf(this.options.module) === -1) {
-            console.error("Invalid --module argument");
-            this.printUsage();
-            Application.exitWithFailure();
-        }
-
-        this.config.module = this.options.module;
+        this.config.module = this.options.typescript ? "ts" : "es6";
     }
 
     private isOutFileSpecified(): boolean {

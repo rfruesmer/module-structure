@@ -1,9 +1,101 @@
 <a href="https://travis-ci.org/rfruesmer/module-structure"><img alt="Build Status" src="https://travis-ci.org/rfruesmer/module-structure.svg?branch=master"></a>
 <a href="https://codecov.io/gh/rfruesmer/module-structure"><img alt="Coverage Status" src="https://codecov.io/gh/rfruesmer/module-structure/master.svg"></a>
 
-# module-structure
+# Module Structure
 
-Create levelized structure maps from ECMAScript/TypeScript dependencies (inspired by <a href="http://structure101.com/">Structure101</a>).
+Creates levelized structure maps from ECMAScript, TypeScript and AMD dependencies (inspired by <a href="https://structure101.com/blog/2011/03/introducing-levelized-structure-maps-lsm/">structure101's Levelized Structure Maps (LSM).</a>).
+
+Generated structure maps may be directly displayed in default browser or saved as JSON files. 
+
+## Installation
+
+`npm install --save dependency-tree`
+
+## CLI 
+
+### Usage
+
+Create structure map for ECMAScript and/or AMD modules and display in default browser:
+
+`module-structure --rootDir directory`           
+
+Create structure map for TypeScript modules and display in default browser:
+
+`module-structure --rootDir directory --ts`           
+
+Create structure map for ECMAScript and/or AMD modules and save as JSON file:
+
+`module-structure --rootDir directory  --outFile file`           
+
+Create structure map for TypeScript modules and save as JSON file:
+
+`module-structure --rootDir directory  --ts --outFile file `           
+
+### Flags 
+
+<table>
+  <thead>
+    <tr>
+      <th width="25%">Flag</th>
+      <th width="15%">Short Flag</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>--help</td>
+      <td>-h</td>
+      <td>Show this help.</td>
+    </tr>
+    <tr>
+      <td>--version</td>
+      <td>-v</td>
+      <td>Print the version number.</td>
+    </tr>
+    <tr>
+      <td>--rootDir</td>
+      <td></td>
+      <td>Specifies the root directory of input files.</td>
+    </tr>
+    <tr>
+      <td>--typescript</td>
+      <td>-ts</td>
+      <td>Must be set for analyzing TypeScript modules instead of ECMAScript or AMD modules.</td>
+    </tr>
+    <tr>
+      <td>--outFile</td>
+      <td></td>
+      <td>
+        Optional: the output path for the structure map JSON-file. 
+        If omitted, the file will be created in a temporary directory and displayed as a diagram in your default browser.
+        </td>
+    </tr>
+    <tr>
+      <td>--exclude</td>
+      <td>-e</td>
+      <td>One or more expressions to filter packages and/or modules.</td>
+    </tr>
+    <tr>
+      <td>--pretty</td>
+      <td></td>
+      <td>Pretty-print the generated structure map JSON-file. Only useful in --outFile mode.</td>
+    </tr>
+    <tr>
+      <td>--port</td>
+      <td>-p</td>
+      <td>
+        Port for serving the included viewer webapp (defaults to 3000). 
+        Omitted if --outFile is specified.
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+## API 
+
+Not stable yet - breaking changes are not very likely, but may become necessary.
+
+Documentation follows as soon as the API is considered stable.
 
 ## Credits
 
