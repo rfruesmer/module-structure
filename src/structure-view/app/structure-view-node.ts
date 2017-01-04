@@ -65,7 +65,7 @@ export class StructureViewNode extends StructureViewObject implements StructureV
 
     private updateRectColors(): void {
         this.rect.attr({
-            "stroke": this.selected ? "#ddcb00" : "#7cbe00"
+            "stroke": this.selected ? "#ddcb00" : this.model.isGroup ? "#7cbe00" : "#70B8A8"
         });
         this.rect.css({
             "fill-opacity": this.expanded ? 1.0 : 0.0,
