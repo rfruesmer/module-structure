@@ -8,12 +8,12 @@ const expectPackageNodeToEqual = util.expectPackageNodeToEqual;
 const expectRootRowCountToEqual = util.expectRootRowCountToEqual;
 const expectRowNodesCountToEqual = util.expectRowNodesCountToEqual;
 const expectRowContainsPackage = util.expectRowContainsPackage;
-const expectPackageContainsSingleModule = util.expectPackageContainsSingleModule;
 const expectDependencyCountToEqual = util.expectDependencyCountToEqual;
 const expectContainsDependency = util.expectContainsDependency;
 const expectRowContainsModule = util.expectRowContainsModule;
 const findNode = util.findNode;
 const expectNodeRowsCountToEqual = util.expectNodeRowsCountToEqual;
+
 
 describe("nested-packages-01", function() {
 

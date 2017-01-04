@@ -24,7 +24,7 @@ export class StructureMapModuleBuilder {
 
     private getImports(modulePath: string, rootDir: string): Array<string> {
         if (path.extname(modulePath) === ".ts") {
-            return this.typeScriptHelper.getImports(modulePath);
+            return this.typeScriptHelper.getImportSourcesFromFile(modulePath);
         }
 
         let tree = dependencyTree({directory: rootDir, filename: modulePath});

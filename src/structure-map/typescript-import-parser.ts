@@ -2,48 +2,47 @@ import fs = require("fs");
 import path = require("path");
 
 const preconditions = require("preconditions").instance();
-const checkState = preconditions.checkState;
-const readEachLineSync  = require("read-each-line-sync");
+const checkArgument = preconditions.checkArgument;
+
 
 /**
  *  Simple implementation to allow processing of TypeScript modules - necessary because
  *  TypeScript compiler output cannot be used since it removes even "important" imports.
  */
 export class TypeScriptImportParser {
+    private static readonly COMMENT_REGEXP = /(\/\*([^*]|[\r\n]|(\*+([^*\/]|[\r\n])))*\*+\/)|(\/\/.*)/g;
+    private static readonly IMPORT_REGEXP = /import(?:["'\s]*([\w*{\s*}\n, ]+)from\s*)?["'\s]*([@\w\/\._-]+)["'\s]*;?;/g;
 
 
-    public getImports(modulePath: string): Array<string> {
-        let imports: Array<string> = [];
+    public getImportSourcesFromFile(modulePath: string): Array<string> {
+        checkArgument(fs.existsSync(modulePath) && fs.statSync(modulePath).isFile());
+        let moduleAsString = fs.readFileSync(modulePath, "utf-8");
 
-        // TODO: allow multiline import declarations
-        let self = this;
-        readEachLineSync(modulePath, function(line: any) {
-            imports.push.apply(imports, self.parseLine(line));
-        });
-
-        return imports;
+        return this.getImportSourcesFromString(moduleAsString);
     }
 
-    private parseLine(line: any): Array<string> {
-        line = TypeScriptImportParser.removeComments(line);
-        return TypeScriptImportParser.getImportDeclarations(line)
-            .map(declaration => TypeScriptImportParser.getImportSource(declaration));
+    public getImportSourcesFromString(moduleAsString: string): Array<string> {
+        return this.findImportSources(this.removeComments(moduleAsString));
     }
 
-    private static removeComments(line: string): string {
-        const regExp = /(\/\*([^*]|[\r\n]|(\*+([^*\/]|[\r\n])))*\*+\/)|(\/\/.*)/g;
-
-        let lineWithoutComments = line;
-
-        TypeScriptImportParser.match(line, regExp)
-            .forEach(match => lineWithoutComments = lineWithoutComments.replace(match, ""));
-
-        return lineWithoutComments;
+    private removeComments(str: string): string {
+        return this.replaceAll(str, TypeScriptImportParser.COMMENT_REGEXP, "");
     }
 
-    private static match(str: string, regExp: RegExp): Array<string> {
+    private replaceAll(str: string, searchValue: RegExp, replaceValue: string): string {
+        let length = str.length;
+        str = str.replace(searchValue, replaceValue);
+        return str.length === length ? str : this.replaceAll(str, searchValue, replaceValue);
+    }
+
+    private findImportSources(moduleString: string): Array<string> {
+        let matches = TypeScriptImportParser.match(moduleString, TypeScriptImportParser.IMPORT_REGEXP);
+        return matches.filter(match => match.length === 3).map(match => match[2] + ".ts");
+    }
+
+    private static match(str: string, regExp: RegExp): Array<RegExpExecArray> {
         let match: RegExpExecArray;
-        let matches: Array<string> = [];
+        let matches: Array<RegExpExecArray> = [];
 
         while ((match = regExp.exec(str)) !== null) {
             // This is necessary to avoid infinite loops with zero-width matches
@@ -55,29 +54,9 @@ export class TypeScriptImportParser {
                 continue;
             }
 
-            matches.push(match.toString());
+            matches.push(match);
         }
 
         return matches;
-    }
-
-    private static getImportDeclarations(line: string): Array<string> {
-        const regExp = /\s*?import\s+?[{]?.*?[}]?\s+?from\s+?".*?"\s*?;/g;
-
-        let matches = TypeScriptImportParser.match(line, regExp);
-        for (let i = 0; i < matches.length; ++i) {
-            matches[i] = matches[i].trim();
-        }
-
-        return matches;
-    }
-
-    private static getImportSource(importDeclaration: string): string {
-        const regExp = /\s*?import\s+?[{]?.*?[}]?\s+?from\s+?"(.*?)"\s*?;/g;
-
-        let matches = regExp.exec(importDeclaration);
-        checkState(matches.length === 2);
-
-        return matches[1].toString() + ".ts";
     }
 }
