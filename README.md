@@ -40,7 +40,7 @@ Create structure map for TypeScript modules and save as JSON file:
   <thead>
     <tr>
       <th align="left" width="100">Flag</th>
-      <th align="left" width="150">Short Flag</th>
+      <th align="left" width="110">Short Flag</th>
       <th align="left">Description</th>
     </tr>
   </thead>
