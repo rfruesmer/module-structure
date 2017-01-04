@@ -27,13 +27,14 @@
     "url": "git+https://github.com/rfruesmer/module-structure.git"
   },
   "keywords": [
-    "module",
-    "structure",
-    "dependencies",
-    "dependency",
-    "ecmascript",
-    "es6",
-    "typescript"
+      "amd",
+      "typescript",
+      "ecmascript",
+      "es6",
+      "dependency",
+      "dependencies",
+      "structure",
+      "module"
   ],
   "author": "Reinhold Früsmer",
   "license": "MIT",
