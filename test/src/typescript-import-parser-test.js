@@ -72,7 +72,7 @@ describe("typescript-import-parser", function() {
         thenImportSourcesShouldEqual(["my-module.ts"]);
     });
 
-    it("should handle whitespace ", function() {
+    it("should ignore whitespace ", function() {
         givenSource("import { myMember }\n from \"my-module\" ;");
         whenGettingImportSources();
         thenImportSourcesShouldEqual(["my-module.ts"]);
