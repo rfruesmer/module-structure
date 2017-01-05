@@ -36,67 +36,18 @@ Create structure map for TypeScript modules and save as JSON file:
 
 ### Flags 
 
-<table>
-  <thead>
-    <tr>
-      <th align="left" width="100">Flag</th>
-      <th align="left" width="110">Short Flag</th>
-      <th align="left">Description</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>--help</td>
-      <td>-h</td>
-      <td align="left">Show this help.</td>
-    </tr>
-    <tr>
-      <td>--version</td>
-      <td>-v</td>
-      <td align="left">Print the version number.</td>
-    </tr>
-    <tr>
-      <td>--rootDir</td>
-      <td></td>
-      <td align="left">Specifies the root directory of input files.</td>
-    </tr>
-    <tr>
-      <td>--ts</td>
-      <td></td>
-      <td align="left">Must be set for analyzing TypeScript modules instead of ECMAScript or AMD modules.</td>
-    </tr>
-    <tr>
-      <td>--outFile</td>
-      <td></td>
-      <td align="left">
-        Optional: the output path for the structure map JSON-file. 
-        If omitted, the file will be created in a temporary directory and displayed as a diagram in your default browser.
-        </td>
-    </tr>
-    <tr>
-      <td>--exclude</td>
-      <td>-e</td>
-      <td align="left">One or more expressions to filter packages and/or modules.</td>
-    </tr>
-    <tr>
-      <td>--pretty</td>
-      <td></td>
-      <td align="left">Pretty-print the generated structure map JSON-file. Only useful in --outFile mode.</td>
-    </tr>
-    <tr>
-      <td>--port</td>
-      <td>-p</td>
-      <td align="left">
-        Port for serving the included viewer webapp (defaults to 3000). 
-        Omitted if --outFile is specified.
-      </td>
-    </tr>
-  </tbody>
-</table>
+| Argument    | Alias | Description                                                                                                                                                                  |
+|-------------|-------|:-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| --help      | -h    | Show this help.                                                                                                                                                              |
+| --version   | -v    | Print the version number.                                                                                                                                                    |
+| --rootDir   |       | Specifies the root directory of input files.                                                                                                                                 |
+| --ts        |       | Only required when analyzing TypeScript modules instead of ECMAScript or AMD modules.                                                                                        |
+| --outFile   |       | Path for the JSON output file. If omitted, the file will be created in a temporary directory and displayed as a diagram in your default browser. |
+| --exclude   | -e    | One or more expressions to filter packages and/or modules.                                                                                                                   |
+| --pretty    |       | Pretty-print the JSON output file. Only used if --outFile is specified.                                                                                           |
+| --port      | -p    | Port for serving the included viewer web-app (defaults to 3000). Omitted if --outFile is specified.                                                                           |
 
 ## API 
-
-Not stable yet - breaking changes are not very likely, but may become necessary.
 
 Documentation follows as soon as the API is considered stable.
 
