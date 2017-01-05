@@ -9,7 +9,7 @@ const dependencyTree = require("dependency-tree");
 
 export class StructureMapModuleBuilder {
     private typeScriptHelper: TypeScriptImportParser = new TypeScriptImportParser();
-
+    private visited = {};
 
     public build(modulePath: string, name: string, rootDir: string): StructureMapModule {
         let simpleName = StructureMapModuleBuilder.getSimpleName(modulePath);
@@ -27,7 +27,7 @@ export class StructureMapModuleBuilder {
             return this.typeScriptHelper.getImportSourcesFromFile(modulePath);
         }
 
-        let tree = dependencyTree({directory: rootDir, filename: modulePath});
+        let tree = dependencyTree({directory: rootDir, filename: modulePath, visited: this.visited});
         let key = Object.keys(tree)[0];
         let imports = Object.keys(tree[key]);
         let moduleDirectory = path.dirname(modulePath);
