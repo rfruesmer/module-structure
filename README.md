@@ -18,12 +18,12 @@ Generated maps can be rendered in your browser or exported as JSON files.
     <li>Green nodes with folder icon show packages (directories)</li>
     <li>Double-click packages to expand them</li>
     <li>Blue nodes with file icon show modules</li>
-    <li>White arrows show dependencies</li>
-    <li>Orange arrows show cyclic dependencies (feedbacks)</li>
-    <li>Yellow border highlights currently selected node</li>
-    <li>Nodes are levelized top-down with upper nodes having more dependencies to the nodes below</li>
+    <li>Nodes are levelized top-down into rows with upper rows having equal or more dependencies to the rows below</li>
     <li>Nodes inside same row have no dependencies between each other</li>
-    <li>Hover dependency arrows to enlarge them (useful for overlapping lines)</li>
+    <li>White arrows show dependencies</li>
+    <li>Orange arrows show cyclic dependencies between rows/packages/modules</li>
+    <li>Yellow border highlights currently selected node</li>
+    <li>Hover dependency arrows to enlarge them - useful to distinguish overlapping lines</li>
 </ul>
 
 ## Installation
