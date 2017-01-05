@@ -19,7 +19,7 @@ Generated maps can be rendered in your browser or exported as JSON files.
     <li>Double-click packages to expand them</li>
     <li>Blue nodes with file icon show modules</li>
     <li>White arrows show dependencies</li>
-    <li>Orange arrows show direct or "transitive" cycles</li>
+    <li>Orange arrows show cyclic dependencies (feedbacks)</li>
     <li>Yellow border highlights currently selected node</li>
     <li>Nodes are levelized top-down with upper nodes having more dependencies to the nodes below</li>
     <li>Nodes inside same row have no dependencies between each other</li>
