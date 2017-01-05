@@ -10,6 +10,22 @@ inspired by <a href="https://structure101.com/blog/2011/03/introducing-levelized
 
 Generated maps can be rendered in your browser or exported as JSON files. 
 
+## Example Diagram
+
+<img src="https://rfruesmer.github.io/module-structure/doc/example-lsm.png"/>
+<br><br>
+<ul>
+    <li>Green nodes with folder icon show packages (directories)</li>
+    <li>Double-click packages to expand them</li>
+    <li>Blue nodes with file icon show modules</li>
+    <li>White arrows show dependencies</li>
+    <li>Orange arrows show direct or "transitive" cycles</li>
+    <li>Yellow border highlights currently selected node</li>
+    <li>Nodes are levelized top-down with upper nodes having more dependencies to the nodes below</li>
+    <li>Nodes inside same row have no dependencies between each other</li>
+    <li>Hover dependency arrows to enlarge them (useful for overlapping lines)</li>
+</ul>
+
 ## Installation
 
 `npm install module-structure -g`
