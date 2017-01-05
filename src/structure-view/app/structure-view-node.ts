@@ -126,7 +126,7 @@ export class StructureViewNode extends StructureViewObject implements StructureV
         this.toggle();
     }
 
-    private toggle(): void {
+    public toggle(): void {
         if (!this.model.isGroup
             || this.model.rows.length === 0) {
             return;
@@ -140,7 +140,7 @@ export class StructureViewNode extends StructureViewObject implements StructureV
         }
     }
 
-    private expand(): void {
+    public expand(): void {
         this.expanded = true;
 
         this.lazyCreateRows();
@@ -219,7 +219,7 @@ export class StructureViewNode extends StructureViewObject implements StructureV
         }
     }
 
-    private collapse(): void {
+    public collapse(): void {
         this.expanded = false;
 
         this.displayRows(false);

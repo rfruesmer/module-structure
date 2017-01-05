@@ -168,6 +168,7 @@ export class StructureView implements StructureViewObjectListener, SelectionList
 
     private makeVisible(): void {
         this.rootNode.setVisible(true);
+        this.rootNode.expand();
     }
 
     onSelectionChanged(selection: StructureViewNode): void {
