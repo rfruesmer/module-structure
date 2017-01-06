@@ -31,7 +31,7 @@ export function moduleStructure(config: ModuleStructureConfiguration): void {
 }
 
 function createStructureMap(config: ModuleStructureConfiguration): StructureMapPackage {
-    startProcessing("Building structure map (this may take some time for large AMD code bases)");
+    startProcessing("Building structure map (may take some time for large AMD code bases)");
 
     let builder = new StructureMapBuilder();
     let structureMap = builder.build(config.rootDir, config.module, config.excludes);
