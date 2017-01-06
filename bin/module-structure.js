@@ -1,6 +1,6 @@
 #! /usr/bin/env node
 
-const ApplicationModule = require("../dist/lib/application");
+const cli = require("../dist/lib/cli");
 
-let theApp = new ApplicationModule.Application();
+const theApp = new cli.Application();
 theApp.run();

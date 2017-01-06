@@ -1,4 +1,4 @@
-import {Application} from "./application";
+import {Application} from "./cli";
 
 (function() {
     new Application().run();

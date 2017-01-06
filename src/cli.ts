@@ -1,6 +1,4 @@
-import {StructureMapBuilder} from "./structure-map/structure-map-builder";
-import {StructureMapPackage} from "./structure-map/structure-map-package";
-import {StructureViewModelBuilder} from "./structure-map/structure-view-model-builder";
+import {ModuleStructureConfiguration, moduleStructure} from "./api";
 
 import fs = require("fs");
 import path = require("path");
@@ -9,22 +7,10 @@ import process = require("process");
 const project = require("../package.json");
 const commandLineArgs = require("command-line-args");
 const commandLineUsage = require("command-line-usage");
-const colors = require("colors/safe");
 const preconditions = require("preconditions").instance();
 const getInstalledPathSync = require("get-installed-path").sync;
-const httpServerModule = require("http-server");
-const opener = require("opener");
 
 
-class ApplicationConfiguration {
-    rootDir = "";
-    module =  "js";
-    outFile =  "";
-    prettyPrint = false;
-    serverPort = 3000;
-    excludes = [];
-    showExport = false;
-}
 
 export class Application {
     private static readonly EXIT_SUCCESS = 0;
@@ -81,22 +67,14 @@ export class Application {
             description: "Port for serving the included viewer webapp (defaults to 3000). Omitted if --outFile is specified."
         }
     ];
-    private config = new ApplicationConfiguration();
-    private structureMap: StructureMapPackage;
-    private startTime: number;
+    private config = new ModuleStructureConfiguration();
 
 
     public run(): void {
         this.parseArguments();
         this.processArguments();
-        this.createStructureMap();
-        this.exportViewModel();
-        if (this.config.showExport) {
-            this.showViewModel();
-        }
-        else {
-            Application.exitWithSuccess();
-        }
+        this.invokeAPI(this.config);
+        this.onFinished();
     }
 
     private parseArguments(): void {
@@ -147,7 +125,7 @@ export class Application {
         else {
             this.buildTemporaryOutputPath();
         }
-        this.processExcludes();
+        this.processExcludeArgument();
         this.processPrettyArgument();
         this.processPortArgument();
     }
@@ -216,7 +194,7 @@ export class Application {
         }
     }
 
-    private processExcludes(): void {
+    private processExcludeArgument(): void {
         this.config.excludes = this.options.exclude ? this.options.exclude : [];
     }
 
@@ -228,58 +206,13 @@ export class Application {
         this.config.serverPort = this.options.port;
     }
 
-    private createStructureMap(): void {
-        this.startProcessing("Building structure map (this may take several minutes for AMD modules)");
-
-        let builder = new StructureMapBuilder();
-        this.structureMap = builder.build(this.config.rootDir, this.config.module, this.config.excludes);
-
-        this.stopProcessing();
+    private invokeAPI(config: ModuleStructureConfiguration) {
+        moduleStructure(config);
     }
 
-    private startProcessing(message: string) {
-        process.stdout.write(colors.yellow(message + " ... "));
-        this.startTime = Date.now();
-    }
-
-    private stopProcessing() {
-        let stopTime = Date.now();
-        let elapsed = stopTime - this.startTime;
-        console.log(colors.yellow("finished in " + elapsed + "ms"));
-    }
-
-    private exportViewModel(): void {
-        this.startProcessing("Exporting view model");
-
-        let destDir = path.dirname(this.config.outFile);
-        if (!fs.existsSync(destDir)) {
-            fs.mkdir(destDir);
+    private onFinished() {
+        if (!this.config.showExport) {
+            Application.exitWithSuccess();
         }
-
-        if (fs.existsSync(this.config.outFile)) {
-            fs.unlinkSync(this.config.outFile);
-        }
-
-        let viewModelBuilder = new StructureViewModelBuilder();
-        let viewModel = viewModelBuilder.build(this.structureMap);
-
-        let spacing = this.config.prettyPrint ? 2 : 0;
-        fs.writeFileSync(this.config.outFile, JSON.stringify(viewModel, null, spacing));
-
-        this.stopProcessing();
-    }
-
-    private showViewModel() {
-        let serverRoot = path.dirname(this.config.outFile);
-        console.log(colors.yellow("Starting http-server, serving from " + serverRoot));
-
-        let server = httpServerModule.createServer({root: serverRoot});
-        server.listen(this.config.serverPort, "127.0.0.1", () => {
-            let url = "http://localhost:" + this.config.serverPort + "/index.html?input=module-structure.json";
-            console.log(colors.green("Module structure is now available at " + url));
-            console.info("Hit CTRL-C to stop the server");
-
-            opener(url);
-        });
     }
 }
