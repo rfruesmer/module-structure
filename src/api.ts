@@ -16,7 +16,7 @@ const getInstalledPathSync = require("get-installed-path").sync;
 const project = require("../package.json");
 
 let startTime = 0;
-
+let config: ModuleStructureConfiguration;
 
 export class ModuleStructureConfiguration {
     rootDir = "";
@@ -29,6 +29,7 @@ export class ModuleStructureConfiguration {
     httpServerModule: any;
     opener: any;
     getInstalledPathSync: any;
+    logging: boolean;
 
 
     constructor(options: any) {
@@ -42,10 +43,11 @@ export class ModuleStructureConfiguration {
         this.prettyPrint = options.prettyPrint ? options.prettyPrint : false;
         this.serverPort =  options.serverPort ? options.serverPort : 3000;
         this.excludes = options.excludes ? options.excludes : [];
-        this.showExport = options.showExport ? options.showExport : false;
+        this.showExport = options.showExport;
         this.httpServerModule = options.httpServerModule ? options.httpServerModule : httpServerModule;
         this.opener = options.opener ? options.opener : opener;
         this.getInstalledPathSync = options.getInstalledPathSync ? options.getInstalledPathSync : getInstalledPathSync;
+        this.logging = options.logging;
     }
 
     public static checkRootDir(rootDir: string): boolean {
@@ -72,31 +74,31 @@ export class ModuleStructureConfiguration {
 }
 
 export function moduleStructure(options: any): StructureViewModel {
-    let config = new ModuleStructureConfiguration(options);
+    config = new ModuleStructureConfiguration(options);
 
-    if (isTemporaryExportNeeded(config)) {
-        buildTemporaryOutFilePath(config);
+    if (isTemporaryExportNeeded()) {
+        buildTemporaryOutFilePath();
     }
 
-    let structureMap = createStructureMap(config);
+    let structureMap = createStructureMap();
     let viewModel = createViewModel(structureMap);
 
     if (config.outFile.length > 0) {
-        exportViewModel(viewModel, config);
+        exportViewModel(viewModel);
     }
 
     if (config.showExport) {
-        showViewModel(config);
+        showViewModel();
     }
 
     return viewModel;
 }
 
-function isTemporaryExportNeeded(config: ModuleStructureConfiguration) {
+function isTemporaryExportNeeded() {
     return config.showExport && config.outFile.length === 0;
 }
 
-function buildTemporaryOutFilePath(config: ModuleStructureConfiguration): void {
+function buildTemporaryOutFilePath(): void {
     try {
         let installedPath = config.getInstalledPathSync(project.name);
         config.outFile = path.join(installedPath, "dist/web-app/module-structure.json");
@@ -107,7 +109,7 @@ function buildTemporaryOutFilePath(config: ModuleStructureConfiguration): void {
     }
 }
 
-function createStructureMap(config: ModuleStructureConfiguration): StructureMapPackage {
+function createStructureMap(): StructureMapPackage {
     startProcessing("Building structure map (may take some time for large AMD code bases)");
 
     let builder = new StructureMapBuilder();
@@ -119,11 +121,19 @@ function createStructureMap(config: ModuleStructureConfiguration): StructureMapP
 }
 
 function startProcessing(message: string) {
+    if (!config.logging) {
+        return;
+    }
+
     process.stdout.write(colors.yellow(message + " ... "));
     startTime = Date.now();
 }
 
 function stopProcessing() {
+    if (!config.logging) {
+        return;
+    }
+
     let stopTime = Date.now();
     let elapsed = stopTime - startTime;
     console.log(colors.yellow("finished in " + elapsed + "ms"));
@@ -140,7 +150,7 @@ function createViewModel(structureMap: StructureMapPackage) {
     return viewModel;
 }
 
-function exportViewModel(viewModel: StructureViewModel, config: ModuleStructureConfiguration): void {
+function exportViewModel(viewModel: StructureViewModel): void {
     let destDir = path.dirname(config.outFile);
     if (!fs.existsSync(destDir)) {
         fs.mkdir(destDir);
@@ -154,16 +164,22 @@ function exportViewModel(viewModel: StructureViewModel, config: ModuleStructureC
     fs.writeFileSync(config.outFile, JSON.stringify(viewModel, null, spacing));
 }
 
-function showViewModel(config: ModuleStructureConfiguration): void {
+function showViewModel(): void {
     let serverRoot = path.dirname(config.outFile);
-    console.log(colors.yellow("Starting http-server, serving from " + serverRoot));
+    log(colors.yellow("Starting http-server, serving from " + serverRoot));
 
     let server = config.httpServerModule.createServer({root: serverRoot});
     server.listen(config.serverPort, "127.0.0.1", () => {
         let url = "http://localhost:" + config.serverPort + "/index.html?input=module-structure.json";
-        console.log(colors.green("Module structure is now available at " + url));
-        console.info("Hit CTRL-C to stop the server");
+        log(colors.green("Module structure is now available at " + url));
+        log("Hit CTRL-C to stop the server");
 
         config.opener(url);
     });
+}
+
+function log(message: any): void {
+    if (config.logging) {
+        console.log(message);
+    }
 }

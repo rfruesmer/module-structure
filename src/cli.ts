@@ -64,7 +64,7 @@ export class Application {
             description: "Port for serving the included viewer webapp (defaults to 3000). Omitted if --outFile is specified."
         }
     ];
-    private config: any = {};
+    private config: any = {logging: true};
 
 
     public run(): void {
