@@ -84,5 +84,30 @@ describe("typescript-import-parser", function() {
         thenImportSourcesShouldEqual(["my-module.ts"]);
     });
 
+    it("should match multiple modules", function() {
+        const source = "import name from \"module-a\";\n"
+            + "import * as name from \"module-b\";\n"
+            + "import { member } from \"module-c\";\n"
+            + "import { member as alias } from \"module-d\";\n"
+            + "import { member1 , member2 } from \"module-e\";\n"
+            + "import { member1 , member2 as alias2 , [...] } from \"ignored\";\n"
+            + "import defaultMember, { member [ , [...] ] } from \"ignored\";\n"
+            + "import defaultMember, * as alias from \"module-f\";\n"
+            + "import defaultMember from \"module-g\";\n"
+            + "import \"module-h\";\n";
+
+        givenSource(source);
+        whenGettingImportSources();
+        thenImportSourcesShouldEqual([
+            "module-a.ts",
+            "module-b.ts",
+            "module-c.ts",
+            "module-d.ts",
+            "module-e.ts",
+            "module-f.ts",
+            "module-g.ts",
+            "module-h.ts"
+        ]);
+    })
 });
 
