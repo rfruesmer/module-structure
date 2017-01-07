@@ -26,6 +26,8 @@ export class ModuleStructureConfiguration {
     serverPort = 3000;
     excludes = [];
     showExport = false;
+    httpServerModule: any;
+
 
     constructor(options: any) {
         checkArgument(ModuleStructureConfiguration.checkRootDir(options.rootDir), "invalid rootDir");
@@ -39,6 +41,7 @@ export class ModuleStructureConfiguration {
         this.serverPort =  options.serverPort ? options.serverPort : 3000;
         this.excludes = options.excludes ? options.excludes : [];
         this.showExport = options.showExport ? options.showExport : false;
+        this.httpServerModule = options.httpServerModule ? options.httpServerModule : httpServerModule;
     }
 
     public static checkRootDir(rootDir: string): boolean {
@@ -151,7 +154,7 @@ function showViewModel(config: ModuleStructureConfiguration): void {
     let serverRoot = path.dirname(config.outFile);
     console.log(colors.yellow("Starting http-server, serving from " + serverRoot));
 
-    let server = httpServerModule.createServer({root: serverRoot});
+    let server = config.httpServerModule.createServer({root: serverRoot});
     server.listen(config.serverPort, "127.0.0.1", () => {
         let url = "http://localhost:" + config.serverPort + "/index.html?input=module-structure.json";
         console.log(colors.green("Module structure is now available at " + url));
