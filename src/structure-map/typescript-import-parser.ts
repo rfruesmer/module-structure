@@ -50,10 +50,6 @@ export class TypeScriptImportParser {
                 regExp.lastIndex++;
             }
 
-            if (match.length === 0) {
-                continue;
-            }
-
             matches.push(match);
         }
 
