@@ -27,6 +27,8 @@ export class ModuleStructureConfiguration {
     excludes = [];
     showExport = false;
     httpServerModule: any;
+    opener: any;
+    getInstalledPathSync: any;
 
 
     constructor(options: any) {
@@ -42,6 +44,8 @@ export class ModuleStructureConfiguration {
         this.excludes = options.excludes ? options.excludes : [];
         this.showExport = options.showExport ? options.showExport : false;
         this.httpServerModule = options.httpServerModule ? options.httpServerModule : httpServerModule;
+        this.opener = options.opener ? options.opener : opener;
+        this.getInstalledPathSync = options.getInstalledPathSync ? options.getInstalledPathSync : getInstalledPathSync;
     }
 
     public static checkRootDir(rootDir: string): boolean {
@@ -94,7 +98,7 @@ function isTemporaryExportNeeded(config: ModuleStructureConfiguration) {
 
 function buildTemporaryOutFilePath(config: ModuleStructureConfiguration): void {
     try {
-        let installedPath = getInstalledPathSync(project.name);
+        let installedPath = config.getInstalledPathSync(project.name);
         config.outFile = path.join(installedPath, "dist/web-app/module-structure.json");
     }
     catch (e) {
@@ -160,6 +164,6 @@ function showViewModel(config: ModuleStructureConfiguration): void {
         console.log(colors.green("Module structure is now available at " + url));
         console.info("Hit CTRL-C to stop the server");
 
-        opener(url);
+        config.opener(url);
     });
 }

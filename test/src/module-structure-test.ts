@@ -8,6 +8,8 @@ import SinonSpyStatic = sinon.SinonSpyStatic;
 const fs = require("fs");
 const os = require("os");
 const path = require("path");
+const rimrafSync = require("rimraf").sync;
+const project = require("../../package.json");
 
 const HttpServerModule = require("http-server");
 const HttpServer = require("http-server").HttpServer;
@@ -15,11 +17,11 @@ const HttpServer = require("http-server").HttpServer;
 
 @suite class ModuleStructureConfigurationTest {
 
-    @test "shows export"() {
-        this.showsExport();
+    @test "starts http-server"() {
+        this.startsHttpServer();
     }
 
-    private showsExport(port: number = undefined) {
+    private startsHttpServer(port: number = undefined) {
         let rootDir = fs.mkdtempSync(path.join(os.tmpdir(), "module-structure-test-"));
         let outDir = path.join(process.cwd(), "src", "structure-view", "data");
         let httpServerSpy = new HttpServer();
@@ -35,11 +37,11 @@ const HttpServer = require("http-server").HttpServer;
         fs.rmdirSync(rootDir);
     }
 
-    @test "shows export with given port"() {
-        this.showsExport(8080);
+    @test "starts http-sserver with given port"() {
+        this.startsHttpServer(8080);
     }
 
-    @test "doesn't show export if not specified"() {
+    @test "doesn't start http-server if showExport isn't specified"() {
         let rootDir = fs.mkdtempSync(path.join(os.tmpdir(), "module-structure-test-"));
         let httpServerSpy = new HttpServer();
         httpServerSpy.listen = sinon.spy();
@@ -52,6 +54,41 @@ const HttpServer = require("http-server").HttpServer;
         expect(httpServerSpy.listen.notCalled).to.be.true;
 
         fs.rmdirSync(rootDir);
+    }
+
+    @test "opens browser"(done) {
+        this.opensBrowser(done);
+    }
+
+    private opensBrowser(done: any, port: number = undefined) {
+        let rootDir = path.join(process.cwd(), "test", "resources", "es6", "ecommerce-sample");
+        let outDir = path.join(process.cwd(), "src", "structure-view", "data");
+        let outFile = path.join(outDir, "module-structure.json");
+
+
+        let httpServerSpy = new HttpServer();
+        httpServerSpy.listen = function(port, host, callback) {
+            callback();
+        };
+
+        let HttpServerModuleMock = sinon.mock(HttpServerModule);
+        HttpServerModuleMock.expects("createServer").once().returns(httpServerSpy);
+
+        let opener = function(actualURL) {
+            let expectedURL = "http://localhost:" + (port ? port : "3000") + "/index.html?input=module-structure.json";
+            expect(actualURL).to.equal(expectedURL);
+            HttpServerModuleMock.verify();
+            done();
+        };
+
+        moduleStructure({rootDir: rootDir, showExport: true, serverPort: port, opener: opener});
+
+        fs.unlinkSync(outFile);
+        fs.rmdirSync(outDir);
+    }
+
+    @test "opens browser at given port"(done) {
+        this.opensBrowser(done, 8080);
     }
 
     @test "creates outFile"() {
@@ -70,4 +107,40 @@ const HttpServer = require("http-server").HttpServer;
         fs.unlinkSync(outFile);
         fs.rmdirSync(outDir);
     }
+
+    @test "skips excluded names"() {
+        let rootDir = path.join(process.cwd(), "test", "resources", "es6", "ecommerce-sample");
+
+        let actualModel = moduleStructure({rootDir: rootDir, excludes: ["billing", "sales-service.js"]});
+
+        let expectedModelPath = path.join(rootDir, "ecommerce-sample-without-excludes.json");
+        let expectedModel = JSON.parse(fs.readFileSync(expectedModelPath, "utf-8"));
+
+        expect(actualModel).to.deep.equal(expectedModel);
+    }
+
+    @test "uses installation dist path for temporary outFiles"() {
+        let rootDir = path.join(process.cwd(), "test", "resources", "es6", "ecommerce-sample");
+        let installedPath = path.join(process.cwd());
+        let distPath = path.join(installedPath, "dist");
+        let webAppPath = path.join(distPath, "web-app");
+        let expectedOutFilePath  = path.join(webAppPath, "module-structure.json");
+
+        rimrafSync(distPath);
+        fs.mkdirSync(distPath);
+        fs.mkdirSync(webAppPath);
+
+        let getInstalledPathSync = sinon.stub();
+        getInstalledPathSync.withArgs(project.name).returns(installedPath);
+
+        moduleStructure({rootDir: rootDir, showExport: true, getInstalledPathSync: getInstalledPathSync});
+
+        let actualModel = JSON.parse(fs.readFileSync(expectedOutFilePath, "utf-8"));
+        let expectedModelPath = path.join(rootDir, "ecommerce-sample.json");
+        let expectedModel = JSON.parse(fs.readFileSync(expectedModelPath, "utf-8"));
+
+        expect(getInstalledPathSync.withArgs(project.name).calledOnce).to.be.true;
+        expect(actualModel).to.deep.equal(expectedModel);
+    }
 }
+
