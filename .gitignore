@@ -11,5 +11,6 @@ src/structure-view/data/
 test/resources/ts/**/*.js*
 !test/resources/ts/tsconfig.json
 test/src/api-integration-test-util.js*
+test/src/module-structure-configuration-test.js*
 output/
 npm-debug.log

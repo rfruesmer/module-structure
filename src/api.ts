@@ -42,7 +42,7 @@ export class ModuleStructureConfiguration {
     }
 
     public static checkRootDir(rootDir: string): boolean {
-        return rootDir
+        return rootDir !== undefined
                 && fs.existsSync(rootDir)
                 && fs.statSync(rootDir).isDirectory();
     }
