@@ -15,7 +15,7 @@ const HttpServerModule = require("http-server");
 const HttpServer = require("http-server").HttpServer;
 
 
-@suite class ModuleStructureConfigurationTest {
+@suite class ModuleStructureTest {
 
     @test "starts http-server"() {
         this.startsHttpServer();
