@@ -7,7 +7,7 @@ import {StructureViewModelNode} from "../structure-view-model/structure-view-mod
 import {StructureViewModelDependency} from "../structure-view-model/structure-view-model-dependency";
 
 const preconditions = require("preconditions").instance();
-const checkState = preconditions.checkState;
+const checkArgument = preconditions.checkArgument;
 
 
 export class StructureViewModelBuilder {
@@ -15,6 +15,8 @@ export class StructureViewModelBuilder {
 
 
     public build(structureMap: StructureMapPackage): StructureViewModel {
+        checkArgument(structureMap);
+
         this.viewModel = new StructureViewModel();
         this.viewModel.root = this.buildInternal(structureMap);
 
@@ -22,16 +24,14 @@ export class StructureViewModelBuilder {
     }
 
     private buildInternal(structureMapEntity: StructureMapEntity): StructureViewModelNode {
+        checkArgument(structureMapEntity instanceof StructureMapPackage
+                || structureMapEntity instanceof StructureMapModule);
+
         if (structureMapEntity instanceof StructureMapPackage) {
             return this.serializePackage(structureMapEntity);
         }
-        else if (structureMapEntity instanceof StructureMapModule) {
-            return this.serializeModule(structureMapEntity);
-        }
 
-        checkState(false, "Unknown entity type");
-
-        return null; // will never reach here, but this return statment makes our compiler happy
+        return this.serializeModule(structureMapEntity as StructureMapModule);
     }
 
     private serializePackage(_package: StructureMapPackage): StructureViewModelNode {
