@@ -111,13 +111,10 @@ export class StructureMapPackageBuilder {
 
     public isResponsibleFor(filePath: string): boolean {
         let extension = path.extname(filePath).toLowerCase();
-        if (this.moduleType === "es6") {
-            return extension === ".js";
-        }
-        else if (this.moduleType === "ts") {
+        if (this.moduleType === "ts") {
             return extension === ".ts";
         }
 
-        return false;
+        return extension === ".js";
     }
 }

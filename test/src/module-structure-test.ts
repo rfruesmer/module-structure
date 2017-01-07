@@ -133,13 +133,30 @@ const HttpServer = require("http-server").HttpServer;
         let getInstalledPathSync = sinon.stub();
         getInstalledPathSync.withArgs(project.name).returns(installedPath);
 
-        moduleStructure({rootDir: rootDir, showExport: true, getInstalledPathSync: getInstalledPathSync});
+        let httpServerSpy = new HttpServer();
+        httpServerSpy.listen = sinon.spy();
+        let HttpServerModuleMock = sinon.mock(HttpServerModule);
+        HttpServerModuleMock.expects("createServer").once().returns(httpServerSpy);
+
+
+        moduleStructure({rootDir: rootDir, showExport: true, httpServerModule: HttpServerModule, getInstalledPathSync: getInstalledPathSync});
 
         let actualModel = JSON.parse(fs.readFileSync(expectedOutFilePath, "utf-8"));
         let expectedModelPath = path.join(rootDir, "ecommerce-sample.json");
         let expectedModel = JSON.parse(fs.readFileSync(expectedModelPath, "utf-8"));
 
         expect(getInstalledPathSync.withArgs(project.name).calledOnce).to.be.true;
+        expect(actualModel).to.deep.equal(expectedModel);
+
+        HttpServerModuleMock.restore();
+    }
+
+    @test "ignores unimportant file extensions"() {
+        let rootDir = path.join(process.cwd(), "test", "resources", "ts", "ecommerce-sample");
+        let actualModel = moduleStructure({rootDir: rootDir});
+        let expectedModelString = fs.readFileSync(path.join(rootDir, "ecommerce-sample-without-modules.json"), "utf-8");
+        let expectedModel = JSON.parse(expectedModelString);
+
         expect(actualModel).to.deep.equal(expectedModel);
     }
 }
