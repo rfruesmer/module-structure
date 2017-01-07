@@ -1,14 +1,11 @@
 import {StructureViewModelNode} from "../../src/structure-view-model/structure-view-model-node";
 import {StructureViewModel} from "../../src/structure-view-model/structure-view-model";
-import {StructureMapBuilder} from "../../src/structure-map/structure-map-builder";
-import {StructureViewModelBuilder} from "../../src/structure-map/structure-view-model-builder";
-
 import {expect} from "chai";
+import {moduleStructure} from "../../src/api";
 
 
 export function buildViewModelFor(rootDir: string, moduleType: string): StructureViewModel {
-    let structureMap = new StructureMapBuilder().build(rootDir, moduleType);
-    let viewModel = new StructureViewModelBuilder().build(structureMap);
+    let viewModel = moduleStructure({rootDir: rootDir, module: moduleType});
     expect(viewModel).to.exist;
 
     return viewModel;

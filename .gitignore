@@ -10,6 +10,6 @@ src/**/*.js*
 src/structure-view/data/
 test/resources/ts/**/*.js*
 !test/resources/ts/tsconfig.json
-test/src/module-structure-integration-test.js*
+test/src/api-integration-test-util.js*
 output/
 npm-debug.log

@@ -1,7 +1,7 @@
 const describe = require("mocha").describe;
 const it = require("mocha").it;
 
-const util = require("./module-structure-integration-test");
+const util = require("./api-integration-test-util");
 const buildViewModelFor = util.buildViewModelFor;
 const expectRootIsPresent = util.expectRootIsPresent;
 const expectPackageNodeToEqual = util.expectPackageNodeToEqual;

@@ -1,4 +1,4 @@
-import {ModuleStructureConfiguration, moduleStructure} from "./api";
+import {moduleStructure, ModuleStructureConfiguration} from "./api";
 
 import fs = require("fs");
 import path = require("path");
@@ -7,9 +7,6 @@ import process = require("process");
 const project = require("../package.json");
 const commandLineArgs = require("command-line-args");
 const commandLineUsage = require("command-line-usage");
-const preconditions = require("preconditions").instance();
-const getInstalledPathSync = require("get-installed-path").sync;
-
 
 
 export class Application {
@@ -67,13 +64,13 @@ export class Application {
             description: "Port for serving the included viewer webapp (defaults to 3000). Omitted if --outFile is specified."
         }
     ];
-    private config = new ModuleStructureConfiguration();
+    private config: any = {};
 
 
     public run(): void {
         this.parseArguments();
         this.processArguments();
-        this.invokeAPI(this.config);
+        this.invokeAPI();
         this.onFinished();
     }
 
@@ -119,12 +116,7 @@ export class Application {
         this.processVersionArgument();
         this.processRootDirArgument();
         this.processModuleArgument();
-        if (this.isOutFileSpecified()) {
-            this.processOutFileArgument();
-        }
-        else {
-            this.buildTemporaryOutputPath();
-        }
+        this.processOutFileArgument();
         this.processExcludeArgument();
         this.processPrettyArgument();
         this.processPortArgument();
@@ -155,8 +147,7 @@ export class Application {
             Application.exitWithFailure();
         }
 
-        if (!fs.existsSync(this.options.rootDir)
-                || !fs.statSync(this.options.rootDir).isDirectory()) {
+        if (!ModuleStructureConfiguration.checkRootDir(this.options.rootDir)) {
             console.error("Invalid --rootDir argument");
             Application.exitWithFailure();
         }
@@ -168,30 +159,14 @@ export class Application {
         this.config.module = this.options.ts ? "ts" : "es6";
     }
 
-    private isOutFileSpecified(): boolean {
-        return this.options.outFile !== undefined;
-    }
-
     private processOutFileArgument(): void {
-        let outDir = path.dirname(this.options.outFile);
-        if (!fs.existsSync(outDir)
-            || !fs.statSync(outDir).isDirectory()) {
+        if (!ModuleStructureConfiguration.checkOutFile(this.options.outFile)) {
             console.error("Invalid --outFile argument");
             Application.exitWithFailure();
         }
 
         this.config.outFile = this.options.outFile;
-    }
-
-    private buildTemporaryOutputPath(): void {
-        try {
-            let installedPath = getInstalledPathSync(project.name);
-            this.config.outFile = path.join(installedPath, "dist/web-app/module-structure.json");
-            this.config.showExport = true;
-        }
-        catch (e) {
-            this.config.outFile = path.join(process.cwd(), "src/structure-view/data/module-structure.json");
-        }
+        this.config.showExport = !this.options.outFile;
     }
 
     private processExcludeArgument(): void {
@@ -206,13 +181,13 @@ export class Application {
         this.config.serverPort = this.options.port;
     }
 
-    private invokeAPI(config: ModuleStructureConfiguration) {
-        moduleStructure(config);
-    }
-
     private onFinished() {
         if (!this.config.showExport) {
             Application.exitWithSuccess();
         }
+    }
+
+    private invokeAPI() {
+        moduleStructure(this.config);
     }
 }
