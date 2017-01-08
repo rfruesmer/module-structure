@@ -26,31 +26,6 @@ const path = require("path");
         expect(ModuleStructureConfiguration.checkRootDir(rootDir)).to.be.false;
     }
 
-    @test "checkModule accepts undefined module"() {
-        let module = undefined;
-        expect(ModuleStructureConfiguration.checkModule(module)).to.be.true;
-    }
-
-    @test "checkModule accepts empty module"() {
-        let module = "";
-        expect(ModuleStructureConfiguration.checkModule(module)).to.be.true;
-    }
-
-    @test "checkModule accepts es6 module"() {
-        let module = "es6";
-        expect(ModuleStructureConfiguration.checkModule(module)).to.be.true;
-    }
-
-    @test "checkModule accepts ts module"() {
-        let module = "ts";
-        expect(ModuleStructureConfiguration.checkModule(module)).to.be.true;
-    }
-
-    @test "checkModule rejects js module"() {
-        let module = "js";
-        expect(ModuleStructureConfiguration.checkModule(module)).to.be.false;
-    }
-
     @test "checkOutFile accepts empty outFile"() {
         expect(ModuleStructureConfiguration.checkOutFile("")).to.be.true;
     }
@@ -122,15 +97,6 @@ const path = require("path");
 
         fs.rmdirSync(rootDir);
     }
-
-    @test "constructor throws error if module is js"() {
-        let rootDir = fs.mkdtempSync(path.join(os.tmpdir(), "module-structure-test-"));
-
-        expect(() => new ModuleStructureConfiguration({rootDir: rootDir, module: "js"})).to.throw(Error);
-
-        fs.rmdirSync(rootDir);
-    }
-
 
     @test "constructor doesn't throw error if outFile is empty"() {
         let rootDir = fs.mkdtempSync(path.join(os.tmpdir(), "module-structure-test-"));

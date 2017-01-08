@@ -5,7 +5,7 @@ const moduleStructure = require("../../../src/module-structure");
 
 
 export function buildViewModelFor(rootDir: string, moduleType: string): StructureViewModel {
-    let viewModel = moduleStructure({rootDir: rootDir, module: moduleType});
+    let viewModel = moduleStructure({rootDir: rootDir, ts: moduleType === "ts"});
     expect(viewModel).to.exist;
 
     return viewModel;

@@ -12,18 +12,18 @@ const checkArgument = preconditions.checkArgument;
 export class StructureMapPackageBuilder {
     private rootDir: string;
     private rootDirParent: string;
-    private moduleType: string;
+    private typeScript: boolean;
     private excludes: Array<string> = [];
     private requireConfigPath: string;
     private moduleBuilder = new StructureMapModuleBuilder();
 
 
-    public build(rootDir: string, module: string, excludes: string[], requireConfigPath = ""): StructureMapPackage {
+    public build(rootDir: string, typeScript: boolean, excludes: string[], requireConfigPath = ""): StructureMapPackage {
         checkArgument(fs.statSync(rootDir).isDirectory());
 
         this.rootDir =  rootDir;
         this.rootDirParent = path.normalize(path.join(rootDir, ".."));
-        this.moduleType = module;
+        this.typeScript = typeScript;
         this.excludes = excludes;
         this.requireConfigPath = requireConfigPath;
 
@@ -111,10 +111,8 @@ export class StructureMapPackageBuilder {
 
     public isResponsibleFor(filePath: string): boolean {
         let extension = path.extname(filePath).toLowerCase();
-        if (this.moduleType === "ts") {
-            return extension === ".ts";
-        }
-
-        return extension === ".js";
+        return this.typeScript
+            ? extension === ".ts"
+            : extension === ".js";
     }
 }

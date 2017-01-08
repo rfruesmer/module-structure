@@ -8,9 +8,12 @@ import fs = require("fs");
 import path = require("path");
 import process = require("process");
 
-const opener = require("opener");
 const log4js = require("log4js");
 const project = require("../package.json");
+
+let HttpServerModule = require("http-server");
+let getInstalledPathSync = require("get-installed-path").sync;
+let opener = require("opener");
 
 let logger;
 let startTime = 0;
@@ -21,6 +24,7 @@ let viewModel: StructureViewModel;
 
 export function moduleStructure(options: any): StructureViewModel {
     buildConfiguration(options);
+    injectDependencies(arguments);
     configureLogging();
     buildTemporaryOutFilePath();
     createStructureMap();
@@ -33,6 +37,17 @@ export function moduleStructure(options: any): StructureViewModel {
 
 function buildConfiguration(options: any): void {
     config = new ModuleStructureConfiguration(options);
+}
+
+function injectDependencies(args: IArguments) {
+    if (args.length < 2) {
+        return;
+    }
+
+    let dependencies = args[1];
+    HttpServerModule = dependencies.HttpServerModule ? dependencies.HttpServerModule : HttpServerModule;
+    opener = dependencies.opener ? dependencies.opener : opener;
+    getInstalledPathSync = dependencies.getInstalledPathSync ? dependencies.getInstalledPathSync : getInstalledPathSync;
 }
 
 function configureLogging(): void {
@@ -59,7 +74,7 @@ function buildTemporaryOutFilePath(): void {
     }
 
     try {
-        let installedPath = config.getInstalledPathSync(project.name);
+        let installedPath = getInstalledPathSync(project.name);
         config.outFile = path.join(installedPath, "dist/web-app/module-structure.json");
     }
     catch (e) {
@@ -76,7 +91,7 @@ function createStructureMap(): void {
     startProcessing("Building structure map (may take some time for large AMD code bases)");
 
     let builder = new StructureMapBuilder();
-    structureMap = builder.build(config.rootDir, config.module, config.excludes);
+    structureMap = builder.build(config.rootDir, config.ts, config.exclude);
 
     stopProcessing();
 }
@@ -106,16 +121,11 @@ function exportViewModel(): void {
         return;
     }
 
-    let destDir = path.dirname(config.outFile);
-    if (!fs.existsSync(destDir)) {
-        fs.mkdir(destDir);
-    }
-
     if (fs.existsSync(config.outFile)) {
         fs.unlinkSync(config.outFile);
     }
 
-    let spacing = config.prettyPrint ? 2 : 0;
+    let spacing = config.pretty ? 2 : 0;
     fs.writeFileSync(config.outFile, JSON.stringify(viewModel, null, spacing));
 }
 
@@ -131,13 +141,13 @@ function showViewModel(): void {
     let serverRoot = path.dirname(config.outFile);
     logger.info("Starting http-server, serving from " + serverRoot);
 
-    let server = config.HttpServerModule.createServer({root: serverRoot});
-    server.listen(config.serverPort, "127.0.0.1", () => {
-        let url = "http://localhost:" + config.serverPort + "/index.html?input=module-structure.json";
+    let server = HttpServerModule.createServer({root: serverRoot});
+    server.listen(config.port, "127.0.0.1", () => {
+        let url = "http://localhost:" + config.port + "/index.html?input=module-structure.json";
         logger.info("Module structure is now available at " + url);
         logger.info("Hit CTRL-C to stop the server");
 
-        config.opener(url);
+        opener(url);
     });
 }
 

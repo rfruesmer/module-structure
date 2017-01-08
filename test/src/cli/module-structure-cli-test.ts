@@ -5,18 +5,18 @@ import {Application} from "../../../src/module-structure-cli";
 
 const path = require("path");
 
-@suite class ModuleStructureCliTest {
+@suite class ModuleStructureCLITest {
     private cli: Application;
     private api: sinon.SinonSpy;
     private expectedConfig: any = {
-        excludes: [],
-        logging: true,
-        module: "es6",
-        outFile: undefined,
-        prettyPrint: false,
         rootDir: "",
-        serverPort: 3000,
-        showExport: true
+        ts: false,
+        outFile: undefined,
+        exclude: [],
+        pretty: false,
+        port: 3000,
+        showExport: true,
+        logging: true
     };
 
 

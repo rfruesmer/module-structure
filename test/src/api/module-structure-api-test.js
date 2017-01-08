@@ -7,12 +7,12 @@ const sinon = require("sinon");
 const os = require("os");
 const fs = require("fs");
 const path = require("path");
-const rimrafSync = require("rimraf").sync;
 const project = require("../../../package.json");
 
 
 describe("module-structure-api", function() {
     let config;
+    let dependencies;
     let rootDir;
     let outFile;
     let HttpServerModule;
@@ -31,7 +31,7 @@ describe("module-structure-api", function() {
     function expectsItStartsHttpServer(port) {
         givenConfigWithShowExport(port);
         givenRootDir("test/resources/ts/ecommerce-sample");
-        givenServerRoot("src/structure-view/data");
+        givenInstalledPath();
         givenSpyingHttpServer();
         givenHttpServerModule();
         whenInvokingAPI();
@@ -41,8 +41,9 @@ describe("module-structure-api", function() {
     function givenConfigWithShowExport(port) {
         config = {showExport: true};
         if (port) {
-            config.serverPort = port;
+            config.port = port;
         }
+        dependencies = {};
     }
 
     function givenRootDir(dir) {
@@ -50,8 +51,19 @@ describe("module-structure-api", function() {
         config.rootDir = rootDir;
     }
 
-    function givenServerRoot(dir) {
-        serverRoot = path.join(process.cwd(), dir);
+    function givenInstalledPath() {
+        const installedPath = fs.mkdtempSync(path.join(os.tmpdir(), "module-structure-"));
+        const distPath = path.join(installedPath, "dist");
+        serverRoot = path.join(distPath, "web-app");
+        expectedOutFilePath  = path.join(serverRoot, "module-structure.json");
+
+        fs.mkdirSync(distPath);
+        fs.mkdirSync(serverRoot);
+
+        getInstalledPathSync = sinon.stub();
+        getInstalledPathSync.withArgs(project.name).returns(installedPath);
+
+        dependencies.getInstalledPathSync = getInstalledPathSync;
     }
 
     function givenSpyingHttpServer() {
@@ -64,11 +76,11 @@ describe("module-structure-api", function() {
         HttpServerModule.createServer = sinon.stub();
         HttpServerModule.createServer.withArgs({root: serverRoot}).returns(httpServer);
 
-        config.HttpServerModule = HttpServerModule;
+        dependencies.HttpServerModule = HttpServerModule;
     }
 
     function whenInvokingAPI() {
-        actualModel = moduleStructure(config);
+        actualModel = moduleStructure(config, dependencies);
     }
 
     function thenHttpServerShouldHaveBeenStarted(port) {
@@ -83,7 +95,7 @@ describe("module-structure-api", function() {
     it("doesn't start http-server if showExport isn't specified", function() {
         givenConfigWithoutShowExport();
         givenRootDir("test/resources/ts/ecommerce-sample");
-        givenServerRoot("src/structure-view/data");
+        givenInstalledPath();
         givenSpyingHttpServer();
         givenHttpServerModule();
         whenInvokingAPI();
@@ -101,7 +113,7 @@ describe("module-structure-api", function() {
     it("opens browser with default port", function() {
         givenConfigWithShowExport();
         givenRootDir("test/resources/ts/ecommerce-sample");
-        givenServerRoot("src/structure-view/data");
+        givenInstalledPath();
         givenFakeHttpServer();
         givenHttpServerModule();
         givenOpener();
@@ -118,7 +130,7 @@ describe("module-structure-api", function() {
 
     function givenOpener() {
         opener = sinon.spy();
-        config.opener = opener;
+        dependencies.opener = opener;
     }
 
     function thenBrowserShouldHaveBeenOpened(port) {
@@ -129,7 +141,7 @@ describe("module-structure-api", function() {
     it("opens browser with specified port", function() {
         givenConfigWithShowExport(8080);
         givenRootDir("test/resources/ts/ecommerce-sample");
-        givenServerRoot("src/structure-view/data");
+        givenInstalledPath();
         givenFakeHttpServer();
         givenHttpServerModule();
         givenOpener();
@@ -168,7 +180,7 @@ describe("module-structure-api", function() {
     });
 
     function givenExcludes(excludes) {
-        config.excludes = excludes;
+        config.exclude = excludes;
     }
 
     function thenActualModelShouldEqualExpectedModel() {
@@ -182,29 +194,11 @@ describe("module-structure-api", function() {
         givenConfigWithShowExport();
         givenRootDir("test/resources/es6/ecommerce-sample");
         givenInstalledPath();
-        givenServerRoot("src/structure-view/data/dist//web-app");
         givenSpyingHttpServer();
         givenHttpServerModule();
         whenInvokingAPI();
         thenOutFileShouldBeExportedToDist();
     });
-
-    function givenInstalledPath() {
-        const installedPath = path.join(process.cwd(), "src/structure-view/data");
-        const distPath = path.join(installedPath, "dist");
-        const webAppPath = path.join(distPath, "web-app");
-        expectedOutFilePath  = path.join(webAppPath, "module-structure.json");
-
-        rimrafSync(installedPath);
-        fs.mkdirSync(installedPath);
-        fs.mkdirSync(distPath);
-        fs.mkdirSync(webAppPath);
-
-        getInstalledPathSync = sinon.stub();
-        getInstalledPathSync.withArgs(project.name).returns(installedPath);
-
-        config.getInstalledPathSync = getInstalledPathSync;
-    }
 
     function thenOutFileShouldBeExportedToDist() {
         const actualModel = JSON.parse(fs.readFileSync(expectedOutFilePath, "utf-8"));
@@ -213,6 +207,30 @@ describe("module-structure-api", function() {
 
         assert.isTrue(getInstalledPathSync.withArgs(project.name).calledOnce);
         assert.deepEqual(actualModel, expectedModel);
+    }
+
+    it("uses cwd dist path for temporary outFiles if not installed", function() {
+        givenConfigWithShowExport();
+        givenRootDir("test/resources/es6/ecommerce-sample");
+        givenDevelopmentPath();
+        givenSpyingHttpServer();
+        givenHttpServerModule();
+        whenInvokingAPI();
+        thenOutFileShouldBeExportedToDist();
+    });
+
+    function givenDevelopmentPath() {
+        serverRoot = path.join(process.cwd(), "src/structure-view/data");
+        expectedOutFilePath  = path.join(serverRoot, "module-structure.json");
+
+        if (!fs.existsSync(serverRoot)) {
+            fs.mkdirSync(serverRoot);
+        }
+
+        getInstalledPathSync = sinon.stub();
+        getInstalledPathSync.withArgs(project.name).throws(Error);
+
+        dependencies.getInstalledPathSync = getInstalledPathSync;
     }
 
     it("ignores file extensions that don't match current module type", function() {

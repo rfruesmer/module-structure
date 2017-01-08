@@ -1,10 +1,9 @@
-import {moduleStructure} from "./module-structure";
-
 import fs = require("fs");
 import path = require("path");
 import process = require("process");
 import {ModuleStructureConfiguration} from "./module-structure-configuration";
 
+const moduleStructure = require("./module-structure");
 const project = require("../package.json");
 const commandLineArgs = require("command-line-args");
 const commandLineUsage = require("command-line-usage");
@@ -117,7 +116,7 @@ export class Application {
         this.processHelpArgument();
         this.processVersionArgument();
         this.processRootDirArgument();
-        this.processModuleArgument();
+        this.processTypeScriptArgument();
         this.processOutFileArgument();
         this.processExcludeArgument();
         this.processPrettyArgument();
@@ -154,8 +153,8 @@ export class Application {
         this.config.rootDir = this.options.rootDir;
     }
 
-    private processModuleArgument(): void {
-        this.config.module = this.options.ts ? "ts" : "es6";
+    private processTypeScriptArgument(): void {
+        this.config.ts = !!this.options.ts;
     }
 
     private processOutFileArgument(): void {
@@ -168,15 +167,15 @@ export class Application {
     }
 
     private processExcludeArgument(): void {
-        this.config.excludes = this.options.exclude ? this.options.exclude : [];
+        this.config.exclude = this.options.exclude ? this.options.exclude : [];
     }
 
     private processPrettyArgument(): void {
-        this.config.prettyPrint = this.options.pretty !== undefined;
+        this.config.pretty = this.options.pretty !== undefined;
     }
 
     private processPortArgument(): void {
-        this.config.serverPort = this.options.port;
+        this.config.port = this.options.port;
     }
 
     private onFinished() {
