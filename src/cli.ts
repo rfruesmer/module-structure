@@ -65,7 +65,12 @@ export class Application {
         }
     ];
     private config: any = {logging: true};
+    private api: any;
 
+
+    constructor(api: any = moduleStructure) {
+        this.api = api;
+    }
 
     public run(): void {
         this.parseArguments();
@@ -79,10 +84,13 @@ export class Application {
             this.options = commandLineArgs(this.optionDefinitions);
         }
         catch (e) {
-            console.error(e.message);
-            this.printUsage();
-            Application.exitWithFailure();
+            Application.exitWithFailure(e.message);
         }
+    }
+
+    private static exitWithFailure(message: string): void {
+        console.error(message + " See 'module-structure --help'.");
+        throw new Error();
     }
 
     private printUsage(): void {
@@ -107,10 +115,6 @@ export class Application {
         console.log(commandLineUsage(sections));
     }
 
-    private static exitWithFailure(): void {
-        process.exit(Application.EXIT_FAILURE);
-    }
-
     private processArguments(): void {
         this.processHelpArgument();
         this.processVersionArgument();
@@ -130,7 +134,7 @@ export class Application {
     }
 
     private static exitWithSuccess(): void {
-        process.exit(Application.EXIT_SUCCESS);
+        throw null;
     };
 
     private processVersionArgument(): void {
@@ -142,14 +146,11 @@ export class Application {
 
     private processRootDirArgument(): void {
         if (!this.options.rootDir) {
-            console.error("Missing --rootDir argument");
-            this.printUsage();
-            Application.exitWithFailure();
+            Application.exitWithFailure("Missing --rootDir argument.");
         }
 
         if (!ModuleStructureConfiguration.checkRootDir(this.options.rootDir)) {
-            console.error("Invalid --rootDir argument");
-            Application.exitWithFailure();
+            Application.exitWithFailure("Invalid --rootDir argument.");
         }
 
         this.config.rootDir = this.options.rootDir;
@@ -161,8 +162,7 @@ export class Application {
 
     private processOutFileArgument(): void {
         if (!ModuleStructureConfiguration.checkOutFile(this.options.outFile)) {
-            console.error("Invalid --outFile argument");
-            Application.exitWithFailure();
+            Application.exitWithFailure("Invalid --outFile argument.");
         }
 
         this.config.outFile = this.options.outFile;
@@ -188,6 +188,12 @@ export class Application {
     }
 
     private invokeAPI() {
-        moduleStructure(this.config);
+        try {
+            this.api(this.config);
+        }
+        catch (e) {
+            console.error(e);
+            throw e;
+        }
     }
 }

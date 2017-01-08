@@ -71,14 +71,6 @@ Documentation follows as soon as the API is considered stable.
 
 <table align="center">
     <tr>
-        <td>color.js</td>
-        <td align="right">
-            <a href="https://www.npmjs.com/package/colors/">homepage</a>
-            &nbsp;-&nbsp;  
-            <a href="https://github.com/Marak/colors.js/blob/master/LICENSE">show license</a>
-        </td>
-    </tr>
-    <tr>
         <td>command-line-args</td>
         <td align="right">
             <a href="https://www.npmjs.com/package/command-line-args/">homepage</a>
@@ -132,6 +124,14 @@ Documentation follows as soon as the API is considered stable.
             <a href="https://jquery.com/">homepage</a>
             &nbsp;-&nbsp;  
             <a href="https://github.com/jquery/jquery/blob/master/LICENSE.txt">show license</a>
+        </td>
+    </tr>
+    <tr>
+        <td>log4js</td>
+        <td align="right">
+            <a href="https://www.npmjs.com/package/log4js/">homepage</a>
+            &nbsp;-&nbsp;  
+            <a href="https://github.com/nomiddlename/log4js-node/blob/master/LICENSE">show license</a>
         </td>
     </tr>
     <tr>

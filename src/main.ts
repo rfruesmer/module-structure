@@ -1,3 +1,9 @@
 import {Application} from "./cli";
 
-new Application().run();
+try {
+    new Application().run();
+}
+catch (e) {
+    // already logged
+    process.exit(e === null ? 0 : -1);
+}

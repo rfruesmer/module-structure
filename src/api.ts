@@ -9,7 +9,7 @@ import process = require("process");
 
 const httpServerModule = require("http-server");
 const opener = require("opener");
-const colors = require("colors/safe");
+const log4js = require("log4js");
 const preconditions = require("preconditions").instance();
 const checkArgument = preconditions.checkArgument;
 const getInstalledPathSync = require("get-installed-path").sync;
@@ -17,6 +17,8 @@ const project = require("../package.json");
 
 let startTime = 0;
 let config: ModuleStructureConfiguration;
+let logger;
+
 
 export class ModuleStructureConfiguration {
     rootDir = "";
@@ -26,7 +28,7 @@ export class ModuleStructureConfiguration {
     serverPort = 3000;
     excludes = [];
     showExport = false;
-    httpServerModule: any;
+    HttpServerModule: any;
     opener: any;
     getInstalledPathSync: any;
     logging: boolean;
@@ -43,8 +45,8 @@ export class ModuleStructureConfiguration {
         this.prettyPrint = options.prettyPrint ? options.prettyPrint : false;
         this.serverPort =  options.serverPort ? options.serverPort : 3000;
         this.excludes = options.excludes ? options.excludes : [];
-        this.showExport = options.showExport;
-        this.httpServerModule = options.httpServerModule ? options.httpServerModule : httpServerModule;
+        this.showExport = options.showExport ? options.showExport : false;
+        this.HttpServerModule = options.HttpServerModule ? options.HttpServerModule : httpServerModule;
         this.opener = options.opener ? options.opener : opener;
         this.getInstalledPathSync = options.getInstalledPathSync ? options.getInstalledPathSync : getInstalledPathSync;
         this.logging = options.logging;
@@ -75,6 +77,7 @@ export class ModuleStructureConfiguration {
 
 export function moduleStructure(options: any): StructureViewModel {
     config = new ModuleStructureConfiguration(options);
+    configureLogging();
 
     if (isTemporaryExportNeeded()) {
         buildTemporaryOutFilePath();
@@ -92,6 +95,24 @@ export function moduleStructure(options: any): StructureViewModel {
     }
 
     return viewModel;
+}
+
+function configureLogging()  {
+    let log4jsConfig = {
+        appenders: [
+            {
+                type: "console",
+                layout: {
+                    type: "pattern",
+                    pattern: "%m"
+                }
+            }
+        ]
+    };
+    log4js.configure(log4jsConfig);
+
+    logger = log4js.getLogger();
+    logger.setLevel(config.logging ? log4js.levels.INFO : log4js.levels.OFF);
 }
 
 function isTemporaryExportNeeded() {
@@ -121,22 +142,14 @@ function createStructureMap(): StructureMapPackage {
 }
 
 function startProcessing(message: string) {
-    if (!config.logging) {
-        return;
-    }
-
-    process.stdout.write(colors.yellow(message + " ... "));
+    logger.info(message + " ... ");
     startTime = Date.now();
 }
 
 function stopProcessing() {
-    if (!config.logging) {
-        return;
-    }
-
     let stopTime = Date.now();
     let elapsed = stopTime - startTime;
-    console.log(colors.yellow("finished in " + elapsed + "ms"));
+    logger.info("Finished in " + elapsed + "ms");
 }
 
 function createViewModel(structureMap: StructureMapPackage) {
@@ -166,20 +179,15 @@ function exportViewModel(viewModel: StructureViewModel): void {
 
 function showViewModel(): void {
     let serverRoot = path.dirname(config.outFile);
-    log(colors.yellow("Starting http-server, serving from " + serverRoot));
+    logger.info("Starting http-server, serving from " + serverRoot);
 
-    let server = config.httpServerModule.createServer({root: serverRoot});
+    let server = config.HttpServerModule.createServer({root: serverRoot});
     server.listen(config.serverPort, "127.0.0.1", () => {
         let url = "http://localhost:" + config.serverPort + "/index.html?input=module-structure.json";
-        log(colors.green("Module structure is now available at " + url));
-        log("Hit CTRL-C to stop the server");
+        logger.info("Module structure is now available at " + url);
+        logger.info("Hit CTRL-C to stop the server");
 
         config.opener(url);
     });
 }
 
-function log(message: any): void {
-    if (config.logging) {
-        console.log(message);
-    }
-}
