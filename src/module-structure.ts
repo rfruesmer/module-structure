@@ -12,37 +12,30 @@ const opener = require("opener");
 const log4js = require("log4js");
 const project = require("../package.json");
 
+let logger;
 let startTime = 0;
 let config: ModuleStructureConfiguration;
-let logger;
-
+let structureMap: StructureMapPackage;
+let viewModel: StructureViewModel;
 
 
 export function moduleStructure(options: any): StructureViewModel {
-    config = new ModuleStructureConfiguration(options);
+    buildConfiguration(options);
     configureLogging();
-
-    if (isTemporaryExportNeeded()) {
-        buildTemporaryOutFilePath();
-    }
-
-    let structureMap = createStructureMap();
-    let viewModel = createViewModel(structureMap);
-
-    if (config.outFile.length > 0) {
-        exportViewModel(viewModel);
-    }
-
-    if (config.showExport) {
-        showViewModel();
-    }
+    buildTemporaryOutFilePath();
+    createStructureMap();
+    createViewModel();
+    exportViewModel();
+    showViewModel();
 
     return viewModel;
 }
 
-module.exports = moduleStructure;
+function buildConfiguration(options: any): void {
+    config = new ModuleStructureConfiguration(options);
+}
 
-function configureLogging()  {
+function configureLogging(): void {
     let log4jsConfig = {
         appenders: [
             {
@@ -60,11 +53,11 @@ function configureLogging()  {
     logger.setLevel(config.logging ? log4js.levels.INFO : log4js.levels.OFF);
 }
 
-function isTemporaryExportNeeded() {
-    return config.showExport && config.outFile.length === 0;
-}
-
 function buildTemporaryOutFilePath(): void {
+    if (!isTemporaryExport()) {
+        return;
+    }
+
     try {
         let installedPath = config.getInstalledPathSync(project.name);
         config.outFile = path.join(installedPath, "dist/web-app/module-structure.json");
@@ -75,40 +68,44 @@ function buildTemporaryOutFilePath(): void {
     }
 }
 
-function createStructureMap(): StructureMapPackage {
+function isTemporaryExport(): boolean {
+    return config.showExport && config.outFile.length === 0;
+}
+
+function createStructureMap(): void {
     startProcessing("Building structure map (may take some time for large AMD code bases)");
 
     let builder = new StructureMapBuilder();
-    let structureMap = builder.build(config.rootDir, config.module, config.excludes);
+    structureMap = builder.build(config.rootDir, config.module, config.excludes);
 
     stopProcessing();
-
-    return structureMap;
 }
 
-function startProcessing(message: string) {
+function startProcessing(message: string): void {
     logger.info(message + " ... ");
     startTime = Date.now();
 }
 
-function stopProcessing() {
+function stopProcessing(): void {
     let stopTime = Date.now();
     let elapsed = stopTime - startTime;
     logger.info("Finished in " + elapsed + "ms");
 }
 
-function createViewModel(structureMap: StructureMapPackage) {
+function createViewModel(): void {
     startProcessing("Exporting view model");
 
     let viewModelBuilder = new StructureViewModelBuilder();
-    let viewModel = viewModelBuilder.build(structureMap);
+    viewModel = viewModelBuilder.build(structureMap);
 
     stopProcessing();
-
-    return viewModel;
 }
 
-function exportViewModel(viewModel: StructureViewModel): void {
+function exportViewModel(): void {
+    if (!isExportViewModel()) {
+        return;
+    }
+
     let destDir = path.dirname(config.outFile);
     if (!fs.existsSync(destDir)) {
         fs.mkdir(destDir);
@@ -122,7 +119,15 @@ function exportViewModel(viewModel: StructureViewModel): void {
     fs.writeFileSync(config.outFile, JSON.stringify(viewModel, null, spacing));
 }
 
+function isExportViewModel(): boolean {
+    return config.outFile.length > 0;
+};
+
 function showViewModel(): void {
+    if (!isShowViewModel()) {
+        return;
+    }
+
     let serverRoot = path.dirname(config.outFile);
     logger.info("Starting http-server, serving from " + serverRoot);
 
@@ -136,3 +141,8 @@ function showViewModel(): void {
     });
 }
 
+function isShowViewModel(): boolean {
+    return config.showExport;
+};
+
+module.exports = moduleStructure;
