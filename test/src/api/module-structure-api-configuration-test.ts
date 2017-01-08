@@ -1,4 +1,4 @@
-import {ModuleStructureConfiguration} from "../../src/api";
+import {ModuleStructureConfiguration} from "../../../src/module-structure";
 import {suite, test} from "mocha-typescript";
 import {expect} from "chai";
 
@@ -7,7 +7,7 @@ const os = require("os");
 const path = require("path");
 
 
-@suite class ModuleStructureConfigurationTest {
+@suite class ModuleStructureAPIConfigurationTest {
     @test "checkRootDir rejects undefined rootDir"() {
         let rootDir = undefined;
         expect(ModuleStructureConfiguration.checkRootDir(rootDir)).to.be.false;

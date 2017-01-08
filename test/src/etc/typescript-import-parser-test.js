@@ -2,7 +2,7 @@ const describe = require("mocha").describe;
 const it = require("mocha").it;
 const expect = require("chai").expect;
 
-const TypeScriptImportParser = require("../../src/structure-map/typescript-import-parser.js").TypeScriptImportParser;
+const TypeScriptImportParser = require("../../../src/structure-map/typescript-import-parser.js").TypeScriptImportParser;
 
 
 describe("typescript-import-parser", function() {

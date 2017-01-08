@@ -11,9 +11,8 @@ src/structure-view/data/
 test/resources/ts/**/*.js*
 !test/resources/ts/tsconfig.json
 !test/resources/ts/ecommerce-sample/ecommerce-sample-without-modules.json
-test/src/api-integration-test-util.js*
-test/src/cli-test.js*
-test/src/module-structure-test.js*
-test/src/module-structure-configuration-test.js*
+test/src/api/module-structure-api-configuration-test.js*
+test/src/cli/module-structure-cli-test.js*
+test/src/model-builder/model-builder-test-util.js*
 output/
 npm-debug.log

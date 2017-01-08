@@ -17,7 +17,7 @@
     "posttest": "nyc report --reporter=json && codecov -f coverage/*.json",
     "start-dev-server": "webpack-dev-server --config conf/webpack.dev.js  --hot --inline --progress --port 8080",
     "start-prod-server": "http-server dist/web-app -o http://localhost:8080?data=module-structure.json",
-    "test": "nyc mocha test/src",
+    "test": "nyc mocha test/src/**/*.js",
     "tsc-prod-lib": "tsc -p conf/tsconfig.prod.json --outDir dist/lib",
     "tsc-test-resources": "tsc -p test/resources/ts",
     "tslint": "tslint -c conf/tslint.json --project ."

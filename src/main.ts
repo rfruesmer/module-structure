@@ -1,4 +1,4 @@
-import {Application} from "./cli";
+import {Application} from "./module-structure-cli";
 
 try {
     new Application().run();

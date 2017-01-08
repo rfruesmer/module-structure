@@ -1,4 +1,4 @@
-const moduleStructure = require("../../src/api").moduleStructure;
+const moduleStructure = require("../../../src/module-structure").moduleStructure;
 
 const describe = require("mocha").describe;
 const it = require("mocha").it;
@@ -8,7 +8,7 @@ const os = require("os");
 const fs = require("fs");
 const path = require("path");
 const rimrafSync = require("rimraf").sync;
-const project = require("../../package.json");
+const project = require("../../../package.json");
 
 
 describe("module-structure-api", function() {

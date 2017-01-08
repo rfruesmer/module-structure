@@ -1,4 +1,4 @@
-import {moduleStructure, ModuleStructureConfiguration} from "./api";
+import {moduleStructure, ModuleStructureConfiguration} from "./module-structure";
 
 import fs = require("fs");
 import path = require("path");
@@ -10,9 +10,6 @@ const commandLineUsage = require("command-line-usage");
 
 
 export class Application {
-    private static readonly EXIT_SUCCESS = 0;
-    private static readonly EXIT_FAILURE = -1;
-
     private options: any;
     private optionDefinitions = [
         {

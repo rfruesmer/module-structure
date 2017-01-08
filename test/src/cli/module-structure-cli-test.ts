@@ -1,7 +1,7 @@
 import {suite, test} from "mocha-typescript";
 import {expect} from "chai";
 import * as sinon from "sinon";
-import {Application} from "../../src/cli";
+import {Application} from "../../../src/module-structure-cli";
 
 const path = require("path");
 
