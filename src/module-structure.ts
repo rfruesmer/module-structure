@@ -20,6 +20,7 @@ let startTime = 0;
 let config: ModuleStructureConfiguration;
 let structureMap: StructureMapPackage;
 let viewModel: StructureViewModel;
+let firstRequest = true;
 
 
 export function moduleStructure(options: any): StructureViewModel {
@@ -141,14 +142,41 @@ function showViewModel(): void {
     let serverRoot = path.dirname(config.outFile);
     logger.info("Starting http-server, serving from " + serverRoot);
 
-    let server = HttpServerModule.createServer({root: serverRoot, cache: 0});
+    let options = {
+        root: serverRoot,
+        cache: 0,
+        before: [onRequest]
+    };
+
+    let server = HttpServerModule.createServer(options);
     server.listen(config.port, "127.0.0.1", () => {
         let url = "http://localhost:" + config.port + "/index.html?input=module-structure.json";
         logger.info("Module structure is now available at " + url);
+        logger.info("Hit F5 in browser to run analysis again and refresh browser");
         logger.info("Hit CTRL-C to stop the server");
 
         opener(url);
     });
+}
+
+function onRequest(req, res) {
+    try {
+        if (firstRequest) {
+            firstRequest = false;
+            return;
+        }
+
+        if (req.originalUrl.indexOf("/index.html") !== 0) {
+            return;
+        }
+
+        createStructureMap();
+        createViewModel();
+        exportViewModel();
+    }
+    finally {
+        res.emit("next");
+    }
 }
 
 function isShowViewModel(): boolean {

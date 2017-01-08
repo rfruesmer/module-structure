@@ -1,0 +1,202 @@
+{
+    "root": {
+        "id": "ecommerce-sample",
+        "name": "ecommerce-sample",
+        "isGroup": true,
+        "rows": [
+            [
+                {
+                    "id": "ecommerce-sample.billing",
+                    "name": "billing",
+                    "isGroup": true,
+                    "rows": [
+                        [
+                            {
+                                "id": "ecommerce-sample.billing.billing-service.js",
+                                "name": "billing-service.js",
+                                "isGroup": false,
+                                "rows": []
+                            },
+                            {
+                                "id": "ecommerce-sample.billing.payment-status.js",
+                                "name": "payment-status.js",
+                                "isGroup": false,
+                                "rows": []
+                            }
+                        ],
+                        [
+                            {
+                                "id": "ecommerce-sample.billing.bill.js",
+                                "name": "bill.js",
+                                "isGroup": false,
+                                "rows": []
+                            }
+                        ]
+                    ]
+                },
+                {
+                    "id": "ecommerce-sample.shopping",
+                    "name": "shopping",
+                    "isGroup": true,
+                    "rows": [
+                        [
+                            {
+                                "id": "ecommerce-sample.shopping.basket.js",
+                                "name": "basket.js",
+                                "isGroup": false,
+                                "rows": []
+                            }
+                        ]
+                    ]
+                }
+            ],
+            [
+                {
+                    "id": "ecommerce-sample.shipping",
+                    "name": "shipping",
+                    "isGroup": true,
+                    "rows": [
+                        [
+                            {
+                                "id": "ecommerce-sample.shipping.shipping-service.js",
+                                "name": "shipping-service.js",
+                                "isGroup": false,
+                                "rows": []
+                            },
+                            {
+                                "id": "ecommerce-sample.shipping.shipping.js",
+                                "name": "shipping.js",
+                                "isGroup": false,
+                                "rows": []
+                            }
+                        ]
+                    ]
+                }
+            ],
+            [
+                {
+                    "id": "ecommerce-sample.sales",
+                    "name": "sales",
+                    "isGroup": true,
+                    "rows": [
+                        [
+                            {
+                                "id": "ecommerce-sample.sales.sales-service.js",
+                                "name": "sales-service.js",
+                                "isGroup": false,
+                                "rows": []
+                            }
+                        ],
+                        [
+                            {
+                                "id": "ecommerce-sample.sales.order-request.js",
+                                "name": "order-request.js",
+                                "isGroup": false,
+                                "rows": []
+                            },
+                            {
+                                "id": "ecommerce-sample.sales.order.js",
+                                "name": "order.js",
+                                "isGroup": false,
+                                "rows": []
+                            }
+                        ]
+                    ]
+                }
+            ],
+            [
+                {
+                    "id": "ecommerce-sample.shared",
+                    "name": "shared",
+                    "isGroup": true,
+                    "rows": [
+                        [
+                            {
+                                "id": "ecommerce-sample.shared.customer-repository.js",
+                                "name": "customer-repository.js",
+                                "isGroup": false,
+                                "rows": []
+                            },
+                            {
+                                "id": "ecommerce-sample.shared.product.js",
+                                "name": "product.js",
+                                "isGroup": false,
+                                "rows": []
+                            }
+                        ],
+                        [
+                            {
+                                "id": "ecommerce-sample.shared.customer.js",
+                                "name": "customer.js",
+                                "isGroup": false,
+                                "rows": []
+                            }
+                        ]
+                    ]
+                }
+            ]
+        ]
+    },
+    "dependencies": [
+        {
+            "from": "ecommerce-sample.billing.billing-service.js",
+            "to": "ecommerce-sample.shipping.shipping-service.js"
+        },
+        {
+            "from": "ecommerce-sample.billing.billing-service.js",
+            "to": "ecommerce-sample.billing.bill.js"
+        },
+        {
+            "from": "ecommerce-sample.billing.billing-service.js",
+            "to": "ecommerce-sample.sales.order.js"
+        },
+        {
+            "from": "ecommerce-sample.billing.bill.js",
+            "to": "ecommerce-sample.sales.order.js"
+        },
+        {
+            "from": "ecommerce-sample.shopping.basket.js",
+            "to": "ecommerce-sample.shared.product.js"
+        },
+        {
+            "from": "ecommerce-sample.shipping.shipping-service.js",
+            "to": "ecommerce-sample.sales.order.js"
+        },
+        {
+            "from": "ecommerce-sample.shipping.shipping.js",
+            "to": "ecommerce-sample.sales.order.js"
+        },
+        {
+            "from": "ecommerce-sample.sales.sales-service.js",
+            "to": "ecommerce-sample.sales.order.js"
+        },
+        {
+            "from": "ecommerce-sample.sales.sales-service.js",
+            "to": "ecommerce-sample.sales.order-request.js"
+        },
+        {
+            "from": "ecommerce-sample.sales.sales-service.js",
+            "to": "ecommerce-sample.billing.billing-service.js"
+        },
+        {
+            "from": "ecommerce-sample.sales.order-request.js",
+            "to": "ecommerce-sample.shared.customer.js"
+        },
+        {
+            "from": "ecommerce-sample.sales.order-request.js",
+            "to": "ecommerce-sample.shared.product.js"
+        },
+        {
+            "from": "ecommerce-sample.sales.order.js",
+            "to": "ecommerce-sample.shared.customer.js"
+        },
+        {
+            "from": "ecommerce-sample.sales.order.js",
+            "to": "ecommerce-sample.shared.product.js"
+        },
+        {
+            "from": "ecommerce-sample.shared.customer-repository.js",
+            "to": "ecommerce-sample.shared.customer.js"
+        }
+    ]
+}

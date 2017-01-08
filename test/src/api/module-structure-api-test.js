@@ -7,6 +7,7 @@ const sinon = require("sinon");
 const os = require("os");
 const fs = require("fs");
 const path = require("path");
+const mv = require("mv");
 const project = require("../../../package.json");
 
 
@@ -17,12 +18,14 @@ describe("module-structure-api", function() {
     let outFile;
     let HttpServerModule;
     let httpServer;
+    let httpServerOptions;
     let serverRoot;
     let opener;
     let actualModel;
     let expectedOutFilePath;
     let getInstalledPathSync;
-
+    let tempDir;
+    let response;
 
     it("starts http-server", function() {
         expectsItStartsHttpServer();
@@ -74,7 +77,7 @@ describe("module-structure-api", function() {
     function givenHttpServerModule() {
         HttpServerModule = {};
         HttpServerModule.createServer = sinon.stub();
-        HttpServerModule.createServer.withArgs({root: serverRoot, cache: 0}).returns(httpServer);
+        HttpServerModule.createServer.withArgs({root: serverRoot, cache: 0, before: sinon.match.any}).returns(httpServer);
 
         dependencies.HttpServerModule = HttpServerModule;
     }
@@ -84,7 +87,7 @@ describe("module-structure-api", function() {
     }
 
     function thenHttpServerShouldHaveBeenStarted(port) {
-        assert.isTrue(HttpServerModule.createServer.withArgs({root: serverRoot, cache: 0}).calledOnce);
+        assert.isTrue(HttpServerModule.createServer.withArgs({root: serverRoot, cache: 0, before: sinon.match.any}).calledOnce);
         assert.isTrue(httpServer.listen.withArgs(port ? port : 3000, "127.0.0.1").calledOnce);
     }
 
@@ -154,7 +157,7 @@ describe("module-structure-api", function() {
         givenRootDir("test/resources/es6/ecommerce-sample");
         givenOutFile("src/structure-view/data/module-structure.json");
         whenInvokingAPI();
-        thenExportedModelShouldEqualExpectedModel();
+        thenExportedModelShouldEqualExpectedModel("ecommerce-sample.json");
     });
 
     function givenOutFile(pathName) {
@@ -167,9 +170,9 @@ describe("module-structure-api", function() {
         }
     }
 
-    function thenExportedModelShouldEqualExpectedModel() {
+    function thenExportedModelShouldEqualExpectedModel(fileName) {
         const actualModel = JSON.parse(fs.readFileSync(outFile, "utf-8"));
-        const expectedModelPath = path.join(rootDir, "ecommerce-sample.json");
+        const expectedModelPath = path.join(rootDir, fileName);
         const expectedModel = JSON.parse(fs.readFileSync(expectedModelPath, "utf-8"));
 
         assert.deepEqual(actualModel, expectedModel);
@@ -250,5 +253,128 @@ describe("module-structure-api", function() {
         const expectedModel = JSON.parse(expectedModelString);
 
         assert.deepEqual(actualModel, expectedModel);
+    }
+
+    it("repeats analysis on index.html reload", function(done) {
+        givenConfigWithShowExport();
+        givenRootDir("test/resources/es6/ecommerce-sample");
+        givenDevelopmentPath();
+        givenFakeHttpServer();
+        givenFakeHttpServerModule();
+        givenOpener();
+        whenInvokingAPI();
+        afterPageIsLoaded();
+        thenEmitShouldHaveBeenCalled();
+        afterModelHasChanged()
+            .then(() => andReloadingPage(done))
+            .catch(err => failTest(err, done));
+    });
+
+    function givenFakeHttpServerModule() {
+        HttpServerModule = {};
+        HttpServerModule.createServer = function(options) {
+            httpServerOptions = options;
+            return httpServer;
+        };
+        dependencies.HttpServerModule = HttpServerModule;
+    }
+
+    function afterPageIsLoaded() {
+        loadResource("/index.html?input=module-structure.json");
+    }
+
+    function thenEmitShouldHaveBeenCalled() {
+        assert.isTrue(response.emit.called);
+        response.emit.reset();
+    }
+
+    function loadResource(url) {
+        const request = {};
+        request.originalUrl = url;
+
+        response = {};
+        response.emit = sinon.spy();
+
+        httpServerOptions.before[0](request, response);
+    }
+
+    function afterModelHasChanged() {
+        tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "module-structure-"));
+        tempDir = path.join(tempDir, "app");
+        const sourceDir = path.join(rootDir, "app");
+
+        return new Promise((resolve, reject) => {
+            mv(sourceDir, tempDir, (err) => {
+                if (err) {
+                    reject(err);
+                }
+                else {
+                    resolve(0);
+                }
+            });
+        });
+    }
+
+    function andReloadingPage(done) {
+        afterPageIsLoaded();
+        thenEmitShouldHaveBeenCalled();
+        thenExportedModelShouldEqualExpectedModel("ecommerce-sample-without-app.json");
+
+        rollbackMovedDirectory()
+            .then(() => done())
+            .catch(err => done(err));
+    }
+
+    function rollbackMovedDirectory() {
+        const destDir = path.join(rootDir, "app");
+
+        return new Promise((resolve, reject) => {
+            if (!fs.existsSync(tempDir)) {
+                resolve(0);
+                return;
+            }
+
+            mv(tempDir, destDir, (err) => {
+                if (err) {
+                    reject(err);
+                }
+                else {
+                    resolve(0);
+                }
+            });
+        });
+    }
+
+    function failTest(err, done) {
+        rollbackMovedDirectory()
+            .then(() => done(err))
+            .catch(() => done(err));
+    }
+
+
+    it("doesn't repeats analysis for reload of other resources", function(done) {
+        givenConfigWithShowExport();
+        givenRootDir("test/resources/es6/ecommerce-sample");
+        givenDevelopmentPath();
+        givenFakeHttpServer();
+        givenFakeHttpServerModule();
+        givenOpener();
+        whenInvokingAPI();
+        afterPageIsLoaded();
+        thenEmitShouldHaveBeenCalled();
+        afterModelHasChanged()
+            .then(() => andLoadingSomeOtherResource(done))
+            .catch(err => failTest(err, done));
+    });
+
+    function andLoadingSomeOtherResource(done) {
+        loadResource("/styles.css");
+
+        thenEmitShouldHaveBeenCalled();
+        thenExportedModelShouldEqualExpectedModel("ecommerce-sample.json");
+
+        rollbackMovedDirectory()
+            .then(() => done())
+            .catch(err => done(err));
     }
 });
