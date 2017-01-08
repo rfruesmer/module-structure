@@ -157,9 +157,14 @@ describe("module-structure-api", function() {
         thenExportedModelShouldEqualExpectedModel();
     });
 
-    function givenOutFile(dir) {
-        outFile = path.join(process.cwd(), dir);
+    function givenOutFile(pathName) {
+        outFile = path.join(process.cwd(), pathName);
         config.outFile = outFile;
+
+        const outDir = path.dirname(outFile);
+        if (!fs.existsSync(outDir)) {
+            fs.mkdirSync(outDir);
+        }
     }
 
     function thenExportedModelShouldEqualExpectedModel() {
