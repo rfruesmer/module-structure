@@ -74,7 +74,7 @@ describe("module-structure-api", function() {
     function givenHttpServerModule() {
         HttpServerModule = {};
         HttpServerModule.createServer = sinon.stub();
-        HttpServerModule.createServer.withArgs({root: serverRoot}).returns(httpServer);
+        HttpServerModule.createServer.withArgs({root: serverRoot, cache: 0}).returns(httpServer);
 
         dependencies.HttpServerModule = HttpServerModule;
     }
@@ -84,7 +84,7 @@ describe("module-structure-api", function() {
     }
 
     function thenHttpServerShouldHaveBeenStarted(port) {
-        assert.isTrue(HttpServerModule.createServer.withArgs({root: serverRoot}).calledOnce);
+        assert.isTrue(HttpServerModule.createServer.withArgs({root: serverRoot, cache: 0}).calledOnce);
         assert.isTrue(httpServer.listen.withArgs(port ? port : 3000, "127.0.0.1").calledOnce);
     }
 

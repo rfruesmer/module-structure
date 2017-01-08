@@ -141,7 +141,7 @@ function showViewModel(): void {
     let serverRoot = path.dirname(config.outFile);
     logger.info("Starting http-server, serving from " + serverRoot);
 
-    let server = HttpServerModule.createServer({root: serverRoot});
+    let server = HttpServerModule.createServer({root: serverRoot, cache: 0});
     server.listen(config.port, "127.0.0.1", () => {
         let url = "http://localhost:" + config.port + "/index.html?input=module-structure.json";
         logger.info("Module structure is now available at " + url);
