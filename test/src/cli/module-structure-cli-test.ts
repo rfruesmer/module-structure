@@ -15,7 +15,7 @@ const path = require("path");
         exclude: [],
         pretty: false,
         port: 3000,
-        showExport: true,
+        open: true,
         logging: true
     };
 
@@ -68,7 +68,7 @@ const path = require("path");
         this.expectedConfig.outFile = path.join(process.cwd(), "test", "module-structure.json");
         process.argv.push.apply(process.argv, ["--outFile", this.expectedConfig.outFile]);
 
-        this.expectedConfig.showExport = false;
+        this.expectedConfig.open = false;
     }
 
     @test "throws error if rootDir is missing"() {

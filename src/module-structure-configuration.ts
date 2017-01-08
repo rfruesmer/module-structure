@@ -14,7 +14,7 @@ export class ModuleStructureConfiguration {
     exclude = [];
     pretty = false;
     port = 3000;
-    showExport = false;
+    open = false;
     logging: boolean;
 
 
@@ -28,7 +28,7 @@ export class ModuleStructureConfiguration {
         this.exclude = options.exclude ? options.exclude : [];
         this.pretty = options.pretty ? options.pretty : false;
         this.port =  options.port ? options.port : 3000;
-        this.showExport = options.showExport ? options.showExport : false;
+        this.open = options.open ? options.open : false;
         this.logging = options.logging;
     }
 

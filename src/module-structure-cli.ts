@@ -163,7 +163,7 @@ export class Application {
         }
 
         this.config.outFile = this.options.outFile;
-        this.config.showExport = !this.options.outFile;
+        this.config.open = !this.options.outFile;
     }
 
     private processExcludeArgument(): void {
@@ -179,7 +179,7 @@ export class Application {
     }
 
     private onFinished() {
-        if (!this.config.showExport) {
+        if (!this.config.open) {
             Application.exitWithSuccess();
         }
     }

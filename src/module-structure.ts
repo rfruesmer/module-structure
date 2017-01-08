@@ -85,7 +85,7 @@ function buildTemporaryOutFilePath(): void {
 }
 
 function isTemporaryExport(): boolean {
-    return config.showExport && config.outFile.length === 0;
+    return config.open && config.outFile.length === 0;
 }
 
 function createStructureMap(): void {
@@ -180,7 +180,7 @@ function onRequest(req, res) {
 }
 
 function isShowViewModel(): boolean {
-    return config.showExport;
+    return config.open;
 }
 
 module.exports = moduleStructure;

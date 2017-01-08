@@ -32,7 +32,7 @@ describe("module-structure-api", function() {
     });
 
     function expectsItStartsHttpServer(port) {
-        givenConfigWithShowExport(port);
+        givenConfigWithOpen(port);
         givenRootDir("test/resources/ts/ecommerce-sample");
         givenInstalledPath();
         givenSpyingHttpServer();
@@ -41,8 +41,8 @@ describe("module-structure-api", function() {
         thenHttpServerShouldHaveBeenStarted(port);
     }
 
-    function givenConfigWithShowExport(port) {
-        config = {showExport: true};
+    function givenConfigWithOpen(port) {
+        config = {open: true};
         if (port) {
             config.port = port;
         }
@@ -95,8 +95,8 @@ describe("module-structure-api", function() {
         expectsItStartsHttpServer(8080);
     });
 
-    it("doesn't start http-server if showExport isn't specified", function() {
-        givenConfigWithoutShowExport();
+    it("doesn't start http-server if open isn't specified", function() {
+        givenConfigWithoutOpen();
         givenRootDir("test/resources/ts/ecommerce-sample");
         givenInstalledPath();
         givenSpyingHttpServer();
@@ -105,7 +105,7 @@ describe("module-structure-api", function() {
         thenHttpServerShouldNotHaveBeenStarted();
     });
 
-    function givenConfigWithoutShowExport() {
+    function givenConfigWithoutOpen() {
         config = {};
     }
 
@@ -114,7 +114,7 @@ describe("module-structure-api", function() {
     }
 
     it("opens browser with default port", function() {
-        givenConfigWithShowExport();
+        givenConfigWithOpen();
         givenRootDir("test/resources/ts/ecommerce-sample");
         givenInstalledPath();
         givenFakeHttpServer();
@@ -142,7 +142,7 @@ describe("module-structure-api", function() {
     }
 
     it("opens browser with specified port", function() {
-        givenConfigWithShowExport(8080);
+        givenConfigWithOpen(8080);
         givenRootDir("test/resources/ts/ecommerce-sample");
         givenInstalledPath();
         givenFakeHttpServer();
@@ -153,7 +153,7 @@ describe("module-structure-api", function() {
     });
 
     it("exports outFile", function() {
-        givenConfigWithoutShowExport();
+        givenConfigWithoutOpen();
         givenRootDir("test/resources/es6/ecommerce-sample");
         givenOutFile("src/structure-view/data/module-structure.json");
         whenInvokingAPI();
@@ -179,7 +179,7 @@ describe("module-structure-api", function() {
     }
 
     it("skips excludes", function() {
-        givenConfigWithoutShowExport();
+        givenConfigWithoutOpen();
         givenRootDir("test/resources/es6/ecommerce-sample");
         givenOutFile("src/structure-view/data/module-structure.json");
         givenExcludes(["billing", "sales-service.js"]);
@@ -199,7 +199,7 @@ describe("module-structure-api", function() {
     }
 
     it("uses installation dist path for temporary outFiles", function() {
-        givenConfigWithShowExport();
+        givenConfigWithOpen();
         givenRootDir("test/resources/es6/ecommerce-sample");
         givenInstalledPath();
         givenSpyingHttpServer();
@@ -218,7 +218,7 @@ describe("module-structure-api", function() {
     }
 
     it("uses cwd dist path for temporary outFiles if not installed", function() {
-        givenConfigWithShowExport();
+        givenConfigWithOpen();
         givenRootDir("test/resources/es6/ecommerce-sample");
         givenDevelopmentPath();
         givenSpyingHttpServer();
@@ -242,7 +242,7 @@ describe("module-structure-api", function() {
     }
 
     it("ignores file extensions that don't match current module type", function() {
-        givenConfigWithoutShowExport();
+        givenConfigWithoutOpen();
         givenRootDir("test/resources/ts/ecommerce-sample");
         whenInvokingAPI();
         thenActualModelShouldNotHaveAnyModules();
@@ -256,7 +256,7 @@ describe("module-structure-api", function() {
     }
 
     it("repeats analysis on index.html reload", function(done) {
-        givenConfigWithShowExport();
+        givenConfigWithOpen();
         givenRootDir("test/resources/es6/ecommerce-sample");
         givenDevelopmentPath();
         givenFakeHttpServer();
@@ -353,7 +353,7 @@ describe("module-structure-api", function() {
 
 
     it("doesn't repeats analysis for reload of other resources", function(done) {
-        givenConfigWithShowExport();
+        givenConfigWithOpen();
         givenRootDir("test/resources/es6/ecommerce-sample");
         givenDevelopmentPath();
         givenFakeHttpServer();
