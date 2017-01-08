@@ -121,7 +121,7 @@ function exportViewModel(): void {
 
 function isExportViewModel(): boolean {
     return config.outFile.length > 0;
-};
+}
 
 function showViewModel(): void {
     if (!isShowViewModel()) {
@@ -143,6 +143,6 @@ function showViewModel(): void {
 
 function isShowViewModel(): boolean {
     return config.showExport;
-};
+}
 
 module.exports = moduleStructure;
