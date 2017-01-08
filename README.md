@@ -167,8 +167,8 @@ let model = moduleStructure({rootDir: "/path/to/some/codebase"});
  
 ### Dependency Type
 
-* `from`: The full qualified name of the dependency source node.
-* `to`: The full qualified name of the dependency target node.
+* `from`: The full qualified name of the dependency's source module.
+* `to`: The full qualified name of the dependency's target module.
 
 ## Credits
 
