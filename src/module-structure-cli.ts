@@ -1,8 +1,9 @@
-import {moduleStructure, ModuleStructureConfiguration} from "./module-structure";
+import {moduleStructure} from "./module-structure";
 
 import fs = require("fs");
 import path = require("path");
 import process = require("process");
+import {ModuleStructureConfiguration} from "./module-structure-configuration";
 
 const project = require("../package.json");
 const commandLineArgs = require("command-line-args");

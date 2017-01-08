@@ -5,7 +5,7 @@ import {Application} from "../../../src/module-structure-cli";
 
 const path = require("path");
 
-@suite class CLITest {
+@suite class ModuleStructureCliTest {
     private cli: Application;
     private api: sinon.SinonSpy;
     private expectedConfig: any = {

@@ -1,4 +1,5 @@
-import {ModuleStructureConfiguration} from "../../../src/module-structure";
+import {ModuleStructureConfiguration} from "../../../src/module-structure-configuration";
+
 import {suite, test} from "mocha-typescript";
 import {expect} from "chai";
 
