@@ -2,5 +2,10 @@
 
 const cli = require("../dist/lib/module-structure-cli");
 
-const theApp = new cli.Application();
-theApp.run();
+try {
+    new cli.Application().run();
+}
+catch (e) {
+    // already logged
+    process.exit(e === null ? 0 : -1);
+}
