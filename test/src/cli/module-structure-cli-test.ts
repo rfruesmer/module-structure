@@ -7,10 +7,9 @@ const path = require("path");
 
 @suite class ModuleStructureCLITest {
     private cli: Application;
-    private api: sinon.SinonSpy;
+    private api: any;
     private expectedConfig: any = {
         rootDir: "",
-        ts: false,
         outFile: undefined,
         exclude: [],
         pretty: false,
@@ -32,22 +31,21 @@ const path = require("path");
         this.thenAPIShouldBeCalledWithExpectedConfig();
     }
 
-    private givenRootDir() {
-        this.expectedConfig.rootDir = path.join(process.cwd(), "test/resources/es6/ecommerce-sample");
-        process.argv.push.apply(process.argv, ["--rootDir", this.expectedConfig.rootDir]);
+    private givenAPI() {
+        this.api = sinon.spy();
     }
-
 
     private givenCLI() {
         this.cli = new Application(this.api);
     }
 
-    private whenInvokingCLI() {
-        this.cli.run();
+    private givenRootDir() {
+        this.expectedConfig.rootDir = path.join(process.cwd(), "test/resources/es6/ecommerce-sample");
+        process.argv.push.apply(process.argv, ["--rootDir", this.expectedConfig.rootDir]);
     }
 
-    private givenAPI() {
-        this.api = sinon.spy();
+    private whenInvokingCLI() {
+        this.cli.run();
     }
 
     private thenAPIShouldBeCalledWithExpectedConfig() {
@@ -134,5 +132,26 @@ const path = require("path");
 
     private givenUnknownArgument() {
         process.argv.push.apply(process.argv, ["--wrong"]);
+    }
+
+    @test "rethrows errors"() {
+        let error = null;
+
+        try {
+            this.givenThrowingAPI();
+            this.givenCLI();
+            this.givenRootDir();
+            this.whenInvokingCLI();
+        }
+        catch (e) {
+            error = e;
+        }
+
+        expect(error).to.be.not.null;
+    }
+
+    private givenThrowingAPI() {
+        this.api = sinon.stub();
+        this.api.withArgs(this.expectedConfig).throws(Error);
     }
 }

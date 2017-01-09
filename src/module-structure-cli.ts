@@ -31,11 +31,6 @@ export class Application {
             description: "Specifies the root directory of input files."
         },
         {
-            name: "ts",
-            type: Boolean,
-            description: "Only necessary for analyzing TypeScript modules."
-        },
-        {
             name: "outFile",
             type: String,
             typeLabel: "[underline]{file}",
@@ -116,7 +111,6 @@ export class Application {
         this.processHelpArgument();
         this.processVersionArgument();
         this.processRootDirArgument();
-        this.processTypeScriptArgument();
         this.processOutFileArgument();
         this.processExcludeArgument();
         this.processPrettyArgument();
@@ -151,10 +145,6 @@ export class Application {
         }
 
         this.config.rootDir = this.options.rootDir;
-    }
-
-    private processTypeScriptArgument(): void {
-        this.config.ts = !!this.options.ts;
     }
 
     private processOutFileArgument(): void {

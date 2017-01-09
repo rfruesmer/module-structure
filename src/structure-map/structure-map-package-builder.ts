@@ -12,18 +12,16 @@ const checkArgument = preconditions.checkArgument;
 export class StructureMapPackageBuilder {
     private rootDir: string;
     private rootDirParent: string;
-    private typeScript: boolean;
     private excludes: Array<string> = [];
     private requireConfigPath: string;
     private moduleBuilder = new StructureMapModuleBuilder();
 
 
-    public build(rootDir: string, typeScript: boolean, excludes: string[], requireConfigPath = ""): StructureMapPackage {
+    public build(rootDir: string, excludes: string[], requireConfigPath = ""): StructureMapPackage {
         checkArgument(fs.statSync(rootDir).isDirectory());
 
         this.rootDir =  rootDir;
         this.rootDirParent = path.normalize(path.join(rootDir, ".."));
-        this.typeScript = typeScript;
         this.excludes = excludes;
         this.requireConfigPath = requireConfigPath;
 
@@ -90,8 +88,7 @@ export class StructureMapPackageBuilder {
 
         this.getModuleFiles(dir).forEach(modulePath => {
             let moduleName = StructureMapPackageBuilder.getModuleName(modulePath, packageName);
-            if (!this.isExcluded(moduleName)
-                    && this.isResponsibleFor(modulePath)) {
+            if (!this.isExcluded(moduleName)) {
                 modules.push(this.moduleBuilder.build(modulePath, moduleName, this.rootDir));
             }
         });
@@ -100,19 +97,28 @@ export class StructureMapPackageBuilder {
     }
 
     private getModuleFiles(dir: string): string[] {
-        return fs.readdirSync(dir)
+        let moduleFileMap = {};
+        fs.readdirSync(dir)
+            .filter(fileName => fs.statSync(path.join(dir, fileName)).isFile())
+            .filter(fileName => [".js", ".ts"].indexOf(path.extname(fileName)) > -1)
             .map(fileName => path.join(dir, fileName))
-            .filter(filePath => fs.statSync(filePath).isFile() && [".js", ".ts"].indexOf(path.extname(filePath)) > -1);
+            .forEach(moduleFile => moduleFileMap[moduleFile] = path.extname(moduleFile));
+
+        for (let moduleFile in moduleFileMap) {
+            if (moduleFileMap[moduleFile] !== ".ts") {
+                continue;
+            }
+
+            let correspondingJsFile = moduleFile.substr(0, moduleFile.length - 3) + ".js";
+            if (moduleFileMap[correspondingJsFile]) {
+                delete moduleFileMap[correspondingJsFile];
+            }
+        }
+
+        return Object.keys(moduleFileMap);
     }
 
     private static getModuleName(filePath: string, packageName: string): string {
         return packageName + "." + path.basename(filePath);
-    }
-
-    public isResponsibleFor(filePath: string): boolean {
-        let extension = path.extname(filePath).toLowerCase();
-        return this.typeScript
-            ? extension === ".ts"
-            : extension === ".js";
     }
 }

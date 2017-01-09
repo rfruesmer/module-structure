@@ -241,13 +241,6 @@ describe("module-structure-api", function() {
         dependencies.getInstalledPathSync = getInstalledPathSync;
     }
 
-    it("ignores file extensions that don't match current module type", function() {
-        givenConfigWithoutOpen();
-        givenRootDir("test/resources/ts/ecommerce-sample");
-        whenInvokingAPI();
-        thenActualModelShouldNotHaveAnyModules();
-    });
-
     function thenActualModelShouldNotHaveAnyModules() {
         const expectedModelString = fs.readFileSync(path.join(rootDir, "ecommerce-sample-without-modules.json"), "utf-8");
         const expectedModel = JSON.parse(expectedModelString);

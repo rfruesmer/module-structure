@@ -10,9 +10,6 @@ const expectRowNodesCountToEqual = util.expectRowNodesCountToEqual;
 const expectRowContainsPackage = util.expectRowContainsPackage;
 const expectDependencyCountToEqual = util.expectDependencyCountToEqual;
 const expectContainsDependency = util.expectContainsDependency;
-const expectRowContainsModule = util.expectRowContainsModule;
-const findNode = util.findNode;
-const expectNodeRowsCountToEqual = util.expectNodeRowsCountToEqual;
 const expectPackageContainsSingleModule = util.expectPackageContainsSingleModule;
 
 
@@ -24,7 +21,7 @@ describe("relevelization", function() {
     ];
 
     tests.forEach(test => {
-        test.viewModel = buildViewModelFor(test.rootDir, test.moduleType);
+        test.viewModel = buildViewModelFor(test.rootDir);
     });
 
     tests.forEach(function(test) {

@@ -21,7 +21,7 @@ describe("circular-package-dependency-01", function() {
     ];
 
     tests.forEach(test => {
-        test.viewModel = buildViewModelFor(test.rootDir, test.moduleType);
+        test.viewModel = buildViewModelFor(test.rootDir);
     });
 
     tests.forEach(function(test) {

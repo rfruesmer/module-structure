@@ -92,7 +92,7 @@ function createStructureMap(): void {
     startProcessing("Building structure map (may take some time for large AMD code bases)");
 
     let builder = new StructureMapBuilder();
-    structureMap = builder.build(config.rootDir, config.ts, config.exclude);
+    structureMap = builder.build(config.rootDir, config.exclude);
 
     stopProcessing();
 }

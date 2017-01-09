@@ -9,7 +9,6 @@ const checkArgument = preconditions.checkArgument;
 
 export class ModuleStructureConfiguration {
     rootDir = "";
-    ts = false;
     outFile = "";
     exclude = [];
     pretty = false;
@@ -23,7 +22,6 @@ export class ModuleStructureConfiguration {
         checkArgument(ModuleStructureConfiguration.checkOutFile(options.outFile), "output directory doesn't exist");
 
         this.rootDir = options.rootDir;
-        this.ts = options.ts ? options.ts : false;
         this.outFile = options.outFile ? options.outFile : "";
         this.exclude = options.exclude ? options.exclude : [];
         this.pretty = options.pretty ? options.pretty : false;

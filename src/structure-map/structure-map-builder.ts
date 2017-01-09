@@ -11,16 +11,14 @@ const checkArgument = preconditions.checkArgument;
 
 export class StructureMapBuilder {
     private dir: string;
-    private typeScript: boolean;
     private excludes: string[] = [];
     private packageIndex: any = {};
     private moduleIndex: any = {};
     private structureMap: StructureMapPackage;
 
 
-    public build(dir: string, typeScript: boolean, excludes: string[] = []): StructureMapPackage {
+    public build(dir: string, excludes: string[] = []): StructureMapPackage {
         this.dir = dir;
-        this.typeScript = typeScript;
         this.excludes = excludes;
 
         this.buildStructureMap();
@@ -33,7 +31,7 @@ export class StructureMapBuilder {
 
     private buildStructureMap(): void {
         let packageBuilder = new StructureMapPackageBuilder();
-        this.structureMap = packageBuilder.build(this.dir, this.typeScript, this.excludes);
+        this.structureMap = packageBuilder.build(this.dir, this.excludes);
     }
 
     private indexStructureMap(): void {
