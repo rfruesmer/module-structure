@@ -15,7 +15,7 @@ export class Application {
         {
             name: "help",
             alias: "h",
-            type: String,
+            type: Boolean,
             description: "Show this help."
         },
         {
