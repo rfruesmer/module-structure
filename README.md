@@ -5,7 +5,7 @@
 <a href="https://codecov.io/gh/rfruesmer/module-structure"><img alt="Coverage Status" src="https://codecov.io/gh/rfruesmer/module-structure/master.svg"></a>
 
 
-Creates levelized structure maps from ECMAScript, TypeScript and AMD dependencies - 
+Creates levelized structure maps from ECMAScript/JavaScript, TypeScript and AMD module dependencies - 
 inspired by <a href="https://structure101.com/blog/2011/03/introducing-levelized-structure-maps-lsm/">structure101's Levelized Structure Maps</a>.
 
 Generated maps can be rendered in your browser or exported as JSON files. 
