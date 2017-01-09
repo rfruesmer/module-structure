@@ -38,14 +38,14 @@ Requires a recent Node.js installation (6.x/7.x).
 
 ### Usage
 
+`module-structure --rootDir directory`           
+
 Create structure map and display in default browser. Refreshing the browser repeats the structure analysis 
 and updates the browser, useful after modifications to the code base:
 
-`module-structure --rootDir directory`           
+`module-structure --rootDir directory  --outFile file`           
 
 Create structure map and save as JSON file. Doesn't open structure map in browser.
-
-`module-structure --rootDir directory  --outFile file`           
 
 ### Flags 
 
@@ -54,8 +54,8 @@ Create structure map and save as JSON file. Doesn't open structure map in browse
 | --help      | -h    | Show this help.                                                                                                                                  |
 | --version   | -v    | Print the version number.                                                                                                                        |
 | --rootDir   |       | Specifies the root directory of input files.                                                                                                     |
-| --outFile   |       | Path for the JSON output file. If omitted, the file will be created in a temporary directory and displayed as a diagram in your default browser. |
 | --exclude   | -e    | One or more expressions to filter packages and/or modules.                                                                                       |
+| --outFile   |       | Path for the JSON output file. If omitted, the file will be created in a temporary directory and displayed as a diagram in your default browser. |
 | --pretty    |       | Pretty-print the JSON output file. Only used if --outFile is specified.                                                                          |
 | --port      | -p    | Port for serving the included viewer web-app (defaults to 3000). Omitted if --outFile is specified.                                              |
 
