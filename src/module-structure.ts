@@ -75,7 +75,7 @@ function buildTemporaryOutFilePath(): void {
     }
 
     try {
-        config.outFile = path.join(this.getInstalledPath(), "dist/web-app/module-structure.json");
+        config.outFile = path.join(getInstalledPath(), "dist/web-app/module-structure.json");
     }
     catch (e) {
         // fallback for debugging/development
@@ -83,7 +83,7 @@ function buildTemporaryOutFilePath(): void {
     }
 }
 
-function getInstalledPath() {
+function getInstalledPath(): string {
     try {
         return getInstalledPathSync(project.name, {local: true});
     }

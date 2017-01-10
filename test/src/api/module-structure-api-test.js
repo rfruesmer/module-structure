@@ -64,7 +64,7 @@ describe("module-structure-api", function() {
         fs.mkdirSync(serverRoot);
 
         getInstalledPathSync = sinon.stub();
-        getInstalledPathSync.withArgs(project.name).returns(installedPath);
+        getInstalledPathSync.withArgs(project.name, {local: true}).returns(installedPath);
 
         dependencies.getInstalledPathSync = getInstalledPathSync;
     }
@@ -213,7 +213,7 @@ describe("module-structure-api", function() {
         const expectedModelPath = path.join(rootDir, "ecommerce-sample.json");
         const expectedModel = JSON.parse(fs.readFileSync(expectedModelPath, "utf-8"));
 
-        assert.isTrue(getInstalledPathSync.withArgs(project.name).calledOnce);
+        assert.isTrue(getInstalledPathSync.withArgs(project.name, {local: true}).calledOnce);
         assert.deepEqual(actualModel, expectedModel);
     }
 
@@ -236,16 +236,9 @@ describe("module-structure-api", function() {
         }
 
         getInstalledPathSync = sinon.stub();
-        getInstalledPathSync.withArgs(project.name).throws(Error);
+        getInstalledPathSync.withArgs(project.name, {local: true}).throws(Error);
 
         dependencies.getInstalledPathSync = getInstalledPathSync;
-    }
-
-    function thenActualModelShouldNotHaveAnyModules() {
-        const expectedModelString = fs.readFileSync(path.join(rootDir, "ecommerce-sample-without-modules.json"), "utf-8");
-        const expectedModel = JSON.parse(expectedModelString);
-
-        assert.deepEqual(actualModel, expectedModel);
     }
 
     it("repeats analysis on index.html reload", function(done) {
