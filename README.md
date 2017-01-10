@@ -14,7 +14,7 @@ Items in the same row do not depend on each other, and items on the lowest level
 This arrangement conveys a lot of dependency information so that most of the item-to-item dependency arrows can be hidden without loss of context.
 <footer>— <cite>structure101.com</cite></footer>
 </blockquote>
-
+<br>
 Generated LSMs can be rendered in your browser or exported as JSON files. 
 
 ## Example Diagram
