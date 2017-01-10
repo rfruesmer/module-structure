@@ -5,10 +5,17 @@
 <a href="https://codecov.io/gh/rfruesmer/module-structure"><img alt="Coverage Status" src="https://codecov.io/gh/rfruesmer/module-structure/master.svg"></a>
 
 
-Creates levelized structure maps from ECMAScript/JavaScript, TypeScript and AMD module dependencies - 
+Creates levelized structure maps (LSMs) from ECMAScript/JavaScript, TypeScript and AMD module dependencies - 
 inspired by <a href="https://structure101.com/blog/2011/03/introducing-levelized-structure-maps-lsm/">structure101's Levelized Structure Maps</a>.
 
-Generated maps can be rendered in your browser or exported as JSON files. 
+<blockquote>
+Items in the LSM are levelized into rows, or levels, so that every item depends on at least one item on the level immediately below it. 
+Items in the same row do not depend on each other, and items on the lowest level do not depend on any other items at the same scope.
+This arrangement conveys a lot of dependency information so that most of the item-to-item dependency arrows can be hidden without loss of context.
+<footer>— <cite>structure101.com</cite></footer>
+</blockquote>
+
+Generated LSMs can be rendered in your browser or exported as JSON files. 
 
 ## Example Diagram
 
@@ -103,12 +110,12 @@ let model = moduleStructure({rootDir: "/path/to/some/codebase"});
         "type": "string",
         "required": true
       },
-      "isGroup": {
-        "type": "boolean",
-        "required": true
-      },
       "name": {
         "type": "string",
+        "required": true
+      },
+      "isGroup": {
+        "type": "boolean",
         "required": true
       },
       "rows": {
@@ -126,6 +133,24 @@ let model = moduleStructure({rootDir: "/path/to/some/codebase"});
     }
   },
   "dependencies": {
+    "type": "array",
+    "required": true,
+    "items": {
+      "type": "dependency",
+      "required": false,
+      "properties": {
+        "from": {
+          "type": "string",
+          "required": true
+        },
+        "to": {
+          "type": "string",
+          "required": true
+        }
+      }
+    }
+  },
+  "feedbacks": {
     "type": "array",
     "required": true,
     "items": {

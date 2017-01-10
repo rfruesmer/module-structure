@@ -229,5 +229,11 @@
       "from": "ecommerce-sample.shared.customer-repository.js",
       "to": "ecommerce-sample.shared.customer.js"
     }
+  ],
+  "feedbacks": [
+    {
+      "from": "ecommerce-sample.sales.sales-service.js",
+      "to": "ecommerce-sample.billing.billing-service.js"
+    }
   ]
 }

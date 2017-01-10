@@ -13,6 +13,8 @@ const expectContainsDependency = util.expectContainsDependency;
 const expectRowContainsModule = util.expectRowContainsModule;
 const findNode = util.findNode;
 const expectNodeRowsCountToEqual = util.expectNodeRowsCountToEqual;
+const expectFeedbackCountToEqual = util.expectFeedbackCountToEqual;
+const expectContainsFeedback = util.expectContainsFeedback;
 
 
 describe("nested-packages-01", function() {
@@ -51,7 +53,7 @@ describe("nested-packages-01", function() {
 
             it("package-b contains package-bb", function () {
                 let row = test.viewModel.root.rows[0];
-                let node = findNode("nested-packages-01.package-b", row);
+                const node = findNode("nested-packages-01.package-b", row);
                 expectNodeRowsCountToEqual(node, 1);
 
                 row = node.rows[0];
@@ -75,7 +77,7 @@ describe("nested-packages-01", function() {
             });
 
             it("second row contains package-a", function () {
-                let row = test.viewModel.root.rows[1];
+                const row = test.viewModel.root.rows[1];
                 expectRowNodesCountToEqual(row, 1);
 
                 expectRowContainsPackage(row, "nested-packages-01.package-a", "package-a");
@@ -83,7 +85,7 @@ describe("nested-packages-01", function() {
 
             it("package-b contains package-aa, module-a1 and module-a2", function () {
                 let row = test.viewModel.root.rows[1];
-                let node = findNode("nested-packages-01.package-a", row);
+                const node = findNode("nested-packages-01.package-a", row);
                 expectNodeRowsCountToEqual(node, 2);
 
                 row = node.rows[0];
@@ -144,6 +146,20 @@ describe("nested-packages-01", function() {
             it("contains dependency from module-aab to module-a2", function() {
                 expectContainsDependency(test.viewModel, "nested-packages-01.package-a.package-aa.module-aab" + test.extension,
                     "nested-packages-01.package-a.module-a2" + test.extension);
+            });
+
+            it("contains two feedbacks", function() {
+                expectFeedbackCountToEqual(test.viewModel, 2);
+            });
+
+            it("contains feedback from module-aaa to module-bb", function() {
+                expectContainsFeedback(test.viewModel, "nested-packages-01.package-a.package-aa.module-aaa" + test.extension,
+                    "nested-packages-01.package-b.package-bb.module-bb" + test.extension);
+            });
+
+            it("contains feedback from module-aab to module-bb", function() {
+                expectContainsFeedback(test.viewModel, "nested-packages-01.package-a.package-aa.module-aab" + test.extension,
+                    "nested-packages-01.package-b.package-bb.module-bb" + test.extension);
             });
         });
     });

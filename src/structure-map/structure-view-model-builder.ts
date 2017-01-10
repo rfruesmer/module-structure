@@ -12,11 +12,12 @@ const checkArgument = preconditions.checkArgument;
 
 export class StructureViewModelBuilder {
     private viewModel: StructureViewModel;
-
+    private visitedModules: any;
 
     public build(structureMap: StructureMapPackage): StructureViewModel {
         checkArgument(structureMap);
 
+        this.visitedModules = {};
         this.viewModel = new StructureViewModel();
         this.viewModel.root = this.buildInternal(structureMap);
 
@@ -76,7 +77,13 @@ export class StructureViewModelBuilder {
             viewModelDependency.to = dependency.name;
 
             this.viewModel.dependencies.push(viewModelDependency);
+
+            if (this.visitedModules[dependency.name]) {
+                this.viewModel.feedbacks.push(viewModelDependency);
+            }
         });
+
+        this.visitedModules[module.name] = module;
 
         return node;
     }

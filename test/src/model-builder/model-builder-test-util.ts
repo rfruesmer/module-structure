@@ -85,3 +85,13 @@ export function expectContainsDependency(viewModel: StructureViewModel, from: st
     let searchResult = viewModel.dependencies.filter(dependency => dependency.from === from && dependency.to === to);
     expect(searchResult).to.have.length(1);
 }
+
+export function expectFeedbackCountToEqual(viewModel: StructureViewModel, expectedCount: number) {
+    expect(viewModel).to.have.property("feedbacks");
+    expect(viewModel.feedbacks).to.have.length(expectedCount);
+}
+
+export function expectContainsFeedback(viewModel: StructureViewModel, from: string, to: string): void {
+    let searchResult = viewModel.feedbacks.filter(feedback => feedback.from === from && feedback.to === to);
+    expect(searchResult).to.have.length(1);
+}

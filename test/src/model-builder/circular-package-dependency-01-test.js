@@ -11,6 +11,8 @@ const expectRowContainsPackage = util.expectRowContainsPackage;
 const expectDependencyCountToEqual = util.expectDependencyCountToEqual;
 const expectContainsDependency = util.expectContainsDependency;
 const expectPackageContainsSingleModule = util.expectPackageContainsSingleModule;
+const expectFeedbackCountToEqual = util.expectFeedbackCountToEqual;
+const expectContainsFeedback = util.expectContainsFeedback;
 
 
 describe("circular-package-dependency-01", function() {
@@ -119,6 +121,15 @@ describe("circular-package-dependency-01", function() {
             it("contains dependency from module-c to module-d", function() {
                 expectContainsDependency(test.viewModel, "circular-package-dependency-01.package-c.module-c" + test.extension,
                     "circular-package-dependency-01.package-d.module-d" + test.extension);
+            });
+
+            it("contains one feedback", function() {
+                expectFeedbackCountToEqual(test.viewModel, 1);
+            });
+
+            it("contains feedback from module-c to module-e", function() {
+                expectContainsFeedback(test.viewModel, "circular-package-dependency-01.package-c.module-c" + test.extension,
+                    "circular-package-dependency-01.package-e.module-e" + test.extension);
             });
         });
     });

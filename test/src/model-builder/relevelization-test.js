@@ -11,6 +11,7 @@ const expectRowContainsPackage = util.expectRowContainsPackage;
 const expectDependencyCountToEqual = util.expectDependencyCountToEqual;
 const expectContainsDependency = util.expectContainsDependency;
 const expectPackageContainsSingleModule = util.expectPackageContainsSingleModule;
+const expectFeedbackCountToEqual = util.expectFeedbackCountToEqual;
 
 
 describe("relevelization", function() {
@@ -101,6 +102,10 @@ describe("relevelization", function() {
             it("contains dependency from module project to module logger-context", function() {
                 expectContainsDependency(test.viewModel, "relevelization.project.project" + test.extension,
                     "relevelization.logging.logger-context" + test.extension);
+            });
+
+            it("contains no feedbacks", function() {
+                expectFeedbackCountToEqual(test.viewModel, 0);
             });
         });
     });

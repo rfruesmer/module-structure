@@ -158,5 +158,6 @@
             "from": "ecommerce-sample.shared.customer-repository.js",
             "to": "ecommerce-sample.shared.customer.js"
         }
-    ]
+    ],
+    "feedbacks": []
 }

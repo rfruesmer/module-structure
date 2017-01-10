@@ -14,6 +14,8 @@ const expectContainsDependency = util.expectContainsDependency;
 const expectRowContainsModule = util.expectRowContainsModule;
 const expectNodeRowsCountToEqual = util.expectNodeRowsCountToEqual;
 const findNode = util.findNode;
+const expectFeedbackCountToEqual = util.expectFeedbackCountToEqual;
+const expectContainsFeedback = util.expectContainsFeedback;
 
 
 describe("ecommerce-sample", function() {
@@ -225,6 +227,15 @@ describe("ecommerce-sample", function() {
             it("contains dependency from customer-repository to customer", function() {
                 expectContainsDependency(test.viewModel, "ecommerce-sample.shared.customer-repository" + test.extension,
                     "ecommerce-sample.shared.customer" + test.extension);
+            });
+
+            it("contains one feedback", function() {
+                expectFeedbackCountToEqual(test.viewModel, 1);
+            });
+
+            it("contains feedback from sales-service to billing-service", function() {
+                expectContainsFeedback(test.viewModel, "ecommerce-sample.sales.sales-service" + test.extension,
+                    "ecommerce-sample.billing.billing-service" + test.extension);
             });
         });
     });

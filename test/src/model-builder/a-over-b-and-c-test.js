@@ -11,6 +11,7 @@ const expectRowContainsPackage = util.expectRowContainsPackage;
 const expectPackageContainsSingleModule = util.expectPackageContainsSingleModule;
 const expectDependencyCountToEqual = util.expectDependencyCountToEqual;
 const expectContainsDependency = util.expectContainsDependency;
+const expectFeedbackCountToEqual = util.expectFeedbackCountToEqual;
 
 
 describe("a-over-b-and-c", function() {
@@ -84,6 +85,10 @@ describe("a-over-b-and-c", function() {
             it("contains dependency from module-a to module-c", function () {
                 expectContainsDependency(test.viewModel, "a-over-b-and-c.package-a.module-a" + test.extension,
                     "a-over-b-and-c.package-c.module-c" + test.extension);
+            });
+
+            it("contains no feedbacks", function() {
+                expectFeedbackCountToEqual(test.viewModel, 0);
             });
         });
     });
