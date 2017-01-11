@@ -14,6 +14,8 @@ export class StructureView implements StructureViewObjectListener {
     private dependenciesMap: any = {};
     private visibleLeafsMap: any = {};
     private arrowsMap: any = {};
+    private filteredDependencies: Array<string> = [];
+    private dependencyDisplayMode: DependencyDisplayMode = DependencyDisplayMode.ALL;
 
 
     public show(model: StructureViewModel) {
@@ -162,6 +164,7 @@ export class StructureView implements StructureViewObjectListener {
     private subscribe(): void {
         this.rootNode.addListener(this);
         window.addEventListener("resize", () => this.resize());
+        document.addEventListener("keydown", event => this.onKeyDown(event));
     }
 
     private makeVisible(): void {
@@ -227,7 +230,7 @@ export class StructureView implements StructureViewObjectListener {
 
     private createDependencyArrowsOf(node: StructureViewNode): void {
         let visibleLeafs = this.getVisibleLeafs(node);
-        this.createDependencyArrows(this.dependenciesMap, visibleLeafs);
+        this.createDependencyArrows(visibleLeafs);
     }
 
     private getVisibleLeafs(node: StructureViewNode): Array<StructureViewNode> {
@@ -249,11 +252,11 @@ export class StructureView implements StructureViewObjectListener {
         return visibleLeafs;
     }
 
-    private createDependencyArrows(dependenciesMap: any, visibleLeafs: Array<StructureViewNode>) {
+    private createDependencyArrows(visibleLeafs: Array<StructureViewNode>) {
         visibleLeafs
-            .filter(leaf => dependenciesMap[leaf.model.id] !== undefined)
+            .filter(leaf => this.dependenciesMap[leaf.model.id] !== undefined)
             .forEach(leaf => {
-                (dependenciesMap[leaf.model.id] as Array<string>)
+                (this.dependenciesMap[leaf.model.id] as Array<string>)
                     .map(dependency => this.visibleLeafsMap[dependency])
                     .filter(target => target !== undefined && target !== leaf)
                     .forEach(target => this.createDependencyArrow(leaf, target));
@@ -261,6 +264,18 @@ export class StructureView implements StructureViewObjectListener {
     }
 
     private createDependencyArrow(source: StructureViewNode, target: StructureViewNode): void {
+        if (this.dependencyDisplayMode === DependencyDisplayMode.SELECTED
+                && this.filteredDependencies.indexOf(source.model.id) === -1
+                && this.filteredDependencies.indexOf(target.model.id) === -1) {
+            return;
+        }
+
+        if (this.dependencyDisplayMode === DependencyDisplayMode.BETWEEN
+                && (this.filteredDependencies.indexOf(source.model.id) === -1
+                        || this.filteredDependencies.indexOf(target.model.id) === -1)) {
+            return;
+        }
+
         let entry = this.arrowsMap[source.model.id];
         if (entry && entry.target === target) {
             return;
@@ -424,17 +439,28 @@ export class StructureView implements StructureViewObjectListener {
         else {
             this.setSelection(targetNode);
         }
+
+        this.filterDependencies();
+        this.updateDependencyArrows();
     }
 
     private toggleSelection(node: StructureViewNode): void {
+        node.selected = !node.selected;
+
         if (node.selected) {
-            this.selectionService.removeFromSelection(node);
+            this.selectionService.addToSelection(node);
+            let index = this.filteredDependencies.indexOf(node.model.id);
+            if (index === -1) {
+                this.filteredDependencies.push(node.model.id);
+            }
         }
         else {
-            this.selectionService.addToSelection(node);
+            this.selectionService.removeFromSelection(node);
+            let index = this.filteredDependencies.indexOf(node.model.id);
+            if (index > -1) {
+                this.filteredDependencies.splice(index, 1);
+            }
         }
-
-        node.selected = !node.selected;
     }
 
     private setSelection(node: StructureViewNode) {
@@ -442,4 +468,57 @@ export class StructureView implements StructureViewObjectListener {
         this.selectionService.setSelection([node]);
         node.selected = true;
     }
+
+    private onKeyDown(event: KeyboardEvent) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        if (event.key === "d" && event.altKey) {
+            this.showAllDependencies();
+        }
+        else if (event.key === "s" && event.altKey) {
+            this.showDependenciesOnSelected();
+        }
+        else if (event.key === "b" && event.altKey) {
+            this.showDependenciesBetweenSelected();
+        }
+    }
+
+    private showAllDependencies() {
+        this.resetDependencyFilter(DependencyDisplayMode.ALL);
+        this.updateDependencyArrows();
+    }
+
+    private resetDependencyFilter(mode: DependencyDisplayMode) {
+        this.dependencyDisplayMode = mode;
+        this.filteredDependencies = [];
+    }
+
+    private updateDependencyArrows() {
+        this.removeDependencyArrows();
+        this.createDependencyArrowsOf(this.rootNode);
+    }
+
+    private showDependenciesOnSelected() {
+        this.resetDependencyFilter(DependencyDisplayMode.SELECTED);
+        this.filterDependencies();
+        this.updateDependencyArrows();
+    }
+
+    private filterDependencies() {
+        this.filteredDependencies = [];
+        this.selectionService.getSelection().forEach(node => this.filteredDependencies.push(node.model.id));
+    }
+
+    private showDependenciesBetweenSelected() {
+        this.resetDependencyFilter(DependencyDisplayMode.BETWEEN);
+        this.filterDependencies();
+        this.updateDependencyArrows();
+    }
+}
+
+enum DependencyDisplayMode {
+    ALL,
+    SELECTED,
+    BETWEEN
 }
