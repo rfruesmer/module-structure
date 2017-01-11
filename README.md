@@ -63,7 +63,7 @@ Requires a recent Node.js installation (6.x/7.x).
 `module-structure --rootDir directory`           
 
 Create structure map and display in default browser. Refreshing the browser repeats the structure analysis 
-and updates the browser, useful after modifications to the code base:
+and updates the browser, useful after modifications to the code base.
 
 `module-structure --rootDir directory  --outFile file`           
 
