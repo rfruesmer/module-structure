@@ -33,6 +33,21 @@ Generated LSMs can be rendered in your browser or exported as JSON files.
     <li>Hover dependency arrows to enlarge them - useful to distinguish overlapping lines</li>
 </ul>
 
+## Diagram Viewer
+
+The Diagram Viewer is automatically started in your default browser if invoked without outFile argument (see CLI/API documentation below).
+
+There's no UI like a toolbar or context menu yet (maybe coming for version 2.0).
+
+But for now, it's already possible to influence display of dependencies with the following keyboard shortcuts:
+
+| Shortcut    | Function                                 |
+|:------------|:-----------------------------------------|
+| Ctrl+Click  | Add/Remove nodes from selection          | 
+| Alt+D       | Show all dependencies (default)          |
+| Alt+S       | Show dependencies on selected nodes      |
+| Alt+B       | Show dependencies between selected nodes |
+
 ## Prerequisites
 
 Requires a recent Node.js installation (6.x/7.x).
