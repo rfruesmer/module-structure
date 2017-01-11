@@ -27,4 +27,10 @@ export class StructureViewObject {
             listener.onSizeChanged(this);
         }
     }
+
+    protected notifyClicked(target: StructureViewObject, event: JQueryEventObject): void {
+        for (let listener of this.listeners) {
+            listener.onClicked(target, event);
+        }
+    }
 }

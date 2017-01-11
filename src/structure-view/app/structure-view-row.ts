@@ -81,4 +81,8 @@ export class StructureViewNodeRow extends StructureViewObject implements Structu
     onExpanded(target: StructureViewObject): void {
         this.notifyExpanded(target);
     }
+
+    onClicked(target: StructureViewObject, event: JQueryEventObject): void {
+        this.notifyClicked(target, event);
+    }
 }

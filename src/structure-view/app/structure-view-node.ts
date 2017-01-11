@@ -1,7 +1,6 @@
 import {StructureViewObject} from "./structure-view-object";
 import {StructureViewObjectListener} from "./structure-view-object-listener";
 import {StructureViewNodeRow} from "./structure-view-row";
-import {SelectionService} from "./selection-service";
 import {Point} from "./point";
 import {StructureViewModelNode} from "../../structure-view-model/structure-view-model-node";
 import {StructureViewUtil} from "./structure-view-util";
@@ -29,7 +28,7 @@ export class StructureViewNode extends StructureViewObject implements StructureV
     height: number = 0;
     expanded: boolean = false;
     visible: boolean;
-    selected: boolean;
+    private _selected: boolean;
 
     constructor(parent: StructureViewNode, model: StructureViewModelNode, canvas: JQuery) {
         super();
@@ -58,18 +57,18 @@ export class StructureViewNode extends StructureViewObject implements StructureV
         });
 
         this.updateRectColors();
-        this.rect.click(() => this.onClick());
+        this.rect.click(event => this.onClick(event));
         this.rect.dblclick(() => this.onDoubleClick());
         this.canvas.append(this.rect);
     }
 
     private updateRectColors(): void {
         this.rect.attr({
-            "stroke": this.selected ? "#ddcb00" : this.model.isGroup ? "#7cbe00" : "#70B8A8"
+            "stroke": this._selected ? "#ddcb00" : this.model.isGroup ? "#7cbe00" : "#70B8A8"
         });
         this.rect.css({
             "fill-opacity": this.expanded ? 1.0 : 0.0,
-            "stroke-opacity": this.expanded || this.selected ? 1.0 : 0.0
+            "stroke-opacity": this.expanded || this._selected ? 1.0 : 0.0
         });
     }
 
@@ -86,7 +85,7 @@ export class StructureViewNode extends StructureViewObject implements StructureV
             "height": StructureViewNode.ICON_SIZE
         });
         this.icon.get(0).setAttributeNS("http://www.w3.org/1999/xlink", "href", iconFile);
-        this.icon.click(() => this.onClick());
+        this.icon.click(event => this.onClick(event));
         this.icon.dblclick(() => this.onDoubleClick());
         this.canvas.append(this.icon);
     }
@@ -104,25 +103,26 @@ export class StructureViewNode extends StructureViewObject implements StructureV
             "font-size": "12px"
         });
         this.text.text(this.model.name);
-        this.text.click(() => this.onClick());
+        this.text.click(event => this.onClick(event));
         this.text.dblclick(() => this.onDoubleClick());
         this.canvas.append(this.text);
     }
 
-    private onClick() {
-        this.setSelected(true);
+    private onClick(event: JQueryEventObject): void {
+        this.notifyClicked(this, event);
     }
 
-    public setSelected(selected: boolean): void {
-        this.selected = selected;
+    public set selected(selected: boolean) {
+        this._selected = selected;
         this.updateRectColors();
-        if (selected) {
-            SelectionService.setSelection(this);
-        }
+    }
+
+    public get selected() {
+        return this._selected;
     }
 
     private onDoubleClick(): void {
-        this.setSelected(true);
+        this.selected = true;
         this.toggle();
     }
 
@@ -281,5 +281,9 @@ export class StructureViewNode extends StructureViewObject implements StructureV
 
     onExpanded(target: StructureViewObject): void {
         this.notifyExpanded(target);
+    }
+
+    onClicked(target: StructureViewObject, event: JQueryEventObject): void {
+        this.notifyClicked(target, event);
     }
 }

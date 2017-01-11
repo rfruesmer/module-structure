@@ -1,27 +1,34 @@
-import {StructureViewObject} from "./structure-view-object";
-import {SelectionListener} from "./selection-listener";
 import {StructureViewNode} from "./structure-view-node";
 
 
 export class SelectionService {
-    static selection: StructureViewObject;
-    static selectionListeners: Array<SelectionListener> = [];
+    private selection: Array<StructureViewNode> = [];
 
-    public static addListener(listener: SelectionListener): void {
-        if (this.selectionListeners.indexOf(listener) === -1) {
-            this.selectionListeners.push(listener);
-        }
-    }
 
-    public static setSelection(selection: StructureViewNode): void {
-        if (SelectionService.selection === selection) {
+    public setSelection(selection: Array<StructureViewNode>): void {
+        if (this.selection === selection) {
             return;
         }
 
-        SelectionService.selection = selection;
+        this.selection = selection ? selection : [];
+    }
 
-        for (let listener of SelectionService.selectionListeners) {
-            listener.onSelectionChanged(selection);
+    public getSelection(): Array<StructureViewNode> {
+        return this.selection.slice();
+    }
+
+    public addToSelection(node: StructureViewNode): void {
+        if (this.selection.indexOf(node) === -1) {
+            this.selection.push(node);
         }
+    }
+
+    public removeFromSelection(node: StructureViewNode): void {
+        let index = this.selection.indexOf(node);
+        if (index === -1) {
+            return;
+        }
+
+        this.selection.splice(index, 1);
     }
 }

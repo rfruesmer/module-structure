@@ -2,16 +2,15 @@ import {StructureViewObjectListener} from "./structure-view-object-listener";
 import {SelectionService} from "./selection-service";
 import {StructureViewNode} from "./structure-view-node";
 import {StructureViewObject} from "./structure-view-object";
-import {SelectionListener} from "./selection-listener";
 import {StructureViewModel} from "../../structure-view-model/structure-view-model";
 import {Point} from "./point";
 import {StructureViewUtil} from "./structure-view-util";
 
 
-export class StructureView implements StructureViewObjectListener, SelectionListener {
+export class StructureView implements StructureViewObjectListener {
     private canvas: JQuery;
     private rootNode: StructureViewNode;
-    private selection: StructureViewNode;
+    private selectionService = new SelectionService();
     private dependenciesMap: any = {};
     private visibleLeafsMap: any = {};
     private arrowsMap: any = {};
@@ -162,20 +161,12 @@ export class StructureView implements StructureViewObjectListener, SelectionList
 
     private subscribe(): void {
         this.rootNode.addListener(this);
-        SelectionService.addListener(this);
         window.addEventListener("resize", () => this.resize());
     }
 
     private makeVisible(): void {
         this.rootNode.setVisible(true);
         this.rootNode.expand();
-    }
-
-    onSelectionChanged(selection: StructureViewNode): void {
-        if (this.selection) {
-            this.selection.setSelected(false);
-        }
-        this.selection = selection;
     }
 
     onCollapsed(target: StructureViewObject): void {
@@ -419,5 +410,36 @@ export class StructureView implements StructureViewObjectListener, SelectionList
 
     onSizeChanged(target: StructureViewObject): void {
         this.resize();
+    }
+
+    onClicked(target: StructureViewObject, event: JQueryEventObject): void {
+        if (!(target instanceof StructureViewNode)) {
+            return;
+        }
+
+        let targetNode = target as StructureViewNode;
+        if (event.ctrlKey) {
+            this.toggleSelection(targetNode);
+        }
+        else {
+            this.setSelection(targetNode);
+        }
+    }
+
+    private toggleSelection(node: StructureViewNode): void {
+        if (node.selected) {
+            this.selectionService.removeFromSelection(node);
+        }
+        else {
+            this.selectionService.addToSelection(node);
+        }
+
+        node.selected = !node.selected;
+    }
+
+    private setSelection(node: StructureViewNode) {
+        this.selectionService.getSelection().forEach(node => node.selected = false);
+        this.selectionService.setSelection([node]);
+        node.selected = true;
     }
 }
