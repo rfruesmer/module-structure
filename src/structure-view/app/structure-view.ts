@@ -470,23 +470,28 @@ export class StructureView implements StructureViewObjectListener {
     }
 
     private onKeyDown(event: KeyboardEvent) {
-        event.preventDefault();
-        event.stopPropagation();
-
         if (event.key === "d" && event.altKey) {
             this.showAllDependencies();
+            this.stopPropagation(event);
         }
         else if (event.key === "s" && event.altKey) {
             this.showDependenciesOnSelected();
+            this.stopPropagation(event);
         }
         else if (event.key === "b" && event.altKey) {
             this.showDependenciesBetweenSelected();
+            this.stopPropagation(event);
         }
     }
 
     private showAllDependencies() {
         this.resetDependencyFilter(DependencyDisplayMode.ALL);
         this.updateDependencyArrows();
+    }
+
+    private stopPropagation(event: KeyboardEvent) {
+        event.preventDefault();
+        event.stopPropagation();
     }
 
     private resetDependencyFilter(mode: DependencyDisplayMode) {
