@@ -4,7 +4,7 @@ import {StructureViewNode} from "./structure-view-node";
 import {StructureViewModelNode} from "../../structure-view-model/structure-view-model-node";
 
 
-export class StructureViewNodeRow extends StructureViewObject implements StructureViewObjectListener {
+export class StructureViewRow extends StructureViewObject implements StructureViewObjectListener {
     nodes: Array<StructureViewNode> = [];
     x: number = 0;
     y: number = 0;
@@ -84,5 +84,9 @@ export class StructureViewNodeRow extends StructureViewObject implements Structu
 
     onClicked(target: StructureViewObject, event: JQueryEventObject): void {
         this.notifyClicked(target, event);
+    }
+
+    onDoubleClicked(target: StructureViewObject, event: JQueryEventObject): void {
+        this.notifyDoubleClicked(target, event);
     }
 }

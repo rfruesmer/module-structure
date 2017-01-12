@@ -271,8 +271,7 @@ export class StructureView implements StructureViewObjectListener {
         }
 
         if (this.dependencyDisplayMode === DependencyDisplayMode.BETWEEN
-                && (this.filteredDependencies.indexOf(source.model.id) === -1
-                        || this.filteredDependencies.indexOf(target.model.id) === -1)) {
+                && !this.filteredDependenciesInclude(source, target)) {
             return;
         }
 
@@ -286,6 +285,42 @@ export class StructureView implements StructureViewObjectListener {
             : this.createUpPathSpec(source, target);
         let path = this.createArrowPath(pathDesc, source, target);
         this.mapArrow(source, target, path);
+    }
+
+    private filteredDependenciesInclude(source: StructureViewNode, target: StructureViewNode) {
+        if (!source.selected || !target.selected) {
+            if (this.isInsideSameSelectedNode(source, target)) {
+                return false;
+            }
+        }
+
+        let foundSource = false;
+        let foundTarget = false;
+
+        for (let filteredDependency of this.filteredDependencies) {
+            if (source.model.id.indexOf(filteredDependency) === 0) {
+                foundSource = true;
+            }
+            if (target.model.id.indexOf(filteredDependency) === 0) {
+                foundTarget = true;
+            }
+
+            if (foundSource && foundTarget) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private isInsideSameSelectedNode(source: StructureViewNode, target: StructureViewNode): boolean {
+        for (let selectedNode of this.selectionService.getSelection()) {
+            if (selectedNode.isParentOf(source) && selectedNode.isParentOf(target)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private createDownPathSpec(source: StructureViewNode, target: StructureViewNode): any {
@@ -448,18 +483,26 @@ export class StructureView implements StructureViewObjectListener {
         node.selected = !node.selected;
 
         if (node.selected) {
-            this.selectionService.addToSelection(node);
-            let index = this.filteredDependencies.indexOf(node.model.id);
-            if (index === -1) {
-                this.filteredDependencies.push(node.model.id);
-            }
+            this.deselect(node);
         }
         else {
-            this.selectionService.removeFromSelection(node);
-            let index = this.filteredDependencies.indexOf(node.model.id);
-            if (index > -1) {
-                this.filteredDependencies.splice(index, 1);
-            }
+            this.select(node);
+        }
+    }
+
+    private deselect(node: StructureViewNode) {
+        this.selectionService.addToSelection(node);
+        let index = this.filteredDependencies.indexOf(node.model.id);
+        if (index === -1) {
+            this.filteredDependencies.push(node.model.id);
+        }
+    }
+
+    private select(node: StructureViewNode) {
+        this.selectionService.removeFromSelection(node);
+        let index = this.filteredDependencies.indexOf(node.model.id);
+        if (index > -1) {
+            this.filteredDependencies.splice(index, 1);
         }
     }
 
@@ -512,11 +555,29 @@ export class StructureView implements StructureViewObjectListener {
 
     private filterDependencies() {
         this.filteredDependencies = [];
-        this.selectionService.getSelection().forEach(node => this.filteredDependencies.push(node.model.id));
+        this.selectionService.getSelection().forEach(node => this.filterDependenciesOf(node));
+    }
+
+    private filterDependenciesOf(node) {
+        if (!node.expanded) {
+            this.filteredDependencies.push(node.model.id);
+            return;
+        }
+
+        node.rows.forEach(row => row.nodes.forEach(rowNode => this.filterDependenciesOf(rowNode)));
     }
 
     private showDependenciesBetweenSelected() {
         this.resetDependencyFilter(DependencyDisplayMode.BETWEEN);
+        this.filterDependencies();
+        this.updateDependencyArrows();
+    }
+
+    public onDoubleClicked(target: StructureViewObject, event: JQueryEventObject): void {
+        if (!(target instanceof StructureViewNode)) {
+            return;
+        }
+
         this.filterDependencies();
         this.updateDependencyArrows();
     }

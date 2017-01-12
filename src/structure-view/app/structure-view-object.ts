@@ -33,4 +33,10 @@ export class StructureViewObject {
             listener.onClicked(target, event);
         }
     }
+
+    protected notifyDoubleClicked(target: StructureViewObject, event: JQueryEventObject): void {
+        for (let listener of this.listeners) {
+            listener.onDoubleClicked(target, event);
+        }
+    }
 }

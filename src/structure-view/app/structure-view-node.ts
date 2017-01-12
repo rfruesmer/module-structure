@@ -1,6 +1,6 @@
 import {StructureViewObject} from "./structure-view-object";
 import {StructureViewObjectListener} from "./structure-view-object-listener";
-import {StructureViewNodeRow} from "./structure-view-row";
+import {StructureViewRow} from "./structure-view-row";
 import {Point} from "./point";
 import {StructureViewModelNode} from "../../structure-view-model/structure-view-model-node";
 import {StructureViewUtil} from "./structure-view-util";
@@ -21,7 +21,7 @@ export class StructureViewNode extends StructureViewObject implements StructureV
     text: JQuery;
     model: StructureViewModelNode;
     parent: StructureViewNode;
-    rows: Array<StructureViewNodeRow> = [];
+    rows: Array<StructureViewRow> = [];
     x: number = 0;
     y: number = 0;
     width: number = 0;
@@ -58,7 +58,7 @@ export class StructureViewNode extends StructureViewObject implements StructureV
 
         this.updateRectColors();
         this.rect.click(event => this.onClick(event));
-        this.rect.dblclick(() => this.onDoubleClick());
+        this.rect.dblclick(event => this.onDoubleClick(event));
         this.canvas.append(this.rect);
     }
 
@@ -86,7 +86,7 @@ export class StructureViewNode extends StructureViewObject implements StructureV
         });
         this.icon.get(0).setAttributeNS("http://www.w3.org/1999/xlink", "href", iconFile);
         this.icon.click(event => this.onClick(event));
-        this.icon.dblclick(() => this.onDoubleClick());
+        this.icon.dblclick(event => this.onDoubleClick(event));
         this.canvas.append(this.icon);
     }
 
@@ -104,7 +104,7 @@ export class StructureViewNode extends StructureViewObject implements StructureV
         });
         this.text.text(this.model.name);
         this.text.click(event => this.onClick(event));
-        this.text.dblclick(() => this.onDoubleClick());
+        this.text.dblclick(event => this.onDoubleClick(event));
         this.canvas.append(this.text);
     }
 
@@ -121,9 +121,10 @@ export class StructureViewNode extends StructureViewObject implements StructureV
         return this._selected;
     }
 
-    private onDoubleClick(): void {
+    private onDoubleClick(event: JQueryEventObject): void {
         this.selected = true;
         this.toggle();
+        this.notifyDoubleClicked(this, event);
     }
 
     public toggle(): void {
@@ -156,7 +157,7 @@ export class StructureViewNode extends StructureViewObject implements StructureV
         }
 
         for (let row of this.model.rows) {
-            let viewRow = new StructureViewNodeRow(this, row, this.canvas);
+            let viewRow = new StructureViewRow(this, row, this.canvas);
             viewRow.addListener(this);
             this.rows.push(viewRow);
         }
@@ -285,5 +286,22 @@ export class StructureViewNode extends StructureViewObject implements StructureV
 
     onClicked(target: StructureViewObject, event: JQueryEventObject): void {
         this.notifyClicked(target, event);
+    }
+
+    onDoubleClicked(target: StructureViewObject, event: JQueryEventObject): void {
+        this.notifyDoubleClicked(target, event);
+    }
+
+    isParentOf(source: StructureViewNode) {
+        let parent = source.parent;
+        while (parent !== null) {
+            if (parent === this) {
+                return true;
+            }
+
+            parent = parent.parent;
+        }
+
+        return false;
     }
 }

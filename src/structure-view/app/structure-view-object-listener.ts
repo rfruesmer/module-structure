@@ -5,4 +5,5 @@ export interface StructureViewObjectListener {
     onExpanded(target: StructureViewObject): void;
     onSizeChanged(target: StructureViewObject): void;
     onClicked(target: StructureViewObject, event: JQueryEventObject): void;
+    onDoubleClicked(target: StructureViewObject, event: JQueryEventObject): void;
 }
