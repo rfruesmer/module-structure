@@ -9,3 +9,4 @@ catch (e) {
     // already logged
     process.exit(e === null ? 0 : -1);
 }
+
