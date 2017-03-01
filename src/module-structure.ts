@@ -92,9 +92,11 @@ function isTemporaryExport(): boolean {
 }
 
 function deployWebApp() {
-    if (config.debug) {
+    if (!isTemporaryExport() || config.debug) {
         return;
     }
+
+    logger.info("Deploying web-app ...");
 
     let sourceDir = path.join(installedPath, "dist", "web-app");
     let destDir = isTemporaryExport() ? getTempDir() : path.dirname(config.outFile);
