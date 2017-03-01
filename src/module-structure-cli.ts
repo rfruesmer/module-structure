@@ -49,11 +49,17 @@ export class Application {
             description: "Pretty-print the generated structure map JSON-file."
         },
         {
+            name: "inputFile",
+            type: String,
+            typeLabel: "[underline]{file}",
+            description: "Skips the analysis step and directly renders the specified input model file as a diagram in your default browser."
+        },
+        {
             name: "port",
             alias: "p",
             defaultValue: 3000,
             typeLabel: "[underline]{port}",
-            description: "Port for serving the included viewer webapp (defaults to 3000). Omitted if --outFile is specified."
+            description: "Port for serving the included viewer webapp (defaults to 3000). Omitted if neither --outFile or --inFile are specified."
         }
     ];
     private config: any = {logging: true};
@@ -113,6 +119,7 @@ export class Application {
         this.processRootDirArgument();
         this.processOutFileArgument();
         this.processExcludeArgument();
+        this.processInputFileArgument();
         this.processPrettyArgument();
         this.processPortArgument();
     }
@@ -136,11 +143,11 @@ export class Application {
     }
 
     private processRootDirArgument(): void {
-        if (!this.options.rootDir) {
+        if (!this.options.rootDir && !this.options.inputFile) {
             Application.exitWithFailure("Missing --rootDir argument.");
         }
 
-        if (!ModuleStructureConfiguration.checkRootDir(this.options.rootDir)) {
+        if (!ModuleStructureConfiguration.checkRootDir(this.options)) {
             Application.exitWithFailure("Invalid --rootDir argument.");
         }
 
@@ -158,6 +165,13 @@ export class Application {
 
     private processExcludeArgument(): void {
         this.config.exclude = this.options.exclude ? this.options.exclude : [];
+    }
+
+    private processInputFileArgument() {
+        if (this.options.inputFile) {
+            this.config.open = true;
+        }
+        this.config.inputFile = this.options.inputFile;
     }
 
     private processPrettyArgument(): void {

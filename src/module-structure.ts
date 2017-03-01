@@ -31,12 +31,26 @@ export function moduleStructure(options: any): StructureViewModel {
     injectDependencies(arguments);
     buildConfiguration(options);
     configureLogging();
-    buildTemporaryOutFilePath();
-    deployWebApp();
-    createStructureMap();
-    createViewModel();
-    exportViewModel();
-    showViewModel();
+
+    if (isTemporaryExport()) {
+        deployWebAppToTempDir();
+    }
+
+    if (isCreateViewModel(options)) {
+        createStructureMap();
+        createViewModel();
+    }
+    else {
+        readViewModel(options.inputFile);
+    }
+
+    if (isExportViewModel()) {
+        exportViewModel();
+    }
+
+    if (isShowViewModel()) {
+        showViewModel();
+    }
 
     return viewModel;
 }
@@ -59,6 +73,24 @@ function buildConfiguration(options: any): void {
     config.debug = installedPath.length === 0;
 }
 
+function getInstalledPath(): string {
+    try {
+        return getInstalledPathSync(project.name, {local: true});
+    }
+    catch (e) {
+        // ignored
+    }
+
+    try {
+        return getInstalledPathSync(project.name);
+    }
+    catch (e) {
+        // ignored
+    }
+
+    return "";
+}
+
 function configureLogging(): void {
     let log4jsConfig = {
         appenders: [
@@ -77,22 +109,25 @@ function configureLogging(): void {
     logger.setLevel(config.logging ? log4js.levels.INFO : log4js.levels.OFF);
 }
 
-function buildTemporaryOutFilePath(): void {
-    if (!isTemporaryExport()) {
-        return;
-    }
+function isTemporaryExport(): boolean {
+    return config.open && config.outFile.length === 0;
+}
 
+
+function buildTemporaryOutFilePath(): void {
     config.outFile = config.debug
         ? path.join(process.cwd(), "src/structure-view/data/module-structure.json")
         : path.join(getTempDir(), "module-structure.json");
 }
 
-function isTemporaryExport(): boolean {
-    return config.open && config.outFile.length === 0;
+function isDebugMode() {
+    return config.debug;
 }
 
-function deployWebApp() {
-    if (!isTemporaryExport() || config.debug) {
+function deployWebAppToTempDir() {
+    buildTemporaryOutFilePath();
+
+    if (isDebugMode()) {
         return;
     }
 
@@ -110,22 +145,8 @@ function getTempDir() {
     return path.join(os.tmpdir(), TEMP_DIR);
 }
 
-function getInstalledPath(): string {
-    try {
-        return getInstalledPathSync(project.name, {local: true});
-    }
-    catch (e) {
-        // ignored
-    }
-
-    try {
-        return getInstalledPathSync(project.name);
-    }
-    catch (e) {
-        // ignored
-    }
-
-    return "";
+function isCreateViewModel(options: any) {
+    return !options.inputFile;
 }
 
 function createStructureMap(): void {
@@ -157,11 +178,15 @@ function createViewModel(): void {
     stopProcessing();
 }
 
-function exportViewModel(): void {
-    if (!isExportViewModel()) {
-        return;
-    }
+function readViewModel(inputFile: string) {
+    viewModel = JSON.parse(fs.readFileSync(inputFile, "utf-8"));
+}
 
+function isExportViewModel(): boolean {
+    return config.outFile.length > 0;
+}
+
+function exportViewModel(): void {
     let outDir = path.dirname(config.outFile);
     if (!fs.existsSync(outDir)) {
         fs.mkdirSync(outDir);
@@ -175,15 +200,7 @@ function exportViewModel(): void {
     fs.writeFileSync(config.outFile, JSON.stringify(viewModel, null, spacing));
 }
 
-function isExportViewModel(): boolean {
-    return config.outFile.length > 0;
-}
-
 function showViewModel(): void {
-    if (!isShowViewModel()) {
-        return;
-    }
-
     let serverRoot = path.dirname(config.outFile);
     logger.info("Starting http-server, serving from " + serverRoot);
 

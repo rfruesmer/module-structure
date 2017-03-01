@@ -15,7 +15,8 @@ const path = require("path");
         pretty: false,
         port: 3000,
         open: true,
-        logging: true
+        logging: true,
+        inputFile: undefined
     };
 
 

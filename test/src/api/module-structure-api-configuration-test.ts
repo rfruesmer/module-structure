@@ -14,19 +14,19 @@ const path = require("path");
 
     @test "checkRootDir rejects undefined rootDir"() {
         this.rootDir = undefined;
-        expect(ModuleStructureConfiguration.checkRootDir(this.rootDir)).to.be.false;
+        expect(ModuleStructureConfiguration.checkRootDir({rootDir: this.rootDir})).to.be.false;
     }
 
     @test "checkRootDir rejects empty this.rootDir"() {
         this.rootDir = "";
-        expect(ModuleStructureConfiguration.checkRootDir(this.rootDir)).to.be.false;
+        expect(ModuleStructureConfiguration.checkRootDir({rootDir: this.rootDir})).to.be.false;
     }
 
     @test "checkRootDir rejects non-existing this.rootDir"() {
         this.givenRootDir();
         fs.rmdirSync(this.rootDir);
 
-        expect(ModuleStructureConfiguration.checkRootDir(this.rootDir)).to.be.false;
+        expect(ModuleStructureConfiguration.checkRootDir({rootDir: this.rootDir})).to.be.false;
     }
 
     @test "checkOutFile accepts empty outFile"() {
