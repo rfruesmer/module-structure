@@ -1,11 +1,21 @@
 import {StructureViewModelNode} from "../../../src/structure-view-model/structure-view-model-node";
 import {StructureViewModel} from "../../../src/structure-view-model/structure-view-model";
 import {expect} from "chai";
+
+const fs = require("fs-extra");
+const path = require("path");
+const os = require("os");
+
 const moduleStructure = require("../../../src/module-structure");
 
 
 export function buildViewModelFor(rootDir: string): StructureViewModel {
-    let viewModel = moduleStructure({rootDir: rootDir});
+    const outDir = path.join(os.tmpdir(), "module-structure-1aef3501");
+    const outFile = path.join(outDir, "module-structure.json");
+
+    fs.mkdirsSync(outDir);
+
+    let viewModel = moduleStructure({rootDir: rootDir, outFile: outFile});
     expect(viewModel).to.exist;
 
     return viewModel;

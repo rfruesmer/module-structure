@@ -7,8 +7,9 @@
     <envs />
     <ui>bdd</ui>
     <extra-mocha-options />
-    <test-kind>TEST_FILE</test-kind>
-    <test-file>$PROJECT_DIR$/test/src/module-structure-configuration-test.js</test-file>
+    <test-kind>DIRECTORY</test-kind>
+    <test-directory>$PROJECT_DIR$/test/src</test-directory>
+    <recursive>true</recursive>
     <method />
   </configuration>
 </component>

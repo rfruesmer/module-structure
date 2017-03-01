@@ -4,9 +4,10 @@ import {StructureMapPackage} from "./structure-map/structure-map-package";
 import {StructureViewModelBuilder} from "./structure-map/structure-view-model-builder";
 import {StructureViewModel} from "./structure-view-model/structure-view-model";
 
-import fs = require("fs");
+import fs = require("fs-extra");
 import path = require("path");
 import process = require("process");
+import os = require("os");
 
 const log4js = require("log4js");
 const project = require("../package.json");
@@ -15,29 +16,29 @@ let HttpServerModule = require("http-server");
 let getInstalledPathSync = require("get-installed-path").sync;
 let opener = require("opener");
 
+const TEMP_DIR = "module-structure-0c8c1f08";
+
 let logger;
 let startTime = 0;
 let config: ModuleStructureConfiguration;
 let structureMap: StructureMapPackage;
 let viewModel: StructureViewModel;
 let firstRequest = true;
+let installedPath = "";
 
 
 export function moduleStructure(options: any): StructureViewModel {
-    buildConfiguration(options);
     injectDependencies(arguments);
+    buildConfiguration(options);
     configureLogging();
     buildTemporaryOutFilePath();
+    deployWebApp();
     createStructureMap();
     createViewModel();
     exportViewModel();
     showViewModel();
 
     return viewModel;
-}
-
-function buildConfiguration(options: any): void {
-    config = new ModuleStructureConfiguration(options);
 }
 
 function injectDependencies(args: IArguments) {
@@ -49,6 +50,13 @@ function injectDependencies(args: IArguments) {
     HttpServerModule = dependencies.HttpServerModule ? dependencies.HttpServerModule : HttpServerModule;
     opener = dependencies.opener ? dependencies.opener : opener;
     getInstalledPathSync = dependencies.getInstalledPathSync ? dependencies.getInstalledPathSync : getInstalledPathSync;
+}
+
+function buildConfiguration(options: any): void {
+    installedPath = getInstalledPath();
+
+    config = new ModuleStructureConfiguration(options);
+    config.debug = installedPath.length === 0;
 }
 
 function configureLogging(): void {
@@ -74,13 +82,30 @@ function buildTemporaryOutFilePath(): void {
         return;
     }
 
-    try {
-        config.outFile = path.join(getInstalledPath(), "dist/web-app/module-structure.json");
+    config.outFile = config.debug
+        ? path.join(process.cwd(), "src/structure-view/data/module-structure.json")
+        : path.join(getTempDir(), "module-structure.json");
+}
+
+function isTemporaryExport(): boolean {
+    return config.open && config.outFile.length === 0;
+}
+
+function deployWebApp() {
+    if (config.debug) {
+        return;
     }
-    catch (e) {
-        // fallback for debugging/development
-        config.outFile = path.join(process.cwd(), "src/structure-view/data/module-structure.json");
-    }
+
+    let sourceDir = path.join(installedPath, "dist", "web-app");
+    let destDir = isTemporaryExport() ? getTempDir() : path.dirname(config.outFile);
+
+    fs.removeSync(destDir);
+    fs.mkdirSync(destDir);
+    fs.copySync(sourceDir, destDir);
+}
+
+function getTempDir() {
+    return path.join(os.tmpdir(), TEMP_DIR);
 }
 
 function getInstalledPath(): string {
@@ -88,12 +113,17 @@ function getInstalledPath(): string {
         return getInstalledPathSync(project.name, {local: true});
     }
     catch (e) {
+        // ignored
+    }
+
+    try {
         return getInstalledPathSync(project.name);
     }
-}
+    catch (e) {
+        // ignored
+    }
 
-function isTemporaryExport(): boolean {
-    return config.open && config.outFile.length === 0;
+    return "";
 }
 
 function createStructureMap(): void {
@@ -128,6 +158,11 @@ function createViewModel(): void {
 function exportViewModel(): void {
     if (!isExportViewModel()) {
         return;
+    }
+
+    let outDir = path.dirname(config.outFile);
+    if (!fs.existsSync(outDir)) {
+        fs.mkdirSync(outDir);
     }
 
     if (fs.existsSync(config.outFile)) {

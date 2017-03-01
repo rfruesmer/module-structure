@@ -5,7 +5,7 @@ const it = require("mocha").it;
 const assert = require("chai").assert;
 const sinon = require("sinon");
 const os = require("os");
-const fs = require("fs");
+const fs = require("fs-extra");
 const path = require("path");
 const mv = require("mv");
 const project = require("../../../package.json");
@@ -13,7 +13,7 @@ const project = require("../../../package.json");
 
 describe("module-structure-api", function() {
     let config;
-    let dependencies;
+    let dependencies = {};
     let rootDir;
     let outFile;
     let HttpServerModule;
@@ -46,7 +46,6 @@ describe("module-structure-api", function() {
         if (port) {
             config.port = port;
         }
-        dependencies = {};
     }
 
     function givenRootDir(dir) {
@@ -55,13 +54,14 @@ describe("module-structure-api", function() {
     }
 
     function givenInstalledPath() {
-        const installedPath = fs.mkdtempSync(path.join(os.tmpdir(), "module-structure-"));
-        const distPath = path.join(installedPath, "dist");
-        serverRoot = path.join(distPath, "web-app");
-        expectedOutFilePath  = path.join(serverRoot, "module-structure.json");
+        const installedPath = process.cwd();
+        const webAppPath = path.join(installedPath, "dist", "web-app");
+        if (!fs.existsSync(webAppPath)) {
+            fs.mkdirsSync(webAppPath);
+        }
 
-        fs.mkdirSync(distPath);
-        fs.mkdirSync(serverRoot);
+        serverRoot = path.join(os.tmpdir(), "module-structure-0c8c1f08");
+        expectedOutFilePath  = path.join(serverRoot, "module-structure.json");
 
         getInstalledPathSync = sinon.stub();
         getInstalledPathSync.withArgs(project.name, {local: true}).returns(installedPath);
@@ -106,7 +106,11 @@ describe("module-structure-api", function() {
     });
 
     function givenConfigWithoutOpen() {
-        config = {};
+        const outDir = fs.mkdtempSync(path.join(os.tmpdir(), "module-structure-"));
+
+        config = {
+            outFile: path.join(outDir, "module-structure.json")
+        };
     }
 
     function thenHttpServerShouldNotHaveBeenStarted() {
@@ -220,12 +224,21 @@ describe("module-structure-api", function() {
     it("uses cwd dist path for temporary outFiles if not installed", function() {
         givenConfigWithOpen();
         givenRootDir("test/resources/es6/ecommerce-sample");
+        givenNotInstalled();
         givenDevelopmentPath();
         givenSpyingHttpServer();
         givenHttpServerModule();
+        givenNotInstalled();
         whenInvokingAPI();
         thenOutFileShouldBeExportedToDist();
     });
+
+    function givenNotInstalled() {
+        getInstalledPathSync = sinon.stub();
+        getInstalledPathSync.withArgs(project.name, {local: true}).throws(Error);
+        getInstalledPathSync.withArgs(project.name).throws(Error);
+        dependencies.getInstalledPathSync = getInstalledPathSync;
+    }
 
     function givenDevelopmentPath() {
         serverRoot = path.join(process.cwd(), "src/structure-view/data");
@@ -234,16 +247,12 @@ describe("module-structure-api", function() {
         if (!fs.existsSync(serverRoot)) {
             fs.mkdirSync(serverRoot);
         }
-
-        getInstalledPathSync = sinon.stub();
-        getInstalledPathSync.withArgs(project.name, {local: true}).throws(Error);
-
-        dependencies.getInstalledPathSync = getInstalledPathSync;
     }
 
     it("repeats analysis on index.html reload", function(done) {
         givenConfigWithOpen();
         givenRootDir("test/resources/es6/ecommerce-sample");
+        givenNotInstalled();
         givenDevelopmentPath();
         givenFakeHttpServer();
         givenFakeHttpServerModule();
@@ -341,6 +350,7 @@ describe("module-structure-api", function() {
     it("doesn't repeats analysis for reload of other resources", function(done) {
         givenConfigWithOpen();
         givenRootDir("test/resources/es6/ecommerce-sample");
+        givenNotInstalled();
         givenDevelopmentPath();
         givenFakeHttpServer();
         givenFakeHttpServerModule();

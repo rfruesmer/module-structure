@@ -9,21 +9,24 @@ const path = require("path");
 
 
 @suite class ModuleStructureAPIConfigurationTest {
+    private rootDir: string;
+    private outFile: string;
+
     @test "checkRootDir rejects undefined rootDir"() {
-        let rootDir = undefined;
-        expect(ModuleStructureConfiguration.checkRootDir(rootDir)).to.be.false;
+        this.rootDir = undefined;
+        expect(ModuleStructureConfiguration.checkRootDir(this.rootDir)).to.be.false;
     }
 
-    @test "checkRootDir rejects empty rootDir"() {
-        let rootDir = "";
-        expect(ModuleStructureConfiguration.checkRootDir(rootDir)).to.be.false;
+    @test "checkRootDir rejects empty this.rootDir"() {
+        this.rootDir = "";
+        expect(ModuleStructureConfiguration.checkRootDir(this.rootDir)).to.be.false;
     }
 
-    @test "checkRootDir rejects non-existing rootDir"() {
-        let rootDir = fs.mkdtempSync(path.join(os.tmpdir(), "module-structure-test-"));
-        fs.rmdirSync(rootDir);
+    @test "checkRootDir rejects non-existing this.rootDir"() {
+        this.givenRootDir();
+        fs.rmdirSync(this.rootDir);
 
-        expect(ModuleStructureConfiguration.checkRootDir(rootDir)).to.be.false;
+        expect(ModuleStructureConfiguration.checkRootDir(this.rootDir)).to.be.false;
     }
 
     @test "checkOutFile accepts empty outFile"() {
@@ -31,105 +34,80 @@ const path = require("path");
     }
 
     @test "checkOutFile accepts undefined outFile"() {
-        let outFile = undefined;
-        expect(ModuleStructureConfiguration.checkOutFile(outFile)).to.be.true;
+        this.outFile = undefined;
+        expect(ModuleStructureConfiguration.checkOutFile(this.outFile)).to.be.true;
     }
 
     @test "checkOutFile checks that outFile directory exists"() {
-        let outFileDir = fs.mkdtempSync(path.join(os.tmpdir(), "module-structure-test-"));
-        let outFile = path.join(outFileDir, "module-structure.json");
-        fs.rmdirSync(outFileDir);
+        this.givenOutFile();
+        fs.rmdirSync(path.dirname(this.outFile));
 
-        expect(ModuleStructureConfiguration.checkOutFile(outFile)).to.be.false;
+        expect(ModuleStructureConfiguration.checkOutFile(this.outFile)).to.be.false;
     }
 
-    @test "constructor throws error if rootDir is undefined"() {
+    private givenOutFile() {
+        let outFileDir = fs.mkdtempSync(path.join(os.tmpdir(), "module-structure-test-"));
+        this.outFile = path.join(outFileDir, "module-structure.json");
+    }
+
+    @test "constructor throws error if this.rootDir is undefined"() {
         expect(() => new ModuleStructureConfiguration({})).to.throw(Error);
     }
 
-    @test "constructor throws error if rootDir is empty"() {
-        expect(() => new ModuleStructureConfiguration({rootDir: ""})).to.throw(Error);
+    @test "constructor throws error if this.rootDir is empty"() {
+        expect(() => new ModuleStructureConfiguration({rootDir: this.rootDir})).to.throw(Error);
     }
 
-    @test "constructor throws error if rootDir does not exist"() {
-        let rootDir = fs.mkdtempSync(path.join(os.tmpdir(), "module-structure-test-"));
-        fs.rmdirSync(rootDir);
+    @test "constructor throws error if this.rootDir does not exist"() {
+        this.givenRootDir();
+        fs.rmdirSync(this.rootDir);
 
-        expect(() => new ModuleStructureConfiguration({rootDir: rootDir})).to.throw(Error);
+        expect(() => new ModuleStructureConfiguration({rootDir: this.rootDir})).to.throw(Error);
     }
 
-    @test "constructor doesn't throw error if rootDir exists"() {
-        let rootDir = fs.mkdtempSync(path.join(os.tmpdir(), "module-structure-test-"));
+    @test "constructor doesn't throw error if this.rootDir exists"() {
+        this.givenRootDir();
+        this.outFile = path.join(this.rootDir, "module-structure.json");
 
-        expect(() => new ModuleStructureConfiguration({rootDir: rootDir})).to.not.throw(Error);
+        expect(() => new ModuleStructureConfiguration({rootDir: this.rootDir, outFile: this.outFile})).to.not.throw(Error);
 
-        fs.rmdirSync(rootDir);
-    }
-
-    @test "constructor doesn't throw error if module is undefined"() {
-        let rootDir = fs.mkdtempSync(path.join(os.tmpdir(), "module-structure-test-"));
-
-        expect(() => new ModuleStructureConfiguration({rootDir: rootDir})).to.not.throw(Error);
-
-        fs.rmdirSync(rootDir);
-    }
-
-    @test "constructor doesn't throw error if module is empty"() {
-        let rootDir = fs.mkdtempSync(path.join(os.tmpdir(), "module-structure-test-"));
-
-        expect(() => new ModuleStructureConfiguration({rootDir: rootDir, module: ""})).to.not.throw(Error);
-
-        fs.rmdirSync(rootDir);
-    }
-
-    @test "constructor doesn't throw error if module is es6"() {
-        let rootDir = fs.mkdtempSync(path.join(os.tmpdir(), "module-structure-test-"));
-
-        expect(() => new ModuleStructureConfiguration({rootDir: rootDir, module: "es6"})).to.not.throw(Error);
-
-        fs.rmdirSync(rootDir);
-    }
-
-    @test "constructor doesn't throw error if module is ts"() {
-        let rootDir = fs.mkdtempSync(path.join(os.tmpdir(), "module-structure-test-"));
-
-        expect(() => new ModuleStructureConfiguration({rootDir: rootDir, module: "ts"})).to.not.throw(Error);
-
-        fs.rmdirSync(rootDir);
+        fs.rmdirSync(this.rootDir);
     }
 
     @test "constructor doesn't throw error if outFile is empty"() {
-        let rootDir = fs.mkdtempSync(path.join(os.tmpdir(), "module-structure-test-"));
+        this.givenRootDir();
 
-        expect(() => new ModuleStructureConfiguration({rootDir: rootDir, outFile: ""})).to.not.throw(Error);
+        expect(() => new ModuleStructureConfiguration({rootDir: this.rootDir, open: true, outFile: ""})).to.not.throw(Error);
 
-        fs.rmdirSync(rootDir);
+        fs.rmdirSync(this.rootDir);
     }
 
     @test "constructor doesn't throw error if outFile is undefined"() {
-        let rootDir = fs.mkdtempSync(path.join(os.tmpdir(), "module-structure-test-"));
+        this.givenRootDir();
 
-        expect(() => new ModuleStructureConfiguration({rootDir: rootDir})).to.not.throw(Error);
+        expect(() => new ModuleStructureConfiguration({rootDir: this.rootDir, open: true})).to.not.throw(Error);
 
-        fs.rmdirSync(rootDir);
+        fs.rmdirSync(this.rootDir);
     }
 
     @test "constructor doesn't throw error if outFile directory exists"() {
-        let rootDir = fs.mkdtempSync(path.join(os.tmpdir(), "module-structure-test-"));
-        let outFileDir = fs.mkdtempSync(path.join(os.tmpdir(), "module-structure-test-"));
-        let outFile = path.join(outFileDir, "module-structure.json");
+        this.givenRootDir();
+        this.givenOutFile();
 
-        expect(() => new ModuleStructureConfiguration({rootDir: rootDir, outFile: outFile})).to.not.throw(Error);
+        expect(() => new ModuleStructureConfiguration({rootDir: this.rootDir, outFile: this.outFile})).to.not.throw(Error);
 
-        fs.rmdirSync(outFileDir);
+        fs.rmdirSync(path.dirname(this.outFile));
     }
 
     @test "constructor throws error if outFile directory doesn't exists"() {
-        let rootDir = fs.mkdtempSync(path.join(os.tmpdir(), "module-structure-test-"));
-        let outFileDir = fs.mkdtempSync(path.join(os.tmpdir(), "module-structure-test-"));
-        let outFile = path.join(outFileDir, "module-structure.json");
-        fs.rmdirSync(outFileDir);
+        this.givenRootDir();
+        this.givenOutFile();
+        fs.rmdirSync(path.dirname(this.outFile));
 
-        expect(() => new ModuleStructureConfiguration({rootDir: rootDir, outFile: outFile})).to.throw(Error);
+        expect(() => new ModuleStructureConfiguration({rootDir: this.rootDir, outFile: this.outFile})).to.throw(Error);
+    }
+
+    private givenRootDir() {
+        this.rootDir = fs.mkdtempSync(path.join(os.tmpdir(), "module-structure-test-"));
     }
 }

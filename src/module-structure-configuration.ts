@@ -15,11 +15,12 @@ export class ModuleStructureConfiguration {
     port = 3000;
     open = false;
     logging: boolean;
-
+    debug: boolean;
 
     constructor(options: any) {
         checkArgument(ModuleStructureConfiguration.checkRootDir(options.rootDir), "invalid rootDir");
         checkArgument(ModuleStructureConfiguration.checkOutFile(options.outFile), "output directory doesn't exist");
+        checkArgument(ModuleStructureConfiguration.checkOpen(options), "outFile argument missing or invalid");
 
         this.rootDir = options.rootDir;
         this.outFile = options.outFile ? options.outFile : "";
@@ -42,6 +43,20 @@ export class ModuleStructureConfiguration {
         }
 
         let outDir = path.dirname(outFile);
+        return fs.existsSync(outDir)
+            && fs.statSync(outDir).isDirectory();
+    }
+
+    private static checkOpen(options: any) {
+        if (options.open) {
+            return true;
+        }
+
+        if (!options.outFile || options.outFile.length === 0) {
+            return false;
+        }
+
+        let outDir = path.dirname(options.outFile);
         return fs.existsSync(outDir)
             && fs.statSync(outDir).isDirectory();
     }
