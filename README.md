@@ -226,6 +226,14 @@ let model = moduleStructure({rootDir: "/path/to/some/codebase"});
         </td>
     </tr>
     <tr>
+        <td>fs-extra</td>
+        <td align="right">
+            <a href="https://www.npmjs.com/package/fs-extra/">homepage</a>
+            &nbsp;-&nbsp;  
+            <a href="http://spdx.org/licenses/MIT">show license</a>
+        </td>
+    </tr>
+    <tr>
         <td>get-installed-path</td>
         <td align="right">
             <a href="https://www.npmjs.com/package/get-installed-path/">homepage</a>
