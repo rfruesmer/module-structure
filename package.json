@@ -13,7 +13,7 @@
     "build-prod-webapp": "webpack --config conf/webpack.prod.js --progress --profile --bail",
     "clean-dist": "rimraf dist/",
     "clean-js": "rimraf src/**/*.js && rimraf src/**/*.js.map && rimraf test/resources/ts/**/*.js && rimraf test/resources/ts/**/*.js.map",
-    "pretest": "npm run build-dev && npm run tslint",
+    "pretest": "npm run build-dev",
     "posttest": "nyc report --reporter=json && codecov -f coverage/*.json",
     "start-dev-server": "webpack-dev-server --config conf/webpack.dev.js  --hot --inline --progress --port 8080",
     "start-prod-server": "http-server dist/web-app -o http://localhost:8080?data=module-structure.json",
