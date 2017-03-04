@@ -182,12 +182,6 @@ export class Application {
         this.config.port = this.options.port;
     }
 
-    private onFinished() {
-        if (!this.config.open) {
-            Application.exitWithSuccess();
-        }
-    }
-
     private invokeAPI() {
         try {
             this.api(this.config);
@@ -195,6 +189,12 @@ export class Application {
         catch (e) {
             console.error(e);
             throw e;
+        }
+    }
+
+    private onFinished() {
+        if (!this.config.open) {
+            Application.exitWithSuccess();
         }
     }
 }

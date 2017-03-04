@@ -1,8 +1,10 @@
 import {ModuleStructureConfiguration} from "./module-structure-configuration";
 import {StructureMapBuilder} from "./structure-map/structure-map-builder";
 import {StructureMapPackage} from "./structure-map/structure-map-package";
-import {StructureViewModelBuilder} from "./structure-map/structure-view-model-builder";
 import {StructureViewModel} from "./structure-view-model/structure-view-model";
+import {StructureViewModelBuilder} from "./structure-map/structure-view-model-builder";
+import {ExtensionRegistry} from "./structure-map/extension-registry";
+import {Map} from "es6-map";
 
 import fs = require("fs-extra");
 import path = require("path");
@@ -11,6 +13,7 @@ import os = require("os");
 
 const log4js = require("log4js");
 const project = require("../package.json");
+const PluginManager = require("js-plugins");
 
 let HttpServerModule = require("http-server");
 let getInstalledPathSync = require("get-installed-path").sync;
@@ -25,12 +28,14 @@ let structureMap: StructureMapPackage;
 let viewModel: StructureViewModel;
 let firstRequest = true;
 let installedPath = "";
+let extensionRegistry = new ExtensionRegistry();
 
 
 export function moduleStructure(options: any): StructureViewModel {
     injectDependencies(arguments);
     buildConfiguration(options);
     configureLogging();
+    loadExtensions();
 
     if (isTemporaryExport()) {
         deployWebAppToTempDir();
@@ -109,6 +114,36 @@ function configureLogging(): void {
     logger.setLevel(config.logging ? log4js.levels.INFO : log4js.levels.OFF);
 }
 
+function loadExtensions(): void {
+    let pluginManager = new PluginManager();
+    let pluginsDirectory = path.join(__dirname, "structure-map", "plugins");
+    let globalModulesDirectory = require("global-modules");
+
+    pluginManager.scanSubdirs([pluginsDirectory, globalModulesDirectory]);
+    pluginManager.scan();
+
+    let extensionsMap = pluginManager.connect({}, "", {multi: true}, () => {})._extensions;
+    for (let extensionPoint in extensionsMap) {
+        if (!extensionsMap.hasOwnProperty(extensionPoint)) {
+            continue;
+        }
+
+        let extensions = extensionsMap[extensionPoint];
+        extensions.forEach(id => registerExtension(extensionPoint, id, extensions.names[id]));
+    }
+}
+
+function registerExtension(extensionPoint: any, id: string, factory: Function) {
+    let info = {extension: extensionPoint, name: id};
+    factory(null, {}, info, (err, instance) => {
+        if (err) {
+            logger.error(err);
+            return;
+        }
+        extensionRegistry.register(extensionPoint, id, instance);
+    });
+}
+
 function isTemporaryExport(): boolean {
     return config.open && config.outFile.length === 0;
 }
@@ -152,7 +187,7 @@ function isCreateViewModel(options: any) {
 function createStructureMap(): void {
     startProcessing("Building structure map (may take some time for large AMD code bases)");
 
-    let builder = new StructureMapBuilder();
+    let builder = new StructureMapBuilder(extensionRegistry);
     structureMap = builder.build(config.rootDir, config.exclude);
 
     stopProcessing();

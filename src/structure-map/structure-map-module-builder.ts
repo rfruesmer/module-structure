@@ -1,19 +1,21 @@
 import {StructureMapModule} from "./structure-map-module";
-import {TypeScriptImportParser} from "./typescript-import-parser";
+import {Map} from "es6-map";
+import {StructureMapDependencyProvider} from "./structure-map-module-dependency-provider";
 
 import path = require("path");
-import fs = require("fs");
-import os = require("os");
 
-const dependencyTree = require("dependency-tree");
 
 export class StructureMapModuleBuilder {
-    private typeScriptHelper: TypeScriptImportParser = new TypeScriptImportParser();
-    private visited = {};
+    private dependencyProviders: Map<string, StructureMapDependencyProvider>;
+
+
+    constructor(dependencyProviders: Map<string, StructureMapDependencyProvider>) {
+        this.dependencyProviders = dependencyProviders;
+    }
 
     public build(modulePath: string, name: string, rootDir: string): StructureMapModule {
         let simpleName = StructureMapModuleBuilder.getSimpleName(modulePath);
-        let dependencies = this.getImports(modulePath, rootDir);
+        let dependencies = this.getDependencies(modulePath, rootDir);
 
         return new StructureMapModule(modulePath, name, simpleName, dependencies);
     }
@@ -22,18 +24,14 @@ export class StructureMapModuleBuilder {
         return path.basename(filePath);
     }
 
-    private getImports(modulePath: string, rootDir: string): Array<string> {
-        if (path.extname(modulePath) === ".ts") {
-            return this.typeScriptHelper.getImportSourcesFromFile(modulePath);
+    private getDependencies(modulePath: string, rootDir: string): Array<string> {
+        let fileExtension = path.extname(modulePath);
+        if (fileExtension.length < 2) {
+            return [];
         }
 
-        let tree = dependencyTree({directory: rootDir, filename: modulePath, visited: this.visited});
-        let key = Object.keys(tree)[0];
-        let imports = Object.keys(tree[key]);
-        let moduleDirectory = path.dirname(modulePath);
+        let dependencyProvider = this.dependencyProviders[fileExtension.substr(1)];
 
-        return imports.map(dependencyPath => {
-            return path.relative(moduleDirectory, dependencyPath);
-        });
+        return dependencyProvider ? dependencyProvider.getDependencies(modulePath, rootDir) : [];
     }
 }

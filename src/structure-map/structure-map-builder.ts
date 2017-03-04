@@ -4,6 +4,7 @@ import {StructureMapPackage} from "./structure-map-package";
 import fs = require("fs");
 import path = require("path");
 import {StructureMapModule} from "./structure-map-module";
+import {ExtensionRegistry} from "./extension-registry";
 
 const preconditions = require("preconditions").instance();
 const checkArgument = preconditions.checkArgument;
@@ -15,12 +16,15 @@ export class StructureMapBuilder {
     private packageIndex: any = {};
     private moduleIndex: any = {};
     private structureMap: StructureMapPackage;
+    private extensionRegistry: ExtensionRegistry;
 
+
+    constructor(extensionRegistry: ExtensionRegistry) {
+        this.extensionRegistry = extensionRegistry;
+    }
 
     public build(dir: string, excludes: string[] = []): StructureMapPackage {
-        this.dir = dir;
-        this.excludes = excludes;
-
+        this.setOptions(dir, excludes);
         this.buildStructureMap();
         this.indexStructureMap();
         this.setupDependencies(this.structureMap);
@@ -29,8 +33,13 @@ export class StructureMapBuilder {
         return this.structureMap;
     }
 
+    private setOptions(dir: string, excludes: string[]) {
+        this.dir = dir;
+        this.excludes = excludes;
+    }
+
     private buildStructureMap(): void {
-        let packageBuilder = new StructureMapPackageBuilder();
+        let packageBuilder = new StructureMapPackageBuilder(this.extensionRegistry);
         this.structureMap = packageBuilder.build(this.dir, this.excludes);
     }
 

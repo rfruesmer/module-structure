@@ -1,31 +1,52 @@
 import {StructureMapModuleBuilder} from "./structure-map-module-builder";
+import {StructureMapPackage} from "./structure-map-package";
+import {StructureMapModule} from "./structure-map-module";
+import {ExtensionRegistry} from "./extension-registry";
+import {Map} from "es6-map";
+import {StructureMapDependencyProvider} from "./structure-map-module-dependency-provider";
 
 import fs = require("fs");
 import path = require("path");
-import {StructureMapPackage} from "./structure-map-package";
-import {StructureMapModule} from "./structure-map-module";
 
 const preconditions = require("preconditions").instance();
 const checkArgument = preconditions.checkArgument;
 
 
 export class StructureMapPackageBuilder {
+    public static readonly LANGUAGE_EXTENSION_POINT = "module-structure:language";
+
     private rootDir: string;
     private rootDirParent: string;
     private excludes: Array<string> = [];
-    private requireConfigPath: string;
-    private moduleBuilder = new StructureMapModuleBuilder();
+    private moduleBuilder: StructureMapModuleBuilder;
+    private dependencyProviders: Map<string, StructureMapDependencyProvider>;
+    private supportedExtensions: Array<string> = [];
 
+    constructor(extensionRegistry: ExtensionRegistry) {
+        checkArgument(extensionRegistry);
 
-    public build(rootDir: string, excludes: string[], requireConfigPath = ""): StructureMapPackage {
-        checkArgument(fs.statSync(rootDir).isDirectory());
+        this.dependencyProviders = <Map<string, StructureMapDependencyProvider>>
+            extensionRegistry.getExtensions(StructureMapPackageBuilder.LANGUAGE_EXTENSION_POINT);
 
-        this.rootDir =  rootDir;
-        this.rootDirParent = path.normalize(path.join(rootDir, ".."));
-        this.excludes = excludes;
-        this.requireConfigPath = requireConfigPath;
+        for (let extension in this.dependencyProviders) {
+            this.supportedExtensions.push("." + extension);
+        }
+
+        this.moduleBuilder = new StructureMapModuleBuilder(this.dependencyProviders);
+    }
+
+    public build(rootDir: string, excludes: string[]): StructureMapPackage {
+        this.setOptions(rootDir, excludes);
 
         return this.buildInternal(this.rootDir);
+    }
+
+    private setOptions(rootDir: string, excludes: string[]) {
+        checkArgument(fs.statSync(rootDir).isDirectory());
+
+        this.rootDir = rootDir;
+        this.rootDirParent = path.normalize(path.join(rootDir, ".."));
+        this.excludes = excludes;
     }
 
     private buildInternal(dir: string): StructureMapPackage {
@@ -100,7 +121,7 @@ export class StructureMapPackageBuilder {
         let moduleFileMap = {};
         fs.readdirSync(dir)
             .filter(fileName => fs.statSync(path.join(dir, fileName)).isFile())
-            .filter(fileName => [".js", ".ts"].indexOf(path.extname(fileName)) > -1)
+            .filter(fileName => this.supportedExtensions.indexOf(path.extname(fileName)) > -1)
             .map(fileName => path.join(dir, fileName))
             .forEach(moduleFile => moduleFileMap[moduleFile] = path.extname(moduleFile));
 
