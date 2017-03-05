@@ -2,7 +2,7 @@ import {StructureMapModuleBuilder} from "./structure-map-module-builder";
 import {StructureMapPackage} from "./structure-map-package";
 import {StructureMapModule} from "./structure-map-module";
 import {ExtensionRegistry} from "./extension-registry";
-import {StructureMapDependencyProvider} from "./structure-map-module-dependency-provider";
+import {StructureMapLanguageProvider} from "./structure-map-language-provider";
 
 import fs = require("fs");
 import path = require("path");
@@ -19,13 +19,13 @@ export class StructureMapPackageBuilder {
     private rootDirParent: string;
     private excludes: Array<string> = [];
     private moduleBuilder: StructureMapModuleBuilder;
-    private dependencyProviders: Map<string, StructureMapDependencyProvider>;
+    private dependencyProviders: Map<string, StructureMapLanguageProvider>;
     private supportedExtensions: Array<string> = [];
 
     constructor(extensionRegistry: ExtensionRegistry) {
         checkArgument(extensionRegistry);
 
-        this.dependencyProviders = <Map<string, StructureMapDependencyProvider>>
+        this.dependencyProviders = <Map<string, StructureMapLanguageProvider>>
             extensionRegistry.getExtensions(StructureMapPackageBuilder.LANGUAGE_EXTENSION_POINT);
 
         for (let extension in this.dependencyProviders) {

@@ -213,7 +213,7 @@ package.json file. It need not actually be in npm, it can be a simple folder and
 scans and loads plugins that implement known extension-points. At the time of this writing, there's only one extension-point for providing 
 module dependencies for a given module file which is called `module-structure:language`.
  
-To implement a custom language plugin, one needs to implement the StructureMapDependencyProvider interface and register the node module as 
+To implement a custom language plugin, one needs to implement the StructureMapLanguageProvider interface and register the node module as 
 extension.
  
 Below is an example how to contribute support for the Swift language.
@@ -238,17 +238,17 @@ In the example below, the module registers itself for the `module-structure:lang
  
 ### Implementation
  
-A minimal skeletion implementation written in es6 would look like this:
+A minimal skeleton implementation of the language interface would look like this:
  
 ```javascript
 "use strict";
 
-class SwiftDependencyProvider {
+class SwiftLanguageProvider {
     
     /**
      * @public
      * @param {string} modulePath The file path of the current module to provide dependencies for.
-     * @param {string} rootPath The root path of the code base. Some external libraries may require this.
+     * @param {string} rootPath The root path of the code base. Some external libraries require this.
      * @returns {Array<string>} A list of relative file paths to dependent modules.
      */
     getDependencies(modulePath, rootPath) {
@@ -258,7 +258,7 @@ class SwiftDependencyProvider {
 }
 
 module.exports = function() {
-    return new SwiftDependencyProvider();
+    return new SwiftLanguageProvider();
 };
 ```
 

@@ -1,15 +1,15 @@
 import {StructureMapModule} from "./structure-map-module";
-import {StructureMapDependencyProvider} from "./structure-map-module-dependency-provider";
+import {StructureMapLanguageProvider} from "./structure-map-language-provider";
 
 import path = require("path");
 import Map = require("core-js/es6/map");
 
 
 export class StructureMapModuleBuilder {
-    private dependencyProviders: Map<string, StructureMapDependencyProvider>;
+    private dependencyProviders: Map<string, StructureMapLanguageProvider>;
 
 
-    constructor(dependencyProviders: Map<string, StructureMapDependencyProvider>) {
+    constructor(dependencyProviders: Map<string, StructureMapLanguageProvider>) {
         this.dependencyProviders = dependencyProviders;
     }
 
