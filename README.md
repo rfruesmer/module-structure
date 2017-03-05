@@ -271,8 +271,8 @@ You can find them here:
   
 <ul>
     <li><a href="https://github.com/rfruesmer/module-structure-lang-js">module-structure-lang-js</a></li>
-    <li><a href="https://github.com/rfruesmer/module-structure-lang-js">module-structure-lang-ts</a></li>
-    <li><a href="https://github.com/rfruesmer/module-structure-lang-js">module-structure-lang-html</a></li>
+    <li><a href="https://github.com/rfruesmer/module-structure-lang-ts">module-structure-lang-ts</a></li>
+    <li><a href="https://github.com/rfruesmer/module-structure-lang-html">module-structure-lang-html</a></li>
 </ul>
 
 ## Credits
