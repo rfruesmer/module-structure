@@ -262,8 +262,14 @@ function onRequest(req, res) {
             return;
         }
 
-        createStructureMap();
-        createViewModel();
+        if (isCreateViewModel(config)) {
+            createStructureMap();
+            createViewModel();
+        }
+        else {
+            readViewModel(config.inputFile);
+        }
+
         exportViewModel();
     }
     finally {
