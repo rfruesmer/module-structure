@@ -78,8 +78,7 @@
   "dependencies": {
     "command-line-args": "^3.0.5",
     "command-line-usage": "^3.0.8",
-    "dependency-tree": "^5.7.4",
-    "es6-map": "^0.1.4",
+    "core-js": "^2.4.1",
     "fs-extra": "^2.0.0",
     "get-installed-path": "^2.0.3",
     "http-server": "^0.9.0",

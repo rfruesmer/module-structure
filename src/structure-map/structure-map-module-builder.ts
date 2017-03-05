@@ -1,8 +1,8 @@
 import {StructureMapModule} from "./structure-map-module";
-import {Map} from "es6-map";
 import {StructureMapDependencyProvider} from "./structure-map-module-dependency-provider";
 
 import path = require("path");
+import Map = require("core-js/es6/map");
 
 
 export class StructureMapModuleBuilder {

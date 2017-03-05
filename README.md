@@ -266,6 +266,14 @@ let model = moduleStructure({rootDir: "/path/to/some/codebase"});
         </td>
     </tr>
     <tr>
+        <td>js-plugins</td>
+        <td align="right">
+            <a href="https://www.npmjs.com/package/js-plugins/">homepage</a>
+            &nbsp;-&nbsp;  
+            <a href="https://github.com/easeway/js-plugins/blob/master/LICENSE">show license</a>
+        </td>
+    </tr>
+    <tr>
         <td>log4js</td>
         <td align="right">
             <a href="https://www.npmjs.com/package/log4js/">homepage</a>

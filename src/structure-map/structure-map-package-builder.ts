@@ -2,11 +2,11 @@ import {StructureMapModuleBuilder} from "./structure-map-module-builder";
 import {StructureMapPackage} from "./structure-map-package";
 import {StructureMapModule} from "./structure-map-module";
 import {ExtensionRegistry} from "./extension-registry";
-import {Map} from "es6-map";
 import {StructureMapDependencyProvider} from "./structure-map-module-dependency-provider";
 
 import fs = require("fs");
 import path = require("path");
+import Map = require("core-js/es6/map");
 
 const preconditions = require("preconditions").instance();
 const checkArgument = preconditions.checkArgument;
