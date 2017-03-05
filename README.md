@@ -238,7 +238,7 @@ In the example below, the module registers itself for the `module-structure:lang
  
 ### Implementation
  
-A minimal skeleton implementation of the language interface would look like this:
+A minimal skeleton implementation of the language provider interface would look like this:
  
 ```javascript
 "use strict";
