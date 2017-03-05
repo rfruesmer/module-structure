@@ -25,12 +25,8 @@ export class StructureMapModuleBuilder {
     }
 
     private getDependencies(modulePath: string, rootDir: string): Array<string> {
-        let fileExtension = path.extname(modulePath);
-        if (fileExtension.length < 2) {
-            return [];
-        }
-
-        let dependencyProvider = this.dependencyProviders[fileExtension.substr(1)];
+        let fileExtension = path.extname(modulePath).substr(1);
+        let dependencyProvider = this.dependencyProviders[fileExtension];
 
         return dependencyProvider ? dependencyProvider.getDependencies(modulePath, rootDir) : [];
     }

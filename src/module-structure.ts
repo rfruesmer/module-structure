@@ -222,11 +222,6 @@ function isExportViewModel(): boolean {
 }
 
 function exportViewModel(): void {
-    let outDir = path.dirname(config.outFile);
-    if (!fs.existsSync(outDir)) {
-        fs.mkdirSync(outDir);
-    }
-
     if (fs.existsSync(config.outFile)) {
         fs.unlinkSync(config.outFile);
     }

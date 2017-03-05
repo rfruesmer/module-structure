@@ -12,6 +12,7 @@ test/resources/ts/**/*.js*
 !test/resources/ts/tsconfig.json
 !test/resources/ts/ecommerce-sample/ecommerce-sample-without-modules.json
 test/src/api/module-structure-api-configuration-test.js*
+test/src/api/extension-registry-test.js*
 test/src/cli/module-structure-cli-test.js*
 test/src/model-builder/model-builder-test-util.js*
 output/

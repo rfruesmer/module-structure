@@ -85,8 +85,8 @@
     "jquery": "^3.1.1",
     "js-plugins": "0.0.3",
     "log4js": "^1.1.0",
-    "module-structure-lang-js": "^1.0.2",
-    "module-structure-lang-ts": "^1.0.2",
+    "module-structure-lang-js": "1",
+    "module-structure-lang-ts": "1",
     "opener": "^1.4.2",
     "preconditions": "^2.2.0"
   }

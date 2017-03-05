@@ -168,9 +168,6 @@ export class Application {
     }
 
     private processInputFileArgument() {
-        if (this.options.inputFile) {
-            this.config.open = true;
-        }
         this.config.inputFile = this.options.inputFile;
     }
 

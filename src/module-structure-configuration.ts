@@ -29,7 +29,7 @@ export class ModuleStructureConfiguration {
         this.exclude = options.exclude ? options.exclude : [];
         this.pretty = options.pretty ? options.pretty : false;
         this.port =  options.port ? options.port : 3000;
-        this.open = options.open ? options.open : false;
+        this.open = options.open || options.inputFile ? options.open : false;
         this.inputFile = options.inputFile;
         this.logging = options.logging;
     }
@@ -55,17 +55,11 @@ export class ModuleStructureConfiguration {
     }
 
     private static checkOpen(options: any) {
-        if (options.open) {
+        if (options.open || options.inputFile) {
             return true;
         }
 
-        if (!options.outFile || options.outFile.length === 0) {
-            return false;
-        }
-
-        let outDir = path.dirname(options.outFile);
-        return fs.existsSync(outDir)
-            && fs.statSync(outDir).isDirectory();
+        return options.outFile;
     }
 
     private static checkInputFile(inputFile: string) {

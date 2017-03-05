@@ -373,4 +373,22 @@ describe("module-structure-api", function() {
             .then(() => done())
             .catch(err => done(err));
     }
+
+    it("reads input files", function() {
+        givenConfigWithInputFile();
+        givenNotInstalled();
+        givenDevelopmentPath();
+        whenInvokingAPI();
+        thenReturnedModelShouldEqualExpectedModel();
+    });
+
+    function givenConfigWithInputFile() {
+        const inputFile = path.join(__dirname, "../../resources/sample-structure.json");
+        config = {inputFile: inputFile};
+    }
+
+    function thenReturnedModelShouldEqualExpectedModel() {
+        const expectedModel = JSON.parse(fs.readFileSync(config.inputFile, "utf-8"));
+        assert.deepEqual(actualModel, expectedModel);
+    }
 });

@@ -69,6 +69,10 @@ and updates the browser, useful after modifications to the code base.
 
 Create structure map and save as JSON file. Doesn't open structure map in browser.
 
+`module-structure --inputFile file`           
+
+Reads an existing structure map JSON file and displays it in default browser.
+
 ### Flags 
 
 | Argument    | Alias | Description                                                                                                                                                                  |
@@ -79,6 +83,7 @@ Create structure map and save as JSON file. Doesn't open structure map in browse
 | --exclude   | -e    | One or more expressions to filter packages and/or modules.                                                                                       |
 | --outFile   |       | Path for the JSON output file. If omitted, the file will be created in a temporary directory and displayed as a diagram in your default browser. |
 | --pretty    |       | Pretty-print the JSON output file. Only used if --outFile is specified.                                                                          |
+| --inputFile |       | Skips the analysis step and directly renders the specified model file as a diagram in your default browser.                                      |
 | --port      | -p    | Port for serving the included viewer web-app (defaults to 3000). Omitted if --outFile is specified.                                              |
 
 ## API 
@@ -101,6 +106,7 @@ Create structure map and save as JSON file. Doesn't open structure map in browse
 | pretty      | boolean   | no       | false     | Pretty-print the JSON output file. Only used in combination with outFile.                                  |
 | open        | boolean   | no       | false     | Opens the structure map in default browser.                                                                |
 | port        | number    | no       | 3000      | Port for serving the included viewer web-app (defaults to 3000). Only used in combination with open.       |
+| inputFile   | string    | no       | undefined | Skips the analysis step and directly renders the specified model file as a diagram in your default browser.|
 | logging     | boolean   | no       | false     | Enable/disable logging.                                                                                    |
   
 ### Example
@@ -198,6 +204,77 @@ let model = moduleStructure({rootDir: "/path/to/some/codebase"});
 * `from`: The full qualified name of the dependency's source module.
 * `to`: The full qualified name of the dependency's target module.
 
+## Extensibility
+
+Important note: extension-point support is currently in alpha status. API may change in upcoming versions.
+
+module-structue provides support for custom languages by means of plugin extensions. Each plugin is a node module complete with a 
+package.json file. It need not actually be in npm, it can be a simple folder and made availabe via `npm link`. At startup, module-structure
+scans and loads plugins that implement known extension-points. At the time of this writing, there's only one extension-point for providing 
+module dependencies for a given module file which is called `module-structure:language`.
+ 
+To implement a custom language plugin, one needs to implement the StructureMapDependencyProvider interface and register the node module as 
+extension.
+ 
+Below is an example how to contribute support for the Swift language.
+
+### package.json
+
+In the example below, the module registers itself for the `module-structure:language` extension point and for modules files ending with the
+`.swift` file extension. The value is the relative path to the actual script containing the implementation.  
+
+
+```json
+{
+    "name": "module-structure-lang-swift",
+    ...
+    "extensions": {
+        "module-structure:language": {
+            "swift": "./src/module-structure-lang-swift"
+        }
+    }
+}
+```
+ 
+### Implementation
+ 
+A minimal skeletion implementation written in es6 would look like this:
+ 
+```javascript
+"use strict";
+
+class SwiftDependencyProvider {
+    
+    /**
+     * @public
+     * @param {string} modulePath The file path of the current module to provide dependencies for.
+     * @param {string} rootPath The root path of the code base. Some external libraries may require this.
+     * @returns {Array<string>} A list of relative file paths to dependent modules.
+     */
+    getDependencies(modulePath, rootPath) {
+        // TODO: add implementation here:
+        return [];
+    }
+}
+
+module.exports = function() {
+    return new SwiftDependencyProvider();
+};
+```
+
+### Further Examples
+
+Support for JavaScript, TypeScript and HTML Imports is provided via plugins, so there already exist some working examples written in 
+JavaScript and TypeScript, too. 
+
+You can find them here:
+  
+<ul>
+    <li><a href="https://github.com/rfruesmer/module-structure-lang-js">module-structure-lang-js</a></li>
+    <li><a href="https://github.com/rfruesmer/module-structure-lang-js">module-structure-lang-ts</a></li>
+    <li><a href="https://github.com/rfruesmer/module-structure-lang-js">module-structure-lang-html</a></li>
+</ul>
+
 ## Credits
 
 <table align="center">
@@ -215,14 +292,6 @@ let model = moduleStructure({rootDir: "/path/to/some/codebase"});
             <a href="https://www.npmjs.com/package/command-line-usage/">homepage</a>
             &nbsp;-&nbsp;  
             <a href="https://github.com/75lb/command-line-usage/blob/master/LICENSE">show license</a>
-        </td>
-    </tr>
-    <tr>
-        <td>dependency-tree</td>
-        <td align="right">
-            <a href="https://www.npmjs.com/package/dependency-tree/">homepage</a>
-            &nbsp;-&nbsp;  
-            <a href="http://spdx.org/licenses/MIT">show license</a>
         </td>
     </tr>
     <tr>
