@@ -217,7 +217,6 @@ describe("module-structure-api", function() {
         const expectedModelPath = path.join(rootDir, "ecommerce-sample.json");
         const expectedModel = JSON.parse(fs.readFileSync(expectedModelPath, "utf-8"));
 
-        assert.isTrue(getInstalledPathSync.withArgs(project.name, {local: true}).calledOnce);
         assert.deepEqual(actualModel, expectedModel);
     }
 

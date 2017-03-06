@@ -115,11 +115,19 @@ function configureLogging(): void {
 }
 
 function loadExtensions(): void {
-    let pluginManager = new PluginManager();
-    let pluginsDirectory = path.join(__dirname, "structure-map", "plugins");
     let globalModulesDirectory = require("global-modules");
+    let moduleDirectories = [globalModulesDirectory];
+    let localModulesDirectory = getInstalledPath();
+    localModulesDirectory = localModulesDirectory.length > 0
+        ? path.join(localModulesDirectory, "..")
+        : path.join(process.cwd(), "node_modules"); // for development
+    if (path.basename(localModulesDirectory) === "node_modules"
+            && localModulesDirectory !== globalModulesDirectory) {
+        moduleDirectories.push(localModulesDirectory);
+    }
 
-    pluginManager.scanSubdirs([pluginsDirectory, globalModulesDirectory]);
+    let pluginManager = new PluginManager();
+    pluginManager.scanSubdirs(moduleDirectories);
     pluginManager.scan();
 
     let extensionsMap = pluginManager.connect({}, "", {multi: true}, () => {})._extensions;
