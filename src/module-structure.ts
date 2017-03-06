@@ -271,6 +271,8 @@ function onRequest(req, res) {
         }
 
         if (isCreateViewModel(config)) {
+            // reload extensions to clear states/caches
+            loadExtensions();
             createStructureMap();
             createViewModel();
         }
