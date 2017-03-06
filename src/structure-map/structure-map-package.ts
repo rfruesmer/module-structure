@@ -3,7 +3,7 @@ import {StructureMapEntity} from "./structure-map-entity";
 import {StructureMapModule} from "./structure-map-module";
 
 const preconditions = require("preconditions").instance();
-const checkState = preconditions.checkState;
+const checkArgument = preconditions.checkArgument;
 
 
 export class StructureMapPackage extends StructureMapEntity {
@@ -33,57 +33,75 @@ export class StructureMapPackage extends StructureMapEntity {
             this.levelizeEntity(childPackage);
         });
         this.modules.forEach(module => this.levelizeEntity(module));
-
-        for (let i = this._rows.length - 1; i > 0; --i) {
-            this.finalizeRow(i);
-        }
+        this.finalizeRows();
     }
 
-    private levelizeEntity(entity: StructureMapEntity): void {
+    private levelizeEntity(entity: StructureMapEntity, relevelizing = false): void {
         // console.log("\n>>> " + entity.name + " => " + this.name);
+
+        let dependenciesToEntity: number;
+        let dependenciesToRow: number;
+        let insertPos: number;
+
 
         for (let i = this._rows.length - 1; i >= 0; --i) {
             let row = this._rows[i];
-            let dependenciesToEntity = row.getDependencyCountTo(entity);
-            let dependenciesToRow = row.getDependencyCountFrom(entity);
-
-            if (dependenciesToEntity === 0) {
-                if (dependenciesToRow > 0) {
-                    continue;
-                }
-
-                if (i === 0) {
-                    this.insertEntityIntoRow(entity, 0);
-                    return;
-                }
-
-                continue;
-            }
+            dependenciesToEntity = row.getDependencyCountTo(entity);
+            dependenciesToRow = row.getDependencyCountFrom(entity);
 
             if (dependenciesToEntity > dependenciesToRow) {
-                if (i < this._rows.length - 1) {
-                    dependenciesToEntity = this._rows[i + 1].getDependencyCountTo(entity);
-                    dependenciesToRow = this._rows[i + 1].getDependencyCountFrom(entity);
+                if (i === this._rows.length - 1) {
+                    this.insertEntityIntoNewRowBelow(entity, i);
+                    insertPos = i;
+                }
+                else {
+                    row = this._rows[i + 1];
+                    dependenciesToEntity = row.getDependencyCountTo(entity);
+                    dependenciesToRow = row.getDependencyCountFrom(entity);
                     if (dependenciesToEntity === 0 && dependenciesToRow === 0) {
                         this.insertEntityIntoRow(entity, i + 1);
-                        return;
                     }
+                    else {
+                        this.insertEntityIntoNewRowBelow(entity, i);
+                    }
+
+                    insertPos = i + 1;
                 }
 
-                this.insertEntityIntoNewRowBelow(entity, i);
+                if (!relevelizing) {
+                    this.relevelizeRowsAbove(insertPos);
+                }
+
                 return;
             }
 
             // continue to row above
         }
 
-        this.insertEntityIntoRow(entity, -1);
-        for (let i = 1; i < this._rows.length - 1; ++i) {
-            this.relevelizeRow(i);
+        let firstRow = this._rows[0];
+        dependenciesToEntity = firstRow.getDependencyCountTo(entity);
+        dependenciesToRow = firstRow.getDependencyCountFrom(entity);
+        if (dependenciesToEntity === 0 && dependenciesToRow === 0) {
+            this.insertEntityIntoRow(entity, 0);
+        }
+        else {
+            this.insertEntityIntoRow(entity, -1);
+            if (!relevelizing) {
+                this.relevelizeSecondRow();
+            }
         }
     }
 
+    private insertEntityIntoNewRowBelow(entity: StructureMapEntity, rowIndex: number) {
+        let newRow = new StructureMapRow(this);
+        this._rows.splice(rowIndex + 1, 0, newRow);
+        this.insertEntityIntoRow(entity, rowIndex + 1);
+        return newRow;
+    }
+
     private insertEntityIntoRow(entity: StructureMapEntity, rowIndex: number) {
+        checkArgument(rowIndex >= -1);
+
         if (rowIndex < 0) {
             this._rows.splice(0, 0, new StructureMapRow(this));
             rowIndex = 0;
@@ -96,19 +114,60 @@ export class StructureMapPackage extends StructureMapEntity {
         row.insert(entity);
     }
 
-    private insertEntityIntoNewRowBelow(entity: StructureMapEntity, rowIndex: number) {
-        let newRow = new StructureMapRow(this);
-        this._rows.splice(rowIndex + 1, 0, newRow);
-        this.insertEntityIntoRow(entity, rowIndex + 1);
-        return newRow;
+    private relevelizeSecondRow(): void {
+        let firstRow = this._rows[0];
+        let secondRow = this._rows[1];
+        let entitiesToBeMovedToFirstRow = [];
+        let entitiesToBeMovedToNewRow = [];
+
+        secondRow.entities.forEach(entity => {
+            let dependenciesToEntity = firstRow.getDependencyCountTo(entity);
+            let dependenciesToRow = firstRow.getDependencyCountFrom(entity);
+            if (dependenciesToRow > dependenciesToEntity) {
+                entitiesToBeMovedToNewRow.push(entity);
+            }
+            else if (dependenciesToRow === 0 && dependenciesToEntity === 0) {
+                entitiesToBeMovedToFirstRow.push(entity);
+            }
+        });
+
+        entitiesToBeMovedToFirstRow.forEach(entity => {
+            secondRow.remove(entity);
+            firstRow.insert(entity);
+        });
+
+        if (secondRow.entities.length === 0) {
+            this._rows.splice(1, 1);
+        }
+
+        if (entitiesToBeMovedToNewRow.length === 0) {
+            return;
+        }
+
+        this._rows.splice(0, 0, new StructureMapRow(this));
+        let newRow = this._rows[0];
+
+        entitiesToBeMovedToNewRow.forEach(entity => {
+            secondRow.remove(entity);
+            newRow.insert(entity);
+        });
+
+        if (secondRow.entities.length === 0) {
+            this._rows.splice(2, 1);
+        }
+
+        this.relevelizeSecondRow();
     }
 
-    private relevelizeRow(rowIndex: number): void {
-        let row = this._rows[rowIndex];
-        let rowEntities = row.entities;
-        rowEntities.forEach(entity => row.remove(entity));
-        this._rows.splice(rowIndex, 1);
-        rowEntities.forEach(entity => this.levelizeEntity(entity));
+    private finalizeRows() {
+        for (let i = this._rows.length - 1; i > 0; --i) {
+            this.finalizeRow(i);
+            if (this._rows[i].entities.length === 0) {
+                this._rows.splice(i, 1);
+            }
+        }
+
+        this._rows[0].sort();
     }
 
     private finalizeRow(rowIndex: number): void {
@@ -116,13 +175,29 @@ export class StructureMapPackage extends StructureMapEntity {
         let rowAbove = this._rows[rowIndex - 1];
 
         row.entities.forEach(entity => {
-            if (rowAbove.getDependencyCountTo(entity) === 0) {
+            let dependenciesToEntity = rowAbove.getDependencyCountTo(entity);
+            let dependenciesToRow = rowAbove.getDependencyCountFrom(entity);
+            if (dependenciesToEntity === 0 && dependenciesToRow === 0) {
                 row.remove(entity);
                 rowAbove.insert(entity);
             }
         });
 
-        checkState(row.entities.length > 0);
+        row.sort();
+    }
+
+    private relevelizeRowsAbove(rowIndex: number) {
+        let entititesToLevelize = [];
+
+        for (let i = rowIndex - 1; i >= 0; --i) {
+            let row = this._rows[i];
+            entititesToLevelize = entititesToLevelize.concat(row.entities);
+            this._rows.splice(i, 1);
+        }
+
+        entititesToLevelize.forEach(entity => {
+            this.levelizeEntity(entity, true);
+        });
     }
 
     get packages(): Array<StructureMapPackage> {

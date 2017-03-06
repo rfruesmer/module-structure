@@ -421,9 +421,6 @@ export class StructureView implements StructureViewObjectListener {
         });
 
         path.hover(e => {
-
-            console.log(sourceNode.model.name + " -> " + targetNode.model.name);
-
             path.attr({
                 "stroke": "#7fb8ff",
                 "stroke-width": 2,
@@ -441,6 +438,10 @@ export class StructureView implements StructureViewObjectListener {
 
             let target = $(e.target as HTMLElement);
             target.attr("marker-end", pathDesc.markerEnd);
+        });
+
+        path.click(() => {
+            console.log(sourceNode.model.name + " -> " + targetNode.model.name);
         });
 
         this.canvas.append(path);
@@ -477,6 +478,7 @@ export class StructureView implements StructureViewObjectListener {
 
         this.filterDependencies();
         this.updateDependencyArrows();
+        this.dumpDependencies();
     }
 
     private toggleSelection(node: StructureViewNode): void {
@@ -545,6 +547,90 @@ export class StructureView implements StructureViewObjectListener {
     private updateDependencyArrows() {
         this.removeDependencyArrows();
         this.createDependencyArrowsOf(this.rootNode);
+    }
+
+    private dumpDependencies() {
+        let selection = this.selectionService.getSelection();
+        let selectedDependencies = [];
+
+        if (this.dependencyDisplayMode === DependencyDisplayMode.ALL
+                || this.dependencyDisplayMode === DependencyDisplayMode.SELECTED) {
+            selectedDependencies = this.getDependenciesOf(selection);
+        }
+        else {
+            selectedDependencies = this.getDependenciesBetween(selection);
+        }
+
+        if (selectedDependencies.length === 0) {
+            return;
+        }
+
+        console.log("-------------------------------------------------------------------------------");
+        selectedDependencies.forEach(dependency => {
+            console.log(dependency);
+        });
+    }
+
+    private getDependenciesOf(nodes: Array<StructureViewNode>) {
+        let dependencies = [];
+        nodes.forEach(node => {
+            dependencies = dependencies.concat(this.getDependenciesOfNode(node));
+        });
+
+        return dependencies;
+    }
+
+    private getDependenciesOfNode(node: StructureViewNode): Array<string> {
+        let dependencies = this.dependenciesMap[node.model.id];
+        return dependencies ? this.normalizeDependencies(dependencies, node)
+            .map(dependency => this.formatDependencyOutput(node, dependency)) : [];
+    }
+
+    private normalizeDependencies(dependencies: Array<string>, filteredNode: StructureViewNode = null): Array<string> {
+        return dependencies
+            .filter(firstDependency => {
+                for (let i = 0; i < dependencies.length; ++i) {
+                    if (dependencies[i] === firstDependency) {
+                        continue;
+                    }
+
+                    if (dependencies[i].indexOf(firstDependency) === 0) {
+                        return false;
+                    }
+
+                    if (filteredNode &&
+                            firstDependency.indexOf(filteredNode.model.id) === 0) {
+                        return false;
+                    }
+                }
+
+                return true;
+            }).sort();
+    }
+
+    private formatDependencyOutput(node: StructureViewNode, dependency: string) {
+        return node.model.id + " -> " + dependency;
+    }
+
+    private getDependenciesBetween(nodes: Array<StructureViewNode>) {
+        let dependencies = [];
+
+        nodes.forEach(firstNode => {
+            let firstNodeDependencies = this.dependenciesMap[firstNode.model.id];
+            if (!firstNodeDependencies) {
+                return;
+            }
+            nodes.forEach(secondNode => {
+                firstNodeDependencies.forEach(dependency => {
+                    if (dependency.indexOf(firstNode.model.id) !== 0
+                            && dependency.indexOf(secondNode.model.id) === 0) {
+                        dependencies.push(this.formatDependencyOutput(firstNode, dependency));
+                    }
+                });
+            });
+        });
+
+        return this.normalizeDependencies(dependencies);
     }
 
     private showDependenciesOnSelected() {
