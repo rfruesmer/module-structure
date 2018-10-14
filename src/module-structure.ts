@@ -163,9 +163,7 @@ function isTemporaryExport(): boolean {
 
 
 function buildTemporaryOutFilePath(): void {
-    config.outFile = config.debug
-        ? path.join(process.cwd(), "src/structure-view/data/module-structure.json")
-        : path.join(getTempDir(), "module-structure.json");
+    config.outFile = path.join(getTempDir(), "module-structure.json");
 }
 
 function isDebugMode() {
@@ -174,10 +172,6 @@ function isDebugMode() {
 
 function deployWebAppToTempDir() {
     buildTemporaryOutFilePath();
-
-    if (isDebugMode()) {
-        return;
-    }
 
     logger.info("Deploying web-app ...");
 
