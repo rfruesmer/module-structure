@@ -21,6 +21,8 @@ export class StructureMapPackageBuilder {
     private moduleBuilder: StructureMapModuleBuilder;
     private dependencyProviders: Map<string, StructureMapLanguageProvider>;
     private supportedExtensions: Array<string> = [];
+    private processedModulesMap: Map<string, StructureMapModule>;
+    private processedModules: Array<StructureMapModule>;
 
     constructor(extensionRegistry: ExtensionRegistry) {
         checkArgument(extensionRegistry);
@@ -114,6 +116,8 @@ export class StructureMapPackageBuilder {
             }
         });
 
+        modules = this.postProcessModules(modules);
+
         return modules;
     }
 
@@ -141,5 +145,49 @@ export class StructureMapPackageBuilder {
 
     private static getModuleName(filePath: string, packageName: string): string {
         return packageName + "." + path.basename(filePath);
+    }
+
+    private postProcessModules(modules: Array<StructureMapModule>): Array<StructureMapModule> {
+        this.processedModulesMap = new Map<string, StructureMapModule>();
+        this.processedModules = [];
+
+        modules.forEach(module => {
+            let ext = path.parse(module.simpleName).ext;
+            if (ext === ".h" || ext === ".cpp") {
+                this.postProcessCppModule(module);
+            }
+            else {
+                this.processedModules.push(module);
+           }
+        });
+
+        return this.processedModules;
+    }
+
+    private postProcessCppModule(module: StructureMapModule): void {
+        let moduleExtension = path.parse(module.simpleName).ext;
+        let moduleSimpleName = path.parse(module.simpleName).name;
+        let moduleName = module.name.substr(0, module.name.length - moduleExtension.length);
+        let moduleImports = [];
+
+        module.imports.forEach(moduleImport => {
+            let moduleExt = path.parse(moduleImport).ext;
+            let newModuleImport = moduleImport.substr(0, moduleImport.length - moduleExt.length);
+            if (newModuleImport.length > 10 && newModuleImport.substr(newModuleImport.length - 10) === ".generated") {
+                return;
+            }
+            moduleImports.push(newModuleImport);
+        });
+
+        let processedModule = this.processedModulesMap[moduleName];
+        if (processedModule == null) {
+            let modulePath = module.path.substr(0, module.path.length - moduleExtension.length);
+            processedModule = new StructureMapModule(modulePath, moduleName, moduleSimpleName, moduleImports);
+            this.processedModulesMap[moduleName] = processedModule;
+            this.processedModules.push(processedModule)
+        }
+        else {
+            processedModule.imports.concat(moduleImports);
+        }
     }
 }

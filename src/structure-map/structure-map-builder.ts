@@ -55,7 +55,6 @@ export class StructureMapBuilder {
     }
 
     private indexModule(module: StructureMapModule): void {
-        checkArgument(fs.existsSync(module.path));
         this.moduleIndex[module.path] = module;
     }
 
