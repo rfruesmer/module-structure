@@ -1,9 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="module-structure" type="NodeJSConfigurationType" factoryName="Node.js" path-to-node="project" path-to-js-file="src/main.js" application-parameters="--rootDir X:\dev\sources\ttkf-integration\player\features\com.tts.player\src --exclude Application.js dependencies.js" working-dir="$PROJECT_DIR$">
-    <profiling v8-profiler-path="" />
-    <EXTENSION ID="com.jetbrains.nodejs.run.NodeJSProfilingRunConfigurationExtension">
-      <profiling v8-profiler-path="" />
-    </EXTENSION>
+  <configuration default="false" name="module-structure" type="NodeJSConfigurationType" factoryName="Node.js" path-to-node="project" path-to-js-file="src/main.js" application-parameters="--rootDir C:\UnrealProjects\VisionaryRepo\VisionaryGame\Source\VisionaryGame" working-dir="$PROJECT_DIR$">
     <method />
   </configuration>
 </component>

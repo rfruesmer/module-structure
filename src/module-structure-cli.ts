@@ -132,8 +132,8 @@ export class Application {
     }
 
     private static exitWithSuccess(): void {
-        throw null;
-    };
+        throw new Error();
+    }
 
     private processVersionArgument(): void {
         if (this.options.version) {

@@ -12,6 +12,7 @@
         ],
         "types": [
             "jquery",
+            "mocha",
             "node"
         ]
     },

@@ -279,7 +279,7 @@ describe("module-structure-api", function() {
 
     function thenEmitShouldHaveBeenCalled() {
         assert.isTrue(response.emit.called);
-        response.emit.reset();
+        response.emit.resetHistory();
     }
 
     function loadResource(url) {

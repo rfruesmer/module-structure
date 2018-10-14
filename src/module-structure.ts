@@ -9,7 +9,6 @@ import fs = require("fs-extra");
 import path = require("path");
 import process = require("process");
 import os = require("os");
-import Map = require("core-js/es6/map");
 
 const log4js = require("log4js");
 const project = require("../package.json");
@@ -98,20 +97,26 @@ function getInstalledPath(): string {
 
 function configureLogging(): void {
     let log4jsConfig = {
-        appenders: [
-            {
+        appenders: {
+            default: {
                 type: "console",
                 layout: {
                     type: "pattern",
                     pattern: "%m"
                 }
             }
-        ]
+        },
+        categories: {
+            default: {
+                appenders: ["default"],
+                level: "info"
+            }
+        }
     };
     log4js.configure(log4jsConfig);
 
     logger = log4js.getLogger();
-    logger.setLevel(config.logging ? log4js.levels.INFO : log4js.levels.OFF);
+    logger.level = config.logging ? log4js.levels.INFO : log4js.levels.OFF;
 }
 
 function loadExtensions(): void {

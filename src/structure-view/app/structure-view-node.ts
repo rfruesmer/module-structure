@@ -16,9 +16,9 @@ export class StructureViewNode extends StructureViewObject implements StructureV
     private static readonly TEXT_PADDING = 10;
 
     canvas: JQuery;
-    rect: JQuery;
-    icon: JQuery;
-    text: JQuery;
+    rect: JQuery<SVGElement>;
+    icon: JQuery<SVGElement>;
+    text: JQuery<SVGElement>;
     model: StructureViewModelNode;
     parent: StructureViewNode;
     rows: Array<StructureViewRow> = [];
@@ -108,7 +108,7 @@ export class StructureViewNode extends StructureViewObject implements StructureV
         this.canvas.append(this.text);
     }
 
-    private onClick(event: JQueryEventObject): void {
+    private onClick(event: JQuery.Event): void {
         this.notifyClicked(this, event);
     }
 
@@ -121,7 +121,7 @@ export class StructureViewNode extends StructureViewObject implements StructureV
         return this._selected;
     }
 
-    private onDoubleClick(event: JQueryEventObject): void {
+    private onDoubleClick(event: JQuery.Event): void {
         this.selected = true;
         this.toggle();
         this.notifyDoubleClicked(this, event);

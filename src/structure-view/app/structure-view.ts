@@ -406,7 +406,7 @@ export class StructureView implements StructureViewObjectListener {
         return {from, to, qx, qy, strokeColor, markerEnd};
     }
 
-    private createArrowPath(pathDesc: any, sourceNode: StructureViewNode, targetNode: StructureViewNode): JQuery {
+    private createArrowPath(pathDesc: any, sourceNode: StructureViewNode, targetNode: StructureViewNode): JQuery<SVGElement> {
         let pathString = "M" + pathDesc.from.x + " " + pathDesc.from.y
             + "Q" + pathDesc.qx + " " + pathDesc.qy
             + " " + pathDesc.to.x + " " + pathDesc.to.y;
@@ -427,7 +427,7 @@ export class StructureView implements StructureViewObjectListener {
                 "stroke-dasharray": "2,1"
             });
 
-            let target = $(e.target as HTMLElement);
+            let target = $(e.target as any);
             target.attr("marker-end", "url(#arrow-hover)");
         }, e => {
             path.attr({
@@ -436,7 +436,7 @@ export class StructureView implements StructureViewObjectListener {
                 "stroke-dasharray": ""
             });
 
-            let target = $(e.target as HTMLElement);
+            let target = $(e.target as any);
             target.attr("marker-end", pathDesc.markerEnd);
         });
 
@@ -449,7 +449,7 @@ export class StructureView implements StructureViewObjectListener {
         return path;
     }
 
-    private mapArrow(source: StructureViewNode, target: StructureViewNode, path: JQuery) {
+    private mapArrow(source: StructureViewNode, target: StructureViewNode, path: JQuery<SVGElement>) {
         let key = source.model.id;
         let entries = this.arrowsMap[key];
         if (!entries) {

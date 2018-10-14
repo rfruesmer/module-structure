@@ -51,7 +51,7 @@ const path = require("path");
 
     private thenAPIShouldBeCalledWithExpectedConfig() {
         expect(this.api.calledWith(this.expectedConfig)).to.be.true;
-        this.api.reset();
+        this.api.resetHistory();
     }
 
     @test "exports and terminates if outFile is given"() {
@@ -59,7 +59,7 @@ const path = require("path");
         this.givenCLI();
         this.givenRootDir();
         this.givenOutFile();
-        expect(() => this.whenInvokingCLI()).to.throw(null);
+        expect(() => this.whenInvokingCLI()).to.throw(Error);
         this.thenAPIShouldBeCalledWithExpectedConfig();
     }
 

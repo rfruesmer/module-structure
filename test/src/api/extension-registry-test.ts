@@ -7,6 +7,6 @@ import {ExtensionRegistry} from "../../../src/structure-map/extension-registry";
     @test "returns empty map if no extensions exist for given extension point"() {
         let extensionRegistry = new ExtensionRegistry();
         let extensions = extensionRegistry.getExtensions("fake-extension-point");
-        assert.deepEqual(extensions, {});
+        assert.equal(extensions.size, 0);
     }
 }

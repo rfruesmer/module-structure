@@ -184,7 +184,7 @@ export class StructureMapPackageBuilder {
             let modulePath = module.path.substr(0, module.path.length - moduleExtension.length);
             processedModule = new StructureMapModule(modulePath, moduleName, moduleSimpleName, moduleImports);
             this.processedModulesMap[moduleName] = processedModule;
-            this.processedModules.push(processedModule)
+            this.processedModules.push(processedModule);
         }
         else {
             processedModule.imports.concat(moduleImports);
