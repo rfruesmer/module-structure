@@ -1,2 +1,2 @@
-require("!!script!jquery/dist/jquery.js");
+require("script-loader!!jquery/dist/jquery.js");
 

@@ -1,8 +1,5 @@
-var webpack = require("webpack");
-var HtmlWebpackPlugin = require("html-webpack-plugin");
-var ExtractTextPlugin = require("extract-text-webpack-plugin");
-var helpers = require("./helpers");
-var path = require("path");
+const HtmlWebpackPlugin = require("html-webpack-plugin");
+
 
 module.exports = {
     entry: {
@@ -11,49 +8,25 @@ module.exports = {
     },
 
     resolve: {
-        extensions: ["", ".js", ".ts"]
+        extensions: [".js", ".ts"]
     },
 
     module: {
-        loaders: [
-            {
-                test: /\.ts$/,
-                loaders: ["awesome-typescript-loader"]
-            },
-            {
-                test: /\.html$/,
-                loader: "html"
-            },
-            {
-                test: /\.(png|jpe?g|gif|woff|woff2|ttf|eot|ico)$/,
-                loader: "file?name=assets/[name].[hash].[ext]"
-            },
-            {
-                test: /\.svg/,
-                loader: "file?name=assets/[name].[ext]"
-            },
-            {
-                test: /\.css$/,
-                exclude: helpers.root("src", "app"),
-                loader: ExtractTextPlugin.extract("style", "css?sourceMap")
-            },
-            {
-                test: /\.css$/,
-                include: helpers.root("src", "app"),
-                loader: "raw"
-            },
-            {
-                test: /\.scss$/,
-                loaders: ["style", "css", "sass"]
+        rules: [
+            {test: /\.ts$/, use: "awesome-typescript-loader"},
+            {test: /\.html$/, use: "html-loader"},
+            {test: /\.(png|jpe?g|gif|woff|woff2|ttf|eot|ico)$/,use: "file-loader?name=assets/[name].[hash].[ext]"},
+            {test: /\.svg/, use: "file-loader?name=assets/[name].[ext]"},
+            {test: /\.css$/, use: "raw-loader"},
+            {test: /\.scss$/, use: [
+                    {loader: "style-loader"},
+                    {loader: "css-loader"},
+                    {loader: "sass-loader"}
+                ]
             }
         ]
     },
-
     plugins: [
-        new webpack.optimize.CommonsChunkPlugin({
-            name: ["app", "vendor"]
-        }),
-
         new HtmlWebpackPlugin({
             template: "src/structure-view/index.html"
         })

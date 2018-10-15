@@ -18,11 +18,8 @@ module.exports = webpackMerge(commonConfig, {
     ],
 
     module: {
-        loaders: [
-            {
-                test: /module-structure\.json/,
-                loaders: ["file?name=[name].[ext]"]
-            }
+        rules: [
+            {test: /module-structure\.json/, use: "file?name=[name].[ext]"}
         ]
     },
 
