@@ -15,7 +15,7 @@ const project = require("../package.json");
 const PluginManager = require("js-plugins");
 
 let HttpServerModule = require("http-server");
-let getInstalledPathSync = require("get-installed-path").sync;
+let getInstalledPathSync = require("get-installed-path").getInstalledPathSync;
 let opener = require("opener");
 
 const TEMP_DIR = "module-structure-0c8c1f08";
