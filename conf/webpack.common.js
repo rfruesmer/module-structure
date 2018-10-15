@@ -17,7 +17,11 @@ module.exports = {
             {test: /\.html$/, use: "html-loader"},
             {test: /\.(png|jpe?g|gif|woff|woff2|ttf|eot|ico)$/,use: "file-loader?name=assets/[name].[hash].[ext]"},
             {test: /\.svg/, use: "file-loader?name=assets/[name].[ext]"},
-            {test: /\.css$/, use: "raw-loader"},
+            {test: /\.css$/, use: [
+                    { loader: "style-loader" },
+                    { loader: "css-loader" }
+                ]
+            },
             {test: /\.scss$/, use: [
                     {loader: "style-loader"},
                     {loader: "css-loader"},
