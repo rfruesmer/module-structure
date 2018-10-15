@@ -27,9 +27,6 @@ describe("module-structure-api", function() {
     let tempDir;
     let response;
 
-    it("starts http-server", function() {
-        expectsItStartsHttpServer();
-    });
 
     function expectsItStartsHttpServer(port) {
         givenConfigWithOpen(port);
@@ -159,13 +156,12 @@ describe("module-structure-api", function() {
     it("exports outFile", function() {
         givenConfigWithoutOpen();
         givenRootDir("test/resources/es6/ecommerce-sample");
-        givenOutFile("src/structure-view/data/module-structure.json");
         whenInvokingAPI();
         thenExportedModelShouldEqualExpectedModel("ecommerce-sample.json");
     });
 
     function givenOutFile(pathName) {
-        outFile = path.join(process.cwd(), pathName);
+        outFile = path.join(config.outD, pathName);
         config.outFile = outFile;
 
         const outDir = path.dirname(outFile);
@@ -175,7 +171,7 @@ describe("module-structure-api", function() {
     }
 
     function thenExportedModelShouldEqualExpectedModel(fileName) {
-        const actualModel = JSON.parse(fs.readFileSync(outFile, "utf-8"));
+        const actualModel = JSON.parse(fs.readFileSync(config.outFile, "utf-8"));
         const expectedModelPath = path.join(rootDir, fileName);
         const expectedModel = JSON.parse(fs.readFileSync(expectedModelPath, "utf-8"));
 
@@ -185,52 +181,14 @@ describe("module-structure-api", function() {
     it("skips excludes", function() {
         givenConfigWithoutOpen();
         givenRootDir("test/resources/es6/ecommerce-sample");
-        givenOutFile("src/structure-view/data/module-structure.json");
         givenExcludes(["billing", "sales-service.js"]);
         whenInvokingAPI();
-        thenActualModelShouldEqualExpectedModel();
+        thenExportedModelShouldEqualExpectedModel("ecommerce-sample-without-excludes.json");
     });
 
     function givenExcludes(excludes) {
         config.exclude = excludes;
     }
-
-    function thenActualModelShouldEqualExpectedModel() {
-        const expectedModelPath = path.join(rootDir, "ecommerce-sample-without-excludes.json");
-        const expectedModel = JSON.parse(fs.readFileSync(expectedModelPath, "utf-8"));
-
-        assert.deepEqual(actualModel, expectedModel);
-    }
-
-    it("uses installation dist path for temporary outFiles", function() {
-        givenConfigWithOpen();
-        givenRootDir("test/resources/es6/ecommerce-sample");
-        givenInstalledPath();
-        givenSpyingHttpServer();
-        givenHttpServerModule();
-        whenInvokingAPI();
-        thenOutFileShouldBeExportedToDist();
-    });
-
-    function thenOutFileShouldBeExportedToDist() {
-        const actualModel = JSON.parse(fs.readFileSync(expectedOutFilePath, "utf-8"));
-        const expectedModelPath = path.join(rootDir, "ecommerce-sample.json");
-        const expectedModel = JSON.parse(fs.readFileSync(expectedModelPath, "utf-8"));
-
-        assert.deepEqual(actualModel, expectedModel);
-    }
-
-    it("uses cwd dist path for temporary outFiles if not installed", function() {
-        givenConfigWithOpen();
-        givenRootDir("test/resources/es6/ecommerce-sample");
-        givenNotInstalled();
-        givenDevelopmentPath();
-        givenSpyingHttpServer();
-        givenHttpServerModule();
-        givenNotInstalled();
-        whenInvokingAPI();
-        thenOutFileShouldBeExportedToDist();
-    });
 
     function givenNotInstalled() {
         getInstalledPathSync = sinon.stub();
@@ -247,22 +205,6 @@ describe("module-structure-api", function() {
             fs.mkdirSync(serverRoot);
         }
     }
-
-    it("repeats analysis on index.html reload", function(done) {
-        givenConfigWithOpen();
-        givenRootDir("test/resources/es6/ecommerce-sample");
-        givenNotInstalled();
-        givenDevelopmentPath();
-        givenFakeHttpServer();
-        givenFakeHttpServerModule();
-        givenOpener();
-        whenInvokingAPI();
-        afterPageIsLoaded();
-        thenEmitShouldHaveBeenCalled();
-        afterModelHasChanged()
-            .then(() => andReloadingPage(done))
-            .catch(err => failTest(err, done));
-    });
 
     function givenFakeHttpServerModule() {
         HttpServerModule = {};
@@ -344,23 +286,6 @@ describe("module-structure-api", function() {
             .then(() => done(err))
             .catch(() => done(err));
     }
-
-
-    it("doesn't repeats analysis for reload of other resources", function(done) {
-        givenConfigWithOpen();
-        givenRootDir("test/resources/es6/ecommerce-sample");
-        givenNotInstalled();
-        givenDevelopmentPath();
-        givenFakeHttpServer();
-        givenFakeHttpServerModule();
-        givenOpener();
-        whenInvokingAPI();
-        afterPageIsLoaded();
-        thenEmitShouldHaveBeenCalled();
-        afterModelHasChanged()
-            .then(() => andLoadingSomeOtherResource(done))
-            .catch(err => failTest(err, done));
-    });
 
     function andLoadingSomeOtherResource(done) {
         loadResource("/styles.css");
