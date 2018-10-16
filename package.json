@@ -15,7 +15,7 @@
     "clean-js": "rimraf src/**/*.js && rimraf src/**/*.js.map && rimraf test/resources/ts/**/*.js && rimraf test/resources/ts/**/*.js.map",
     "pretest": "npm run build-dev",
     "posttest": "nyc report --reporter=json && codecov -f coverage/*.json",
-    "publish": "npm version patch && npm publish && git push && npm run build-dev",
+    "publish": "npm version patch && git push && npm run build-prod && npm publish",
     "start-dev-server": "webpack-dev-server --config conf/webpack.dev.js  --hot --inline --progress --port 8080",
     "start-prod-server": "http-server dist/web-app -o http://localhost:8080?data=module-structure.json",
     "test": "nyc mocha test/src/**/*.js",
