@@ -3,10 +3,6 @@ import "./assets/style.css";
 import "./assets/ic_folder_black_24px.svg";
 import "./assets/ic_insert_drive_file_black_24px.svg";
 
-if (process.env.ENV !== "production") {
-    require("./data/module-structure.json");
-}
-
 (function () {
     loadModel()
         .done(model => {
@@ -19,6 +15,14 @@ if (process.env.ENV !== "production") {
 })();
 
 function loadModel(): JQueryPromise<any> {
+
+    if (process.env.ENV !== "production") {
+        const model = require("./data/module-structure.json");
+        const deferred = $.Deferred();
+        deferred.resolve(model);
+        return deferred.promise();
+    }
+
     let url = getParam("input");
     return (url.length > 0)
         ? $.ajax({url: url, dataType: "json"})

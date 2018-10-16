@@ -4,6 +4,7 @@ const commonConfig = require("./webpack.common.js");
 const helpers = require("./helpers");
 
 module.exports = webpackMerge(commonConfig, {
+    mode: "development",
     devtool: "source-map",
 
     output: {
@@ -13,13 +14,8 @@ module.exports = webpackMerge(commonConfig, {
         chunkFilename: "[id].chunk.js"
     },
 
-    plugins: [
-        new ExtractTextPlugin("[name].css")
-    ],
-
     module: {
         rules: [
-            {test: /module-structure\.json/, use: "file?name=[name].[ext]"}
         ]
     },
 

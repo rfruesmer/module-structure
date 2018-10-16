@@ -17,4 +17,3 @@ test/src/cli/module-structure-cli-test.js*
 test/src/model-builder/model-builder-test-util.js*
 output/
 npm-debug.log
-/package-lock.json

@@ -1,10 +1,12 @@
 const webpack = require("webpack");
 const webpackMerge = require("webpack-merge");
+const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 const commonConfig = require("./webpack.common.js");
 const helpers = require("./helpers");
 const ENV = process.env.NODE_ENV = process.env.ENV = "production";
 
 module.exports = webpackMerge(commonConfig, {
+    mode: "production",
     output: {
         path: helpers.root("dist/web-app"),
         publicPath: "",
@@ -24,5 +26,8 @@ module.exports = webpackMerge(commonConfig, {
                 "ENV": JSON.stringify(ENV)
             }
         })
-    ]
+    ],
+    optimization: {
+        minimizer: [new UglifyJsPlugin()]
+    }
 });

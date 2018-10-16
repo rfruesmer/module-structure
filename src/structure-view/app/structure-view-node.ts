@@ -175,8 +175,9 @@ export class StructureViewNode extends StructureViewObject implements StructureV
     }
 
     private calculateSize(): Point {
+        const textBox = $(this.text).get(0).getBoundingClientRect();
         const minimumWidth = 2 * StructureViewNode.ICON_PADDING + StructureViewNode.ICON_SIZE
-            + this.text.width() + StructureViewNode.TEXT_PADDING;
+            + textBox.width + StructureViewNode.TEXT_PADDING;
         if (!this.expanded || this.rows.length === 0) {
             return new Point(minimumWidth, StructureViewNode.DEFAULT_HEIGHT);
         }
