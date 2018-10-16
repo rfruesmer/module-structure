@@ -173,6 +173,9 @@ export class StructureMapPackageBuilder {
         module.imports.forEach(moduleImport => {
             let moduleExt = path.parse(moduleImport).ext;
             let newModuleImport = moduleImport.substr(0, moduleImport.length - moduleExt.length);
+            if (path.parse(newModuleImport).name === moduleSimpleName) {
+                return;
+            }
             if (newModuleImport.length > 10 && newModuleImport.substr(newModuleImport.length - 10) === ".generated") {
                 return;
             }
