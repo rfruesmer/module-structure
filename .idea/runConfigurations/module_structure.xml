@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="module-structure" type="NodeJSConfigurationType" factoryName="Node.js" application-parameters="--rootDir C:\UnrealProjects\VisionaryRepo\VisionaryGame\Source\VisionaryGame --outFile C:\temp\VisionaryGame-Structure.json" path-to-js-file="src/main.js" working-dir="$PROJECT_DIR$">
+  <configuration default="false" name="module-structure" type="NodeJSConfigurationType" factoryName="Node.js" application-parameters="--rootDir C:\UnrealProjects\VisionaryRepo\VisionaryGame\Source\VisionaryGame --outFile V:\dev\sources\module-structure\src\structure-view\data\module-structure.json" path-to-js-file="src/main.js" working-dir="$PROJECT_DIR$">
     <method v="2" />
   </configuration>
 </component>

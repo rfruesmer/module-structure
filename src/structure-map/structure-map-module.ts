@@ -16,4 +16,8 @@ export class StructureMapModule extends StructureMapEntity {
     get imports(): Array<string> {
         return this._imports.slice();
     }
+
+    set imports(imports: Array<string>) {
+        this._imports = imports;
+    }
 }

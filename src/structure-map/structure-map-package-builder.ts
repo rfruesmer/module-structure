@@ -190,7 +190,7 @@ export class StructureMapPackageBuilder {
             this.processedModules.push(processedModule);
         }
         else {
-            processedModule.imports.concat(moduleImports);
+            processedModule.imports = processedModule.imports.concat(moduleImports);
         }
     }
 }
