@@ -273,6 +273,7 @@ You can find them here:
     <li><a href="https://github.com/rfruesmer/module-structure-lang-js">module-structure-lang-js</a></li>
     <li><a href="https://github.com/rfruesmer/module-structure-lang-ts">module-structure-lang-ts</a></li>
     <li><a href="https://github.com/rfruesmer/module-structure-lang-html">module-structure-lang-html</a></li>
+    <li><a href="https://github.com/linternator/module-structure-lang-cpp">module-structure-lang-cpp</a></li>
 </ul>
 
 ## Credits
@@ -348,6 +349,14 @@ You can find them here:
             <a href="https://www.npmjs.com/package/log4js/">homepage</a>
             &nbsp;-&nbsp;  
             <a href="https://github.com/nomiddlename/log4js-node/blob/master/LICENSE">show license</a>
+        </td>
+    </tr>
+    <tr>
+        <td>module-structure-lang-cpp<br><br>Special thanks to my buddy @linternator for implementing<br>the plugin for analyzing C++ dependencies</td>
+        <td align="right">
+            <a href="https://www.npmjs.com/package/module-structure-lang-cpp/">homepage</a>
+            &nbsp;-&nbsp;  
+            <a href="https://spdx.org/licenses/MIT">show license</a>
         </td>
     </tr>
     <tr>
