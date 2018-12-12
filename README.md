@@ -264,7 +264,7 @@ module.exports = function() {
 
 ### Further Examples
 
-Support for JavaScript, TypeScript and HTML Imports is provided via plugins, so there already exist some working examples written in 
+Support for JavaScript, TypeScript, HTML Imports and even C++ is provided via plugins, so there already exist some working examples written in 
 JavaScript and TypeScript, too. 
 
 You can find them here:
