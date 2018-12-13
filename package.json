@@ -33,8 +33,12 @@
     "javascript",
     "ecmascript",
     "es6",
+    "c++",
+    "architecture",
+    "design",
     "dependency",
     "dependencies",
+    "package",
     "structure",
     "module"
   ],
