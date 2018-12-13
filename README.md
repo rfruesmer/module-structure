@@ -50,7 +50,7 @@ But for now, it's already possible to influence display of dependencies with the
 
 ## Prerequisites
 
-Requires a recent Node.js installation (6.x/7.x).
+Requires a recent Node.js installation (8.x).
 
 ## CLI 
 
