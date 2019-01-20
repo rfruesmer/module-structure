@@ -285,11 +285,11 @@ export class StructureViewNode extends StructureViewObject implements StructureV
         this.notifyExpanded(target);
     }
 
-    onClicked(target: StructureViewObject, event: JQueryEventObject): void {
+    onClicked(target: StructureViewObject, event: JQuery.Event): void {
         this.notifyClicked(target, event);
     }
 
-    onDoubleClicked(target: StructureViewObject, event: JQueryEventObject): void {
+    onDoubleClicked(target: StructureViewObject, event: JQuery.Event): void {
         this.notifyDoubleClicked(target, event);
     }
 

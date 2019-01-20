@@ -463,7 +463,7 @@ export class StructureView implements StructureViewObjectListener {
         this.resize();
     }
 
-    onClicked(target: StructureViewObject, event: JQueryEventObject): void {
+    onClicked(target: StructureViewObject, event: JQuery.Event): void {
         if (!(target instanceof StructureViewNode)) {
             return;
         }
@@ -659,7 +659,7 @@ export class StructureView implements StructureViewObjectListener {
         this.updateDependencyArrows();
     }
 
-    public onDoubleClicked(target: StructureViewObject, event: JQueryEventObject): void {
+    public onDoubleClicked(target: StructureViewObject, event: JQuery.Event): void {
         if (!(target instanceof StructureViewNode)) {
             return;
         }
