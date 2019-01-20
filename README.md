@@ -56,7 +56,7 @@ Requires a recent Node.js installation (8.x).
 
 ### Installation
 
-`npm i -g module-structure`
+`npm i -g module-structure module-structure-lang-ts module-structure-lang-js`
 
 ### Usage
 
@@ -90,7 +90,7 @@ Reads an existing structure map JSON file and displays it in default browser.
 
 ### Installation
 
-`npm i --save module-structure`
+`npm i --save module-structure module-structure-lang-ts module-structure-lang-js`
 
 ### Usage
 
