@@ -3,4 +3,5 @@ language: node_js
 node_js: 8
 install:
     - npm i -g module-structure-lang-js module-structure-lang-ts
+    - npm install
 
