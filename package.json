@@ -1,6 +1,6 @@
 {
   "name": "module-structure",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Create levelized structure maps from module dependencies.",
   "main": "index.js",
   "bin": {
