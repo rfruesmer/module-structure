@@ -2,7 +2,7 @@ import {StructureMapModule} from "./structure-map-module";
 import {StructureMapLanguageProvider} from "./structure-map-language-provider";
 
 import path = require("path");
-import Map = require("core-js/es/map");
+import Map = require("core-js/es6/map");
 
 
 export class StructureMapModuleBuilder {
