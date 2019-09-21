@@ -1,4 +1,4 @@
-import Map = require("core-js/es6/map");
+import Map = require("core-js/es/map");
 
 
 export class ExtensionRegistry {
