@@ -161,29 +161,40 @@ export class StructureMapPackage extends StructureMapEntity {
 
     private finalizeRows() {
         for (let i = this._rows.length - 1; i > 0; --i) {
-            this.finalizeRow(i);
+            const restart = this.finalizeRow(i);
             if (this._rows[i].entities.length === 0) {
                 this._rows.splice(i, 1);
+            }
+
+            if (restart) {
+                i = this._rows.length - 1;
             }
         }
 
         this._rows[0].sort();
     }
 
-    private finalizeRow(rowIndex: number): void {
+    private finalizeRow(rowIndex: number): boolean {
         let row = this._rows[rowIndex];
         let rowAbove = this._rows[rowIndex - 1];
+        let restart = false;
 
         row.entities.forEach(entity => {
+            if (entity.simpleName === "preconditions.ts") {
+                console.log("hier?");
+            }
             let dependenciesToEntity = rowAbove.getDependencyCountTo(entity);
             let dependenciesToRow = rowAbove.getDependencyCountFrom(entity);
             if (dependenciesToEntity === 0 && dependenciesToRow === 0) {
                 row.remove(entity);
                 rowAbove.insert(entity);
+                restart = true;
             }
         });
 
         row.sort();
+
+        return restart;
     }
 
     private relevelizeRowsAbove(rowIndex: number) {

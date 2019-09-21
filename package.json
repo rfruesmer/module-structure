@@ -97,7 +97,9 @@
     "preconditions": "^2.2.3"
   },
   "nyc": {
-      "include": "src/**",
-      "extension": [".ts"]
+    "include": "src/**",
+    "extension": [
+      ".ts"
+    ]
   }
 }
