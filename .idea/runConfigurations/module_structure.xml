@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="module-structure" type="NodeJSConfigurationType" application-parameters="--rootDir C:\temp\jsms\src" path-to-js-file="src/main.js" working-dir="$PROJECT_DIR$">
+  <configuration default="false" name="module-structure" type="NodeJSConfigurationType" application-parameters="--rootDir X:\dev\sources\ttps-quickaccess-creator\tts-steplist-editor\src" path-to-js-file="src/main.js" working-dir="$PROJECT_DIR$">
     <method v="2" />
   </configuration>
 </component>

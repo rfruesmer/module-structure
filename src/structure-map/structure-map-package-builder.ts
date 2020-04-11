@@ -6,7 +6,6 @@ import {StructureMapLanguageProvider} from "./structure-map-language-provider";
 
 import fs = require("fs");
 import path = require("path");
-import Map = require("core-js/es6/map");
 
 const preconditions = require("preconditions").instance();
 const checkArgument = preconditions.checkArgument;

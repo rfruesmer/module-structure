@@ -1,6 +1,3 @@
-import fs = require("fs");
-import path = require("path");
-import process = require("process");
 import {ModuleStructureConfiguration} from "./module-structure-configuration";
 
 const moduleStructure = require("./module-structure");
@@ -27,13 +24,13 @@ export class Application {
         {
             name: "rootDir",
             type: String,
-            typeLabel: "[underline]{directory}",
+            typeLabel: "{underline directory}",
             description: "Specifies the root directory of input files."
         },
         {
             name: "outFile",
             type: String,
-            typeLabel: "[underline]{file}",
+            typeLabel: "{underline file}",
             description: "Optional: the output path for the structure map JSON-file. If omitted, the file will be created in a temporary directory and rendered as a diagram in your default browser."
         },
         {
@@ -51,14 +48,14 @@ export class Application {
         {
             name: "inputFile",
             type: String,
-            typeLabel: "[underline]{file}",
+            typeLabel: "{underline file}",
             description: "Skips the analysis step and directly renders the specified input model file as a diagram in your default browser."
         },
         {
             name: "port",
             alias: "p",
             defaultValue: 3000,
-            typeLabel: "[underline]{port}",
+            typeLabel: "{underline port}",
             description: "Port for serving the included viewer webapp (defaults to 3000). Omitted if neither --outFile or --inFile are specified."
         }
     ];
@@ -92,7 +89,7 @@ export class Application {
     }
 
     private printUsage(): void {
-        let sections = [
+        const sections = [
             {
                 header: project.name,
                 content: "Creates levelized structure maps from ECMAScript, TypeScript and AMD dependencies."
@@ -100,8 +97,8 @@ export class Application {
             {
                 header: "Usage",
                 content: [
-                    "$ " + project.name + " [bold]{--rootDir} [underline]{directory}",
-                    "$ " + project.name + " [bold]{--rootDir} [underline]{directory} [bold]{--outFile} [underline]{file}"
+                    "$ " + project.name + " {bold --rootDir} {underline directory}",
+                    "$ " + project.name + " {bold --rootDir} {underline directory} {bold --outFile} {underline file}"
                 ]
             },
             {

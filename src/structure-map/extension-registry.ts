@@ -1,5 +1,3 @@
-import Map = require("core-js/es6/map");
-
 
 export class ExtensionRegistry {
     private _registry = new Map<string, Map<string, any>>();
@@ -22,7 +20,9 @@ export class ExtensionRegistry {
         }
 
         for (let key in extensionMap) {
-            extensions[key] = extensionMap[key];
+            if (extensionMap.hasOwnProperty(key)) {
+                extensions[key] = extensionMap[key];
+            }
         }
 
         return extensions;
