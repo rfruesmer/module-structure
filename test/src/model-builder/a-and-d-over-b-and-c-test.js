@@ -1,6 +1,6 @@
 const describe = require("mocha").describe;
 const it = require("mocha").it;
-
+const join = require("path").join;
 const util = require("./model-builder-test-util");
 const buildViewModelFor = util.buildViewModelFor;
 const expectRootIsPresent = util.expectRootIsPresent;
@@ -17,9 +17,11 @@ const expectContainsFeedback = util.expectContainsFeedback;
 
 describe("a-and-d-over-b-and-c", function() {
 
+    const projectRoot = join(__dirname, "../../../");
+
     const tests = [
-        {rootDir: "test/resources/es6/a-and-d-over-b-and-c", moduleType: "es6", extension: ".js"},
-        {rootDir: "test/resources/ts/a-and-d-over-b-and-c", moduleType: "ts", extension: ".ts"}
+        {rootDir: join(projectRoot, "test/resources/es6/a-and-d-over-b-and-c"), moduleType: "es6", extension: ".js"},
+        {rootDir: join(projectRoot, "test/resources/ts/a-and-d-over-b-and-c"), moduleType: "ts", extension: ".ts"}
     ];
 
     tests.forEach(test => {

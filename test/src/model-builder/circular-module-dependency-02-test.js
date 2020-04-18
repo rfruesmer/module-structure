@@ -1,6 +1,6 @@
 const describe = require("mocha").describe;
 const it = require("mocha").it;
-
+const join = require("path").join;
 const util = require("./model-builder-test-util");
 const buildViewModelFor = util.buildViewModelFor;
 const expectRootIsPresent = util.expectRootIsPresent;
@@ -16,9 +16,11 @@ const expectContainsFeedback = util.expectContainsFeedback;
 
 describe("circular-module-dependency-02", function() {
 
+    const projectRoot = join(__dirname, "../../../");
+
     const tests = [
-        {rootDir: "test/resources/es6/circular-module-dependency-02", moduleType: "es6", extension: ".js"},
-        {rootDir: "test/resources/ts/circular-module-dependency-02", moduleType: "ts", extension: ".ts"}
+        {rootDir: join(projectRoot, "test/resources/es6/circular-module-dependency-02"), moduleType: "es6", extension: ".js"},
+        {rootDir: join(projectRoot, "test/resources/ts/circular-module-dependency-02"), moduleType: "ts", extension: ".ts"}
     ];
 
     tests.forEach(test => {
