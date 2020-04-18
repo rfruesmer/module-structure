@@ -26,19 +26,7 @@ export class StructureMapModuleBuilder {
     private getDependencies(modulePath: string, rootDir: string): Array<string> {
         let fileExtension = path.extname(modulePath).substr(1);
         let dependencyProvider = this.dependencyProviders[fileExtension];
-        let dependencies = dependencyProvider ? dependencyProvider.getDependencies(modulePath, rootDir) : [];
 
-        return dependencies.map(dependency => StructureMapModuleBuilder.resolveRootPathAlias(dependency, modulePath, rootDir));
-    }
-
-    private static resolveRootPathAlias(dependency: string, modulePath: string, rootDir: string): string {
-        if (!dependency.startsWith("@/")) {
-            return dependency;
-        }
-
-        const relativePath = path.relative(path.dirname(modulePath), rootDir);
-        dependency =  path.join(relativePath, dependency.substr(2));
-
-        return dependency;
+        return dependencyProvider ? dependencyProvider.getDependencies(modulePath, rootDir) : [];
     }
 }
