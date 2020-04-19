@@ -9,7 +9,7 @@
   "scripts": {
     "build-dev": "tsc -p . && npm run tslint",
     "build-prod": "npm run clean-js && npm run test && npm run clean-dist && npm run build-prod-lib && npm run build-prod-webapp",
-    "build-prod-lib": "npm run tsc-prod-lib && cp-cli package.json dist && cp-cli dist/lib/index.js dist",
+    "build-prod-lib": "npm run tsc-prod-lib && cp-cli package.json dist/package.json",
     "build-prod-webapp": "webpack --config conf/webpack.prod.js --progress --profile --bail",
     "clean-dist": "rimraf dist/",
     "clean-js": "rimraf src/**/*.js && rimraf src/**/*.js.map && rimraf test/resources/ts/**/*.js && rimraf test/resources/ts/**/*.js.map",
