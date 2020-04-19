@@ -9,7 +9,7 @@ import path = require("path");
 
 const preconditions = require("preconditions").instance();
 const checkArgument = preconditions.checkArgument;
-
+const logger = require("log4js").getLogger();
 
 export class StructureMapPackageBuilder {
     public static readonly LANGUAGE_EXTENSION_POINT = "module-structure:language";
@@ -29,9 +29,14 @@ export class StructureMapPackageBuilder {
         this.dependencyProviders = <Map<string, StructureMapLanguageProvider>>
             extensionRegistry.getExtensions(StructureMapPackageBuilder.LANGUAGE_EXTENSION_POINT);
 
+        let extensionsString = "";
         for (let extension in this.dependencyProviders) {
+            extensionsString += extensionsString.length > 0 ? ", " : "";
             this.supportedExtensions.push("." + extension);
+            extensionsString += "." + extension;
         }
+
+        logger.info("Supported extensions: " + extensionsString);
 
         this.moduleBuilder = new StructureMapModuleBuilder(this.dependencyProviders);
     }
@@ -102,7 +107,7 @@ export class StructureMapPackageBuilder {
     private getSubDirectories(dir: string): string[] {
         return fs.readdirSync(dir)
             .map(file => path.join(dir, file))
-            .filter(path => fs.statSync(path).isDirectory());
+            .filter(currentPath => fs.statSync(currentPath).isDirectory());
     }
 
     private buildModules(dir: string, packageName: string): Array<StructureMapModule> {

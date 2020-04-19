@@ -75,6 +75,9 @@ function buildConfiguration(options: any): void {
 
     config = new ModuleStructureConfiguration(options);
     config.debug = installedPath.length === 0;
+    if (config.rootDir && !path.isAbsolute(config.rootDir)) {
+        config.rootDir = path.join(process.cwd(), config.rootDir);
+    }
 }
 
 function getInstalledPath(): string {

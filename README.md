@@ -37,7 +37,7 @@ Generated LSMs can be rendered in your browser or exported as JSON files.
 
 The Diagram Viewer is automatically started in your default browser if invoked without outFile argument (see CLI/API documentation below).
 
-There's no UI like a toolbar or context menu yet (maybe coming for version 2.0).
+There's no UI like a toolbar or context menu.
 
 But for now, it's already possible to influence display of dependencies with the following keyboard shortcuts:
 
@@ -47,10 +47,12 @@ But for now, it's already possible to influence display of dependencies with the
 | Alt+D       | Show all dependencies (default)          |
 | Alt+S       | Show dependencies on selected nodes      |
 | Alt+B       | Show dependencies between selected nodes |
+| Alt and +   | Expand all nodes                         |
+| Alt and -   | Collapse all nodes                       |
 
 ## Prerequisites
 
-Requires a recent Node.js installation (8.x).
+Requires a recent Node.js installation (>= 10.x).
 
 ## CLI 
 
@@ -206,8 +208,6 @@ let model = moduleStructure({rootDir: "/path/to/some/codebase"});
 
 ## Extensibility
 
-Important note: extension-point support is currently in alpha status. API may change in upcoming versions.
-
 module-structue provides support for custom languages by means of plugin extensions. Each plugin is a node module complete with a 
 package.json file. It need not actually be in npm, it can be a simple folder and made availabe via `npm link`. At startup, module-structure
 scans and loads plugins that implement known extension-points. At the time of this writing, there's only one extension-point for providing 
@@ -264,7 +264,7 @@ module.exports = function() {
 
 ### Further Examples
 
-Support for JavaScript, TypeScript, HTML Imports and even C++ is provided via plugins, so there already exist some working examples written in 
+Support for JavaScript, TypeScript, Vue.js and even C++ is provided via plugins, so there already exist some working examples written in 
 JavaScript and TypeScript, too. 
 
 You can find them here:
@@ -272,8 +272,9 @@ You can find them here:
 <ul>
     <li><a href="https://github.com/rfruesmer/module-structure-lang-js">module-structure-lang-js</a></li>
     <li><a href="https://github.com/rfruesmer/module-structure-lang-ts">module-structure-lang-ts</a></li>
-    <li><a href="https://github.com/rfruesmer/module-structure-lang-html">module-structure-lang-html</a></li>
+    <li><a href="https://github.com/ttskp/module-structure-lang-vue">module-structure-lang-vue</a></li>
     <li><a href="https://github.com/linternator/module-structure-lang-cpp">module-structure-lang-cpp</a></li>
+    <li><a href="https://github.com/rfruesmer/module-structure-lang-html">module-structure-lang-html</a> (deprecated)</li>
 </ul>
 
 ## Credits

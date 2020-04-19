@@ -240,12 +240,12 @@ export class StructureView implements StructureViewObjectListener {
 
         let visibleLeafs: Array<StructureViewNode> = [];
         node.rows.forEach(row =>
-            row.nodes.forEach(node => {
-                if (!node.expanded) {
-                    visibleLeafs.push(node);
+            row.nodes.forEach(currentNode => {
+                if (!currentNode.expanded) {
+                    visibleLeafs.push(currentNode);
                 }
                 else {
-                    visibleLeafs.push.apply(visibleLeafs, this.getVisibleLeafs(node));
+                    visibleLeafs.push.apply(visibleLeafs, this.getVisibleLeafs(currentNode));
                 }
             }));
 
@@ -509,7 +509,7 @@ export class StructureView implements StructureViewObjectListener {
     }
 
     private setSelection(node: StructureViewNode) {
-        this.selectionService.getSelection().forEach(node => node.selected = false);
+        this.selectionService.getSelection().forEach(currentNode => currentNode.selected = false);
         this.selectionService.setSelection([node]);
         node.selected = true;
     }
@@ -526,6 +526,12 @@ export class StructureView implements StructureViewObjectListener {
         else if (event.key === "b" && event.altKey) {
             this.showDependenciesBetweenSelected();
             this.stopPropagation(event);
+        }
+        else if (event.key === "+" && event.altKey) {
+            this.expandAll(this.rootNode);
+        }
+        else if (event.key === "-" && event.altKey) {
+            this.collapseAll(this.rootNode);
         }
     }
 
@@ -666,6 +672,23 @@ export class StructureView implements StructureViewObjectListener {
 
         this.filterDependencies();
         this.updateDependencyArrows();
+    }
+
+    private expandAll(node: StructureViewNode): void {
+        node.expand();
+        node.rows.forEach(row =>
+            row.nodes.forEach(childNode =>
+                this.expandAll(childNode)));
+    }
+
+    private collapseAll(node: StructureViewNode) {
+        node.rows.forEach(row =>
+            row.nodes.forEach(childNode =>
+                this.collapseAll(childNode)));
+
+        if (node !== this.rootNode) {
+            node.collapse();
+        }
     }
 }
 

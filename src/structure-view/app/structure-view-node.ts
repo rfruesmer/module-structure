@@ -128,11 +128,6 @@ export class StructureViewNode extends StructureViewObject implements StructureV
     }
 
     public toggle(): void {
-        if (!this.model.isGroup
-            || this.model.rows.length === 0) {
-            return;
-        }
-
         if (!this.expanded) {
             this.expand();
         }
@@ -142,6 +137,11 @@ export class StructureViewNode extends StructureViewObject implements StructureV
     }
 
     public expand(): void {
+        if (!this.model.isGroup
+                || this.model.rows.length === 0) {
+            return;
+        }
+
         this.expanded = true;
 
         this.lazyCreateRows();
@@ -222,6 +222,11 @@ export class StructureViewNode extends StructureViewObject implements StructureV
     }
 
     public collapse(): void {
+        if (!this.model.isGroup
+                || this.model.rows.length === 0) {
+            return;
+        }
+
         this.expanded = false;
 
         this.displayRows(false);
