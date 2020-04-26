@@ -2,6 +2,6 @@ sudo: false
 language: node_js
 node_js: 10
 install:
-    - npm i -g module-structure-lang-js module-structure-lang-ts
+    - npm i module-structure-lang-js module-structure-lang-ts
     - npm install
 
