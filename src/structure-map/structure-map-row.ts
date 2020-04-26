@@ -146,4 +146,25 @@ export class StructureMapRow {
             return 0;
         });
     }
+
+    public getEntitiesIndependentFrom(entity: StructureMapEntity): Array<StructureMapEntity> {
+        const dependencies = this._dependencyMap[entity.name];
+        if (!dependencies) {
+            return [];
+        }
+
+        let independentEntities = new Array<StructureMapEntity>();
+        independentEntities.push.apply(independentEntities, this.entities);
+        independentEntities = independentEntities.filter(currentEntity => {
+            for (let i = 0; i < dependencies.length; ++i) {
+                if (currentEntity.name === dependencies[i]) {
+                    return false;
+                }
+            }
+
+            return true;
+        });
+
+        return independentEntities;
+    }
 }

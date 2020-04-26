@@ -1,5 +1,5 @@
-
 import {StructureMapPackage} from "./structure-map-package";
+
 export abstract class StructureMapEntity {
     private _path: string;
     private _name: string;
@@ -41,7 +41,7 @@ export abstract class StructureMapEntity {
 
         this._dependencies.push(entity);
 
-        if (this._parent && entity.parent.name.indexOf(this._parent.name) !== 0) {
+        if (this._parent) {
             this._parent.addDependency(entity);
         }
     }

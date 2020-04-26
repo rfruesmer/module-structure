@@ -3,7 +3,6 @@ import {StructureMapPackage} from "./structure-map-package";
 import {StructureMapModule} from "./structure-map-module";
 import {ExtensionRegistry} from "./extension-registry";
 import {StructureMapLanguageProvider} from "./structure-map-language-provider";
-
 import fs = require("fs");
 import path = require("path");
 

@@ -1,10 +1,8 @@
 import {StructureMapPackageBuilder} from "./structure-map-package-builder";
 import {StructureMapPackage} from "./structure-map-package";
-
-import fs = require("fs");
-import path = require("path");
 import {StructureMapModule} from "./structure-map-module";
 import {ExtensionRegistry} from "./extension-registry";
+import path = require("path");
 
 const preconditions = require("preconditions").instance();
 const checkArgument = preconditions.checkArgument;

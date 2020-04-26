@@ -4,7 +4,6 @@ import {StructureMapPackage} from "./structure-map/structure-map-package";
 import {StructureViewModel} from "./structure-view-model/structure-view-model";
 import {StructureViewModelBuilder} from "./structure-map/structure-view-model-builder";
 import {ExtensionRegistry} from "./structure-map/extension-registry";
-
 import fs = require("fs-extra");
 import path = require("path");
 import process = require("process");

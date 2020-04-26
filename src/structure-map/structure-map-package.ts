@@ -34,6 +34,10 @@ export class StructureMapPackage extends StructureMapEntity {
         });
         this.modules.forEach(module => this.levelizeEntity(module));
         this.finalizeRows();
+        this.relevelizeEntitiesWithoutDependenciesFromRowAbove();
+        this.relevelizeEntitiesWithoutDependenciesToRowBelow();
+        this.relevelizeEntitiesByRowSplitting();
+        this.finalizeRows();
     }
 
     private levelizeEntity(entity: StructureMapEntity, relevelizing = false): void {
@@ -50,7 +54,7 @@ export class StructureMapPackage extends StructureMapEntity {
             dependenciesToRow = row.getDependencyCountFrom(entity);
 
             if (dependenciesToEntity > dependenciesToRow) {
-                if (i === this._rows.length - 1) {
+                if (this.isLastRow(i)) {
                     this.insertEntityIntoNewRowBelow(entity, i);
                     insertPos = i;
                 }
@@ -92,11 +96,18 @@ export class StructureMapPackage extends StructureMapEntity {
         }
     }
 
+    private isLastRow(rowIndex: number) {
+        return rowIndex === this._rows.length - 1;
+    }
+
     private insertEntityIntoNewRowBelow(entity: StructureMapEntity, rowIndex: number) {
-        let newRow = new StructureMapRow(this);
-        this._rows.splice(rowIndex + 1, 0, newRow);
+        this.createNewRow(rowIndex + 1);
         this.insertEntityIntoRow(entity, rowIndex + 1);
-        return newRow;
+    }
+
+    private createNewRow(rowIndex: number) {
+        let newRow = new StructureMapRow(this);
+        this._rows.splice(rowIndex, 0, newRow);
     }
 
     private insertEntityIntoRow(entity: StructureMapEntity, rowIndex: number) {
@@ -180,9 +191,6 @@ export class StructureMapPackage extends StructureMapEntity {
         let restart = false;
 
         row.entities.forEach(entity => {
-            if (entity.simpleName === "preconditions.ts") {
-                console.log("hier?");
-            }
             let dependenciesToEntity = rowAbove.getDependencyCountTo(entity);
             let dependenciesToRow = rowAbove.getDependencyCountFrom(entity);
             if (dependenciesToEntity === 0 && dependenciesToRow === 0) {
@@ -221,5 +229,96 @@ export class StructureMapPackage extends StructureMapEntity {
 
     get rows(): Array<StructureMapRow> {
         return this._rows.slice();
+    }
+
+    private relevelizeEntitiesByRowSplitting() {
+        for (let i = this._rows.length - 1; i > 0; --i) {
+            const currentRow = this._rows[i];
+            let rowWasSplit = false;
+            for (let j = i - 1; j >= 0; --j) {
+                const rowAbove = this._rows[j];
+
+                rowAbove.entities.forEach(entity => {
+                    if (currentRow.entities.length === 1
+                            || currentRow.getDependencyCountTo(entity) < currentRow.getDependencyCountFrom(entity)) {
+                        return;
+                    }
+
+                    const independentEntites = currentRow.getEntitiesIndependentFrom(entity);
+                    if (independentEntites.length === 0) {
+                        return;
+                    }
+
+                    if (!rowWasSplit) {
+                        this.createNewRow(i + 1);
+                        this.createNewRow(i + 2);
+                        rowWasSplit = true;
+                    }
+
+                    // move entity into new row below current row
+                    rowAbove.remove(entity);
+                    this.insertEntityIntoRow(entity, i + 1);
+
+                    // remove undependent entities from row
+                    independentEntites.forEach(undependentEntity => {
+                        currentRow.remove(undependentEntity);
+                    });
+
+                    // insert undependent entities into new row below
+                    independentEntites.forEach(undependentEntity => {
+                        this._rows[i + 2].insert(undependentEntity);
+                    });
+
+                    this._rows[i + 2].sort();
+                });
+            }
+        }
+    }
+
+    private relevelizeEntitiesWithoutDependenciesFromRowAbove() {
+        for (let i = this._rows.length - 1; i > 0; --i) {
+            let restart = false;
+
+            const currentRow = this._rows[i];
+            const rowAbove = this._rows[i - 1];
+
+            for (let j = 0; j < currentRow.entities.length; ++j) {
+                const currentEntity = currentRow.entities[j];
+                if (rowAbove.getDependencyCountTo(currentEntity) === 0) {
+                    currentRow.remove(currentEntity);
+                    this.levelizeEntity(currentEntity, true);
+                    restart = true;
+                    break;
+                }
+            }
+
+            if (restart) {
+                i = this._rows.length - 1;
+            }
+        }
+    }
+
+    private relevelizeEntitiesWithoutDependenciesToRowBelow() {
+        for (let i = 0; i < this._rows.length - 1; ++i) {
+            let restart = false;
+
+            const currentRow = this._rows[i];
+            const rowBelow = this._rows[i + 1];
+
+            for (let j = 0; j < currentRow.entities.length; ++j) {
+                const currentEntity = currentRow.entities[j];
+                if (rowBelow.getDependencyCountFrom(currentEntity) === 0
+                        && rowBelow.getDependencyCountTo(currentEntity) > 0) {
+                    currentRow.remove(currentEntity);
+                    this.levelizeEntity(currentEntity, true);
+                    restart = true;
+                    break;
+                }
+            }
+
+            if (restart) {
+                i = this._rows.length - 1;
+            }
+        }
     }
 }

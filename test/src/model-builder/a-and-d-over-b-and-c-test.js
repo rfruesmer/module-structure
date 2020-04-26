@@ -38,15 +38,32 @@ describe("a-and-d-over-b-and-c", function() {
                 expectPackageNodeToEqual(test.viewModel.root, "a-and-d-over-b-and-c", "a-and-d-over-b-and-c");
             });
 
-            it("root contains two rows", function() {
-                expectRootRowCountToEqual(test.viewModel, 2);
+            it("root contains four rows", function() {
+                expectRootRowCountToEqual(test.viewModel, 4);
             });
 
-            it("package-a and package-d should be in first row", function() {
+            it("package-a is in row one", function() {
                 const row = test.viewModel.root.rows[0];
-                expectRowNodesCountToEqual(row, 2);
+                expectRowNodesCountToEqual(row, 1);
                 expectRowContainsPackage(row, "a-and-d-over-b-and-c.package-a", "package-a");
+            });
+
+            it("package-c is in row two", function() {
+                const row = test.viewModel.root.rows[1];
+                expectRowNodesCountToEqual(row, 1);
+                expectRowContainsPackage(row, "a-and-d-over-b-and-c.package-c", "package-c");
+            });
+
+            it("package-d is in row three", function() {
+                const row = test.viewModel.root.rows[2];
+                expectRowNodesCountToEqual(row, 1);
                 expectRowContainsPackage(row, "a-and-d-over-b-and-c.package-d", "package-d");
+            });
+
+            it("package-b is in row four", function() {
+                const row = test.viewModel.root.rows[3];
+                expectRowNodesCountToEqual(row, 1);
+                expectRowContainsPackage(row, "a-and-d-over-b-and-c.package-b", "package-b");
             });
 
             it("package-a should contain module-a", function() {
@@ -54,18 +71,11 @@ describe("a-and-d-over-b-and-c", function() {
             });
 
             it("package-d should contain module-d", function() {
-                expectPackageContainsSingleModule(test.viewModel, "a-and-d-over-b-and-c.package-d", 0, "module-d" + test.extension);
-            });
-
-            it("package-b and package-c should be in second row", function() {
-                const row = test.viewModel.root.rows[1];
-                expectRowNodesCountToEqual(row, 2);
-                expectRowContainsPackage(row, "a-and-d-over-b-and-c.package-b", "package-b");
-                expectRowContainsPackage(row, "a-and-d-over-b-and-c.package-c", "package-c");
+                expectPackageContainsSingleModule(test.viewModel, "a-and-d-over-b-and-c.package-d", 2, "module-d" + test.extension);
             });
 
             it("package-b should contain module-b", function() {
-                expectPackageContainsSingleModule(test.viewModel, "a-and-d-over-b-and-c.package-b", 1, "module-b" + test.extension);
+                expectPackageContainsSingleModule(test.viewModel, "a-and-d-over-b-and-c.package-b", 3, "module-b" + test.extension);
             });
 
             it("package-c should contain module-c", function() {
@@ -96,13 +106,8 @@ describe("a-and-d-over-b-and-c", function() {
                     "a-and-d-over-b-and-c.package-b.module-b" + test.extension);
             });
 
-            it("contains one feedback", function() {
-                expectFeedbackCountToEqual(test.viewModel, 1);
-            });
-
-            it("contains feedback from module-c to module-d", function() {
-                expectContainsFeedback(test.viewModel, "a-and-d-over-b-and-c.package-c.module-c" + test.extension,
-                    "a-and-d-over-b-and-c.package-d.module-d" + test.extension);
+            it("contains no feedbacks", function() {
+                expectFeedbackCountToEqual(test.viewModel, 0);
             });
         });
     });
